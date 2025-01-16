@@ -1,0 +1,45 @@
+import 'package:flutter/material.dart';
+
+class CustomTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String hintText;
+  final bool obscureText;
+  final Function()? onIconPressed;
+  final bool isPassword; // Indicador para saber si es un campo de contraseña
+
+  const CustomTextField({super.key, 
+    required this.controller,
+    required this.hintText,
+    this.obscureText = false,
+    this.onIconPressed,
+    required this.isPassword, // Se espera un valor para isPassword
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        hintText: hintText,
+        filled: true,
+        fillColor: Colors.grey[100],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(5),
+          borderSide: BorderSide.none,
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        // Agregar el sufijo solo si es un campo de contraseña
+        suffixIcon: isPassword
+            ? IconButton(
+                icon: Icon(
+                  obscureText ? Icons.visibility : Icons.visibility_off,
+                  color: Colors.grey,
+                ),
+                onPressed: onIconPressed, // Llama a la función de toggling
+              )
+            : null, // No se agrega ningún sufijo si no es un campo de contraseña
+      ),
+    );
+  }
+}
