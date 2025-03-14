@@ -4,12 +4,102 @@ import 'package:truelovesocio/model/category_model.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:truelovesocio/model/menu_model.dart';
+import 'package:truelovesocio/models/pedido_model.dart';
+import 'package:truelovesocio/models/socio_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  final String baseUrl = 'https://magusemail.com/truelove-back/public/api';
+  static String baseUrl = 'https://magusemail.com/truelove-back/public/api';
+  // static const String baseUrl = 'http://192.168.100.2/truelove-back/public/api';
+
+  static Future<Socio?> login(String nroDocumento, String password) async {
+    final url = Uri.parse('$baseUrl/socio/login');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'usuario': nroDocumento, 'password': password}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        Socio socio = Socio.fromJson(data);
+        final prefs = await SharedPreferences.getInstance();
+        prefs.setString('socio', jsonEncode(data)); // Guardar como JSON
+
+        return socio;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
+  static Future<Socio?> getLoggedUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    final conductorJson = prefs.getString('socio');
+
+    if (conductorJson != null) {
+      final Map<String, dynamic> decodedData = jsonDecode(conductorJson);
+      return Socio.fromJson(decodedData);
+    }
+
+    return null;
+  }
+
+  static Future<int?> getUsuarioId() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final conductorJson = prefs.getString('socio');
+    if (conductorJson != null) {
+      final Map<String, dynamic> decodedData = jsonDecode(conductorJson);
+      Socio socio = Socio.fromJson(decodedData);
+      return socio.id;
+    }
+    return null;
+  }
+
+  Future<List<Pedido>> fetchPedidos() async {
+    final int? idBiker = await getUsuarioId();
+    final String apiUrl = '$baseUrl/socio/get/pedidos/$idBiker';
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final dynamic decodedResponse = json.decode(response.body);
+
+        // Verificar si la respuesta es una lista
+        if (decodedResponse is List) {
+          return decodedResponse
+              .map((pedido) => Pedido.fromJson(pedido))
+              .toList();
+        } else {
+          throw Exception('Formato inesperado de respuesta');
+        }
+      } else {
+        throw Exception('Error al cargar los pedidos');
+      }
+    } catch (error) {
+      throw Exception('Error al obtener los pedidos: $error');
+    }
+  }
+
+  Future<bool> actualizarEstado(int id, int estado) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/socio/update/estado/pedido/$id'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"estado": estado}),
+    );
+    if (response.statusCode == 200) {
+      return true; // Actualización exitosa
+    } else {
+      return false;
+    }
+  }
 
   Future<List<Category>> fetchCategories() async {
-    String id_empresa = "1";
+    String id_empresa = "2";
     final response = await http.get(
       Uri.parse('$baseUrl/categories/$id_empresa'),
     );
@@ -28,7 +118,7 @@ class ApiService {
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'nombre': name,
-        'empresa_id': 1, // Agregar el id_empresa como estático
+        'empresa_id': 2, // Agregar el id_empresa como estático
       }),
     );
 
@@ -43,7 +133,7 @@ class ApiService {
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'nombre': name,
-        'empresa_id': 1, // Agregar el id_empresa como estático
+        'empresa_id': 2, // Agregar el id_empresa como estático
       }),
     );
 
@@ -53,7 +143,7 @@ class ApiService {
   }
 
   Future<void> deleteCategory(int id) async {
-    String empresa_id = "1";
+    String empresa_id = "2";
     final response = await http.delete(
       Uri.parse('$baseUrl/categorias/$id/$empresa_id'),
     );
@@ -81,7 +171,7 @@ class ApiService {
           ..fields['precio'] = precio.toString()
           ..fields['status'] = status
           ..fields['categoria_id'] = categoriaId.toString()
-          ..fields['empresa_id'] = '1'; // Id de la empresa
+          ..fields['empresa_id'] = '2'; // Id de la empresa
 
     // Agregar la imagen al cuerpo de la solicitud
     var file = await http.MultipartFile.fromPath(
@@ -107,7 +197,7 @@ class ApiService {
   }
 
   Future<List<Menu>> fetchMenu() async {
-    String idEmpresa = "1"; // ID de la empresa
+    String idEmpresa = "2"; // ID de la empresa
     final response = await http.get(
       Uri.parse('$baseUrl/listar/menus/$idEmpresa'),
     );

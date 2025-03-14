@@ -3,7 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart'; // Importa el paquete SpinKit
 import 'package:truelovesocio/components/custom_text_field.dart';
+import 'package:truelovesocio/models/socio_model.dart';
 import 'package:truelovesocio/screen/home_screen.dart';
+import 'package:truelovesocio/service/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -28,7 +30,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _updateButtonState() {
     setState(() {
-      isButtonActive = _emailController.text.isNotEmpty &&
+      isButtonActive =
+          _emailController.text.isNotEmpty &&
           _passwordController.text.isNotEmpty;
     });
   }
@@ -40,23 +43,28 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  // Simula la lógica de inicio de sesión
   void _login() async {
-    setState(() {
-      _isLoading = true; // Activar el cargador
-    });
+    setState(() => _isLoading = true);
 
-    await Future.delayed(const Duration(seconds: 2)); // Esperar 2 segundos
+    String user = _emailController.text.trim();
+    String password = _passwordController.text.trim();
 
-    setState(() {
-      _isLoading = false; // Desactivar el cargador después del delay
-    });
+    Socio? conductor = await ApiService.login(user, password);
 
-    // Redireccionar a la nueva pantalla (ejemplo: HomeScreen)
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
-    );
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    if (conductor != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Credenciales incorrectas")));
+    }
   }
 
   @override
@@ -88,8 +96,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.red,
                       borderRadius: BorderRadius.circular(5),
@@ -190,9 +200,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: isButtonActive && !_isLoading
-                            ? _login // Llamamos a la función de login
-                            : null,
+                        onPressed:
+                            isButtonActive && !_isLoading
+                                ? _login // Llamamos a la función de login
+                                : null,
                         style: ElevatedButton.styleFrom(
                           foregroundColor:
                               isButtonActive ? Colors.white : Colors.grey,
@@ -203,19 +214,20 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(5),
                           ),
                         ),
-                        child: _isLoading
-                            ? const SpinKitCircle(
-                                // Mostramos el SpinKit si está cargando
-                                color: Colors.white,
-                                size: 30.0,
-                              )
-                            : const Text(
-                                'Iniciar sesión',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                        child:
+                            _isLoading
+                                ? const SpinKitCircle(
+                                  // Mostramos el SpinKit si está cargando
+                                  color: Colors.white,
+                                  size: 30.0,
+                                )
+                                : const Text(
+                                  'Iniciar sesión',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              ),
                       ),
                     ),
                   ],

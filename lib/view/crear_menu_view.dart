@@ -119,104 +119,106 @@ class _CrearMenuViewState extends State<CrearMenuView> {
         child:
             isLoadingCategories
                 ? const Center(child: CircularProgressIndicator())
-                : Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextField(
-                      controller: _tituloController,
-                      decoration: const InputDecoration(
-                        labelText: 'Título',
-                        border: OutlineInputBorder(),
-                        icon: Icon(Icons.title),
+                : SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextField(
+                        controller: _tituloController,
+                        decoration: const InputDecoration(
+                          labelText: 'Título',
+                          border: OutlineInputBorder(),
+                          icon: Icon(Icons.title),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: _descripcionController,
-                      decoration: const InputDecoration(
-                        labelText: 'Descripción',
-                        border: OutlineInputBorder(),
-                        icon: Icon(Icons.description),
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _descripcionController,
+                        decoration: const InputDecoration(
+                          labelText: 'Descripción',
+                          border: OutlineInputBorder(),
+                          icon: Icon(Icons.description),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    TextField(
-                      controller: _precioController,
-                      keyboardType: TextInputType.numberWithOptions(
-                        decimal: true,
+                      const SizedBox(height: 10),
+                      TextField(
+                        controller: _precioController,
+                        keyboardType: TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        // inputFormatters: [
+                        //   // Restringir el precio a solo decimales
+                        //   FilteringTextInputFormatter.allow(RegExp(r'^\d+(\.\d{0,2})?')),
+                        // ],
+                        decoration: const InputDecoration(
+                          labelText: 'Precio',
+                          border: OutlineInputBorder(),
+                          icon: Icon(Icons.attach_money),
+                        ),
                       ),
-                      // inputFormatters: [
-                      //   // Restringir el precio a solo decimales
-                      //   FilteringTextInputFormatter.allow(RegExp(r'^\d+(\.\d{0,2})?')),
-                      // ],
-                      decoration: const InputDecoration(
-                        labelText: 'Precio',
-                        border: OutlineInputBorder(),
-                        icon: Icon(Icons.attach_money),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    GestureDetector(
-                      onTap: _pickImage,
-                      child: AbsorbPointer(
-                        child: TextField(
-                          controller: _fotoController,
-                          decoration: const InputDecoration(
-                            labelText: 'Foto (URL o Seleccionar Imagen)',
-                            border: OutlineInputBorder(),
-                            icon: Icon(Icons.image),
+                      const SizedBox(height: 10),
+                      GestureDetector(
+                        onTap: _pickImage,
+                        child: AbsorbPointer(
+                          child: TextField(
+                            controller: _fotoController,
+                            decoration: const InputDecoration(
+                              labelText: 'Foto (URL o Seleccionar Imagen)',
+                              border: OutlineInputBorder(),
+                              icon: Icon(Icons.image),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    DropdownButton<String>(
-                      value: _status,
-                      onChanged: (value) {
-                        setState(() {
-                          _status = value!;
-                        });
-                      },
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'active',
-                          child: Text('Activo'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'inactive',
-                          child: Text('Inactivo'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'out-of-stock',
-                          child: Text('Agotado'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    DropdownButton<int>(
-                      value: selectedCategoryId,
-                      hint: const Text('Seleccionar Categoría'),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedCategoryId = value;
-                        });
-                      },
-                      items:
-                          categories
-                              .map(
-                                (category) => DropdownMenuItem<int>(
-                                  value: category.id,
-                                  child: Text(category.name),
-                                ),
-                              )
-                              .toList(),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: _crearMenu,
-                      child: const Text('Crear Menú'),
-                    ),
-                  ],
+                      const SizedBox(height: 10),
+                      DropdownButton<String>(
+                        value: _status,
+                        onChanged: (value) {
+                          setState(() {
+                            _status = value!;
+                          });
+                        },
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'active',
+                            child: Text('Activo'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'inactive',
+                            child: Text('Inactivo'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'out-of-stock',
+                            child: Text('Agotado'),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      DropdownButton<int>(
+                        value: selectedCategoryId,
+                        hint: const Text('Seleccionar Categoría'),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedCategoryId = value;
+                          });
+                        },
+                        items:
+                            categories
+                                .map(
+                                  (category) => DropdownMenuItem<int>(
+                                    value: category.id,
+                                    child: Text(category.name),
+                                  ),
+                                )
+                                .toList(),
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: _crearMenu,
+                        child: const Text('Crear Menú'),
+                      ),
+                    ],
+                  ),
                 ),
       ),
     );

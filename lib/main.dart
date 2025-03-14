@@ -1,27 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:truelovesocio/models/socio_model.dart';
 import 'package:truelovesocio/screen/home_screen.dart';
 import 'package:truelovesocio/screen/screens.dart';
+import 'package:truelovesocio/service/api_service.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  Socio? user = await ApiService.getLoggedUser();
+  bool loggedIn = user != null;
+  runApp(MyApp(isLoggedIn: loggedIn));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+  const MyApp({super.key, required this.isLoggedIn});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Delivery True Love',
-      // theme: ThemeData(
-      //   primarySwatch: Colors.red,
-      // ),
       initialRoute: '/',
       routes: {
-        '/': (context) => const HomeScreen(),
-        // '/login': (context) =>
-        //     const LoginScreen(),
+        '/': (context) => const SplashScreen(),
+        '/login': (context) => isLoggedIn ? HomeScreen() : LoginScreen(),
       },
     );
   }

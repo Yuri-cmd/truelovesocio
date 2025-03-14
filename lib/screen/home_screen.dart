@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import "package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart";
 import 'package:truelovesocio/components/components.dart';
+import 'package:truelovesocio/screen/pedido_screen.dart';
 import 'package:truelovesocio/theme/app_theme.dart';
 import 'package:truelovesocio/view/views.dart';
 
@@ -31,8 +32,7 @@ class HomeScreen extends StatelessWidget {
       body: PersistentTabView(
         context,
         screens: [
-          // Pantalla principal
-          _buildScreen('Home', Colors.blue),
+          const PedidosView(),
           // Otra pantalla
           _buildScreen('Home', Colors.blue),
           const MenuView(),
