@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:truelovesocio/models/socio_model.dart';
+import 'package:truelovesocio/model/socio_model.dart';
 import 'package:truelovesocio/screen/home_screen.dart';
 import 'package:truelovesocio/screen/screens.dart';
 import 'package:truelovesocio/service/api_service.dart';

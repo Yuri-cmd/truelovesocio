@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart'; // Importa el paquete SpinKit
 import 'package:truelovesocio/components/custom_text_field.dart';
-import 'package:truelovesocio/models/socio_model.dart';
+import 'package:truelovesocio/model/socio_model.dart';
 import 'package:truelovesocio/screen/home_screen.dart';
 import 'package:truelovesocio/service/api_service.dart';
 

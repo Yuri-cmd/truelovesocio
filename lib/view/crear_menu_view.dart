@@ -4,10 +4,10 @@ import 'package:truelovesocio/service/api_service.dart';
 import 'package:truelovesocio/model/category_model.dart';
 
 class CrearMenuView extends StatefulWidget {
-  const CrearMenuView({Key? key}) : super(key: key);
+  const CrearMenuView({super.key});
 
   @override
-  _CrearMenuViewState createState() => _CrearMenuViewState();
+  State<CrearMenuView> createState() => _CrearMenuViewState();
 }
 
 class _CrearMenuViewState extends State<CrearMenuView> {
@@ -44,6 +44,7 @@ class _CrearMenuViewState extends State<CrearMenuView> {
       setState(() {
         isLoadingCategories = false;
       });
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al cargar las categorías: $e')),
       );
@@ -92,6 +93,7 @@ class _CrearMenuViewState extends State<CrearMenuView> {
         _status,
         selectedCategoryId!,
       );
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Menú creado correctamente')),
       );

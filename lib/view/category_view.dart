@@ -3,10 +3,10 @@ import 'package:truelovesocio/service/api_service.dart';
 import 'package:truelovesocio/model/category_model.dart';
 
 class CategoryView extends StatefulWidget {
-  const CategoryView({Key? key}) : super(key: key);
+  const CategoryView({super.key});
 
   @override
-  _CategoryViewState createState() => _CategoryViewState();
+  State<CategoryView> createState() => _CategoryViewState();
 }
 
 class _CategoryViewState extends State<CategoryView> {
@@ -34,6 +34,7 @@ class _CategoryViewState extends State<CategoryView> {
       setState(() {
         isLoading = false;
       });
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al cargar las categorías: $e')),
       );
@@ -48,6 +49,8 @@ class _CategoryViewState extends State<CategoryView> {
         _categoryController.clear();
         _loadCategories(); // Recargar las categorías después de agregar una nueva
       } catch (e) {
+        if (!mounted) return;
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error al crear la categoría: $e')),
         );
@@ -61,6 +64,7 @@ class _CategoryViewState extends State<CategoryView> {
       await _apiService.deleteCategory(id);
       _loadCategories(); // Recargar las categorías después de eliminar una
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error al eliminar la categoría: $e')),
       );
@@ -145,6 +149,7 @@ class _CategoryViewState extends State<CategoryView> {
         _categoryController.clear();
         _loadCategories(); // Recargar las categorías después de la actualización
       } catch (e) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error al actualizar la categoría: $e')),
         );

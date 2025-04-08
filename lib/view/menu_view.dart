@@ -9,7 +9,7 @@ class MenuView extends StatefulWidget {
   const MenuView({super.key});
 
   @override
-  _MenuViewState createState() => _MenuViewState();
+  State<MenuView> createState() => _MenuViewState();
 }
 
 class _MenuViewState extends State<MenuView> {
@@ -28,6 +28,7 @@ class _MenuViewState extends State<MenuView> {
           });
         })
         .catchError((e) {
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error al cargar los menús: $e')),
           );
@@ -42,11 +43,13 @@ class _MenuViewState extends State<MenuView> {
           setState(() {
             dish.status = isActive ? 'active' : 'inactive';
           });
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Estado del platillo actualizado')),
           );
         })
         .catchError((e) {
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error al actualizar el estado: $e')),
           );
@@ -194,6 +197,7 @@ class _MenuViewState extends State<MenuView> {
                                   setState(() {
                                     dishes = menus;
                                   });
+                                  
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text('Menú actualizado'),

@@ -10,8 +10,8 @@ class Socio {
   final String verificationCode;
   final String? emailVerifiedAt;
   final int estado;
-  final String createdAt;
-  final String updatedAt;
+  final String? createdAt;
+  final String? updatedAt;
   final int userId;
   final bool aprobado;
 
@@ -35,21 +35,22 @@ class Socio {
 
   factory Socio.fromJson(Map<String, dynamic> json) {
     return Socio(
-      id: json['socio']['id'],
-      documentType: json['socio']['documentType'],
-      documentNumber: json['socio']['documentNumber'],
-      name: json['socio']['name'],
-      lastName: json['socio']['lastName'],
-      businessType: json['socio']['businessType'],
-      phone: json['socio']['phone'],
-      email: json['socio']['email'],
-      verificationCode: json['socio']['verification_code'],
-      emailVerifiedAt: json['socio']['email_verified_at'],
-      estado: json['socio']['estado'],
-      createdAt: json['socio']['created_at'],
-      updatedAt: json['socio']['updated_at'],
-      userId: json['socio']['user_id'],
-      aprobado: json['socio']['aprobado'],
+      id: json['id'],
+      documentType:
+          json['documentType'].toString(), // Convertir a String si es int
+      documentNumber: json['documentNumber'].toString(),
+      name: json['name'] ?? '',
+      lastName: json['lastName'] ?? '',
+      businessType: json['businessType'].toString(),
+      phone: json['phone'] ?? '',
+      email: json['email'] ?? '',
+      verificationCode: json['verification_code'] ?? '',
+      emailVerifiedAt: json['email_verified_at'],
+      estado: json['estado'] ?? 0,
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at'],
+      userId: json['user_id'] ?? 0,
+      aprobado: json['aprobado'] ?? false,
     );
   }
 

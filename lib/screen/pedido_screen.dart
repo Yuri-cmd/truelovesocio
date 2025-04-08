@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:truelovesocio/models/pedido_model.dart';
+import 'package:truelovesocio/model/pedido_model.dart';
 import 'package:truelovesocio/service/api_service.dart';
 import 'package:truelovesocio/theme/app_theme.dart';
 import 'package:truelovesocio/utils/helpers.dart';
@@ -40,7 +40,7 @@ class _PedidosViewState extends State<PedidosView> {
       await apiService.actualizarEstado(id, estado);
       loadPedidos();
     } catch (e) {
-      print('Error actualizando pedido: $e');
+      throw('Error actualizando pedido: $e');
     } finally {
       setState(() {
         _bloqueoBotones[id] =
@@ -83,7 +83,7 @@ class _PedidosViewState extends State<PedidosView> {
         pedidos = data;
       });
     } catch (e) {
-      print('Error cargando pedidos: $e');
+      throw('Error cargando pedidos: $e');
     }
   }
 
