@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:truelovesocio/model/pedido_model.dart';
+import 'package:truelovesocio/screen/seguimiento_pedido_screen.dart';
 import 'package:truelovesocio/service/api_service.dart';
 import 'package:truelovesocio/theme/app_theme.dart';
 import 'package:truelovesocio/utils/helpers.dart';
@@ -28,23 +29,85 @@ class _PedidosViewState extends State<PedidosView> {
     );
   }
 
-  Future<void> actualizarEstadoPedido(int id, int estado) async {
-    bool confirmar = await mostrarAlertaConfirmacion(estado);
-    if (!confirmar) return; // Si cancela, no hace nada
+  // Muestra un diálogo para ingresar el tiempo de preparación
+  Future<int?> _mostrarDialogoTiempo() async {
+    final TextEditingController controller = TextEditingController();
+    return showDialog<int>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Tiempo de preparación'),
+            content: TextField(
+              controller: controller,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Minutos estimados',
+                hintText: 'Ej: 20',
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(null),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  final String text = controller.text;
+                  final int? minutos = int.tryParse(text);
+                  Navigator.of(context).pop(minutos);
+                },
+                child: const Text('Aceptar'),
+              ),
+            ],
+          ),
+    );
+  }
 
+  Future<void> actualizarEstadoPedido(Pedido pedido, int nuevoEstado) async {
+    // Bloquear el botón
     setState(() {
-      _bloqueoBotones[id] = true; // Bloquea el botón
+      _bloqueoBotones[pedido.id] = true;
     });
 
     try {
-      await apiService.actualizarEstado(id, estado);
-      loadPedidos();
+      int? tiempoPrep;
+      final int estadoActual = int.parse(pedido.estado);
+      if (estadoActual == 1) {
+        // Si no está aceptado, pedir tiempo de preparación
+        tiempoPrep = await _mostrarDialogoTiempo();
+        if (tiempoPrep == null) {
+          // Usuario canceló diálogo
+          return;
+        }
+      }
+      if (estadoActual == 0 || estadoActual == 1) {
+        // Llamada API: actualizar estado y, si aplica, tiempo de preparación
+        await apiService.actualizarEstado(
+          pedido.id,
+          nuevoEstado,
+          tiempo: tiempoPrep ?? 0,
+        );
+      }
+      await loadPedidos();
+      // Si nuevoEstado es aceptado (1), navegar a seguimiento
+      if (nuevoEstado == 2 && context.mounted) {
+        if (tiempoPrep != null) {
+          pedido.tiempo = tiempoPrep;
+        }
+        if (!mounted) return;
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SeguimientoPedidoView(pedido: pedido),
+          ),
+        );
+      }
     } catch (e) {
-      throw('Error actualizando pedido: $e');
+      // showErrorSnackBar(context, 'Error: $e');
     } finally {
+      // Desbloquear el botón
       setState(() {
-        _bloqueoBotones[id] =
-            false; // Desbloquea el botón después de la petición
+        _bloqueoBotones[pedido.id] = false;
       });
     }
   }
@@ -83,7 +146,7 @@ class _PedidosViewState extends State<PedidosView> {
         pedidos = data;
       });
     } catch (e) {
-      throw('Error cargando pedidos: $e');
+      throw ('Error cargando pedidos: $e');
     }
   }
 
@@ -203,7 +266,7 @@ class _PedidosViewState extends State<PedidosView> {
                               const Icon(Icons.timer, color: Colors.orange),
                               const SizedBox(width: 8),
                               Text(
-                                '${pedido.tiempoEstimado} min',
+                                '${pedido.tiempo} min',
                                 style: const TextStyle(
                                   fontSize: 14,
                                   color: Colors.black87,
@@ -238,15 +301,13 @@ class _PedidosViewState extends State<PedidosView> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               // Botón Finalizar
-                              // Botón Finalizar
                               ElevatedButton.icon(
                                 onPressed:
                                     int.parse(pedido.estado) == 0 ||
-                                            int.parse(pedido.estado) == 2 ||
                                             _bloqueoBotones[pedido.id] == true
                                         ? null
                                         : () {
-                                          actualizarEstadoPedido(pedido.id, 2);
+                                          actualizarEstadoPedido(pedido, 2);
                                         },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.green,
@@ -256,7 +317,7 @@ class _PedidosViewState extends State<PedidosView> {
                                   color: Colors.white,
                                 ),
                                 label: const Text(
-                                  'Finalizar',
+                                  'Aceptar',
                                   style: TextStyle(color: Colors.white),
                                 ),
                               ),
@@ -266,10 +327,17 @@ class _PedidosViewState extends State<PedidosView> {
                                 onPressed:
                                     int.parse(pedido.estado) == 0 ||
                                             int.parse(pedido.estado) == 2 ||
+                                            int.parse(pedido.estado) == 3 ||
+                                            int.parse(pedido.estado) == 4 ||
+                                            int.parse(pedido.estado) == 5 ||
+                                            int.parse(pedido.estado) == 6 ||
+                                            int.parse(pedido.estado) == 7 ||
+                                            int.parse(pedido.estado) == 8 ||
+                                            int.parse(pedido.estado) == 9 ||
                                             _bloqueoBotones[pedido.id] == true
                                         ? null
                                         : () {
-                                          actualizarEstadoPedido(pedido.id, 0);
+                                          actualizarEstadoPedido(pedido, 0);
                                         },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.redAccent,

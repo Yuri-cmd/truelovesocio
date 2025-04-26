@@ -1,3 +1,5 @@
+import 'package:truelovesocio/model/detall_pedido_model.dart';
+
 class Pedido {
   final int id;
   final String local;
@@ -13,6 +15,10 @@ class Pedido {
   final String longitud;
   final String productos;
   final String estado;
+  final String motorizado;
+  final String celularMotorizado;
+  int tiempo;
+  final List<DetallePedido> detalleArray;
 
   Pedido({
     required this.id,
@@ -29,6 +35,10 @@ class Pedido {
     required this.longitud,
     required this.productos,
     required this.estado,
+    required this.detalleArray,
+    required this.tiempo,
+    required this.motorizado,
+    required this.celularMotorizado,
   });
 
   factory Pedido.fromJson(Map<String, dynamic> json) {
@@ -47,6 +57,14 @@ class Pedido {
       longitud: json['lon_local'] ?? '',
       productos: json['detalle'] ?? '',
       estado: json['ultimo_estado_tracking'] ?? '',
+      tiempo: json['tiempo'] ?? 0,
+      motorizado: json['motorizado'] ?? '',
+      celularMotorizado: json['celularMotorizado'] ?? '',
+      detalleArray:
+          (json['detalleArray'] as List<dynamic>?)
+              ?.map((item) => DetallePedido.fromJson(item))
+              .toList() ??
+          [],
     );
   }
 

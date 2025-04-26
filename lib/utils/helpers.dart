@@ -5,18 +5,20 @@ String obtenerEstado(int estado) {
     case 0:
       return 'Cancelado';
     case 1:
-      return 'Preparando pedido';
+      return 'Pendiente';
     case 2:
-      return 'Pedido listo';
+      return 'Preparando pedido';
     case 3:
-      return 'Motorizado aceptó';
+      return 'Pedido listo';
     case 4:
-      return 'Motorizado en restaurante';
+      return 'Motorizado aceptó';
     case 5:
-      return 'Motorizado en camino';
+      return 'Motorizado en restaurante';
     case 6:
-      return 'Motorizado llegó al domicilio';
+      return 'Motorizado en camino';
     case 7:
+      return 'Motorizado llegó al domicilio';
+    case 8:
       return 'Pedido entregado';
     default:
       return 'Desconocido';

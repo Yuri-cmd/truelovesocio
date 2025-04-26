@@ -13,9 +13,8 @@ import 'package:truelovesocio/model/socio_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static String baseUrl = 'https://magusemail.com/truelove-back/public/api';
-  // static const String baseUrl =
-  //     'http://192.168.100.50/truelove-back/public/api';
+  // static String baseUrl = 'https://magusemail.com/truelove-back/public/api';
+  static const String baseUrl = 'http://192.168.100.2/truelove-back/public/api';
 
   static Future<Socio?> login(String nroDocumento, String password) async {
     final url = Uri.parse('$baseUrl/socio/login');
@@ -95,11 +94,11 @@ class ApiService {
     }
   }
 
-  Future<bool> actualizarEstado(int id, int estado) async {
+  Future<bool> actualizarEstado(int id, int estado, {int tiempo = 0}) async {
     final response = await http.put(
       Uri.parse('$baseUrl/socio/update/estado/pedido/$id'),
       headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"estado": estado}),
+      body: jsonEncode({"estado": estado, "tiempo": tiempo}),
     );
     if (response.statusCode == 200) {
       return true; // Actualización exitosa
