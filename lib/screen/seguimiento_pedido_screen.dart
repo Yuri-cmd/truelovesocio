@@ -116,8 +116,19 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
           _buildTimelineButton(
             'Aceptada\nTiempo Estimado Prep: ${(widget.pedido.tiempo).toString()} min',
             false,
+            false,
           ),
-          _buildTimelineButton('Indicar orden como preparada', true),
+          ['3', '4', '5', '6', '7', '8'].contains(widget.pedido.estado)
+              ? _buildTimelineButton(
+                'Indicar orden como preparada',
+                false,
+                true,
+              )
+              : _buildTimelineButton(
+                'Indicar orden como preparada',
+                true,
+                false,
+              ),
         ],
       ),
     );
@@ -142,19 +153,25 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildTimelineButton('Indicar orden como preparada', true),
+        ['3', '4', '5', '6', '7', '8'].contains(widget.pedido.estado)
+            ? _buildTimelineButton('Indicar orden como preparada', false, true)
+            : _buildTimelineButton('Indicar orden como preparada', true, false),
         Icon(Icons.keyboard_arrow_down_sharp, color: Colors.grey),
-        _buildTimelineButton('Motorizado llegó al negocio', false),
+        ['5', '6', '7', '8'].contains(widget.pedido.estado)
+            ? _buildTimelineButton('Motorizado llegó al negocio', false, true)
+            : _buildTimelineButton('Motorizado llegó al negocio', true, false),
         Icon(Icons.keyboard_arrow_down_sharp, color: Colors.grey),
-        _buildTimelineButton('Motorizado está en camino', false),
+        ['6', '7', '8'].contains(widget.pedido.estado)
+            ? _buildTimelineButton('Motorizado está en camino', false, true)
+            : _buildTimelineButton('Motorizado está en camino', true, false),
       ],
     );
   }
 
-  Widget _buildTimelineButton(String label, bool isLast) {
+  Widget _buildTimelineButton(String label, bool isLast, bool isBlack) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: isLast ? Colors.black : Colors.white,
+        backgroundColor: isBlack ? Colors.black : Colors.white,
         side: const BorderSide(color: Colors.grey),
         minimumSize: const Size(double.infinity, 40),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -162,15 +179,18 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
       ),
       onPressed: () {
         if (isLast) {
-          print("estado: ${widget.pedido.estado}");
           if (widget.pedido.estado == '2') {
             actualizarEstadoPedido(widget.pedido.id, 3);
+          }
+
+          if (widget.pedido.estado == '4') {
+            actualizarEstadoPedido(widget.pedido.id, 5);
           }
         }
       },
       child: Text(
         label,
-        style: TextStyle(color: isLast ? Colors.white : Colors.black),
+        style: TextStyle(color: isBlack ? Colors.white : Colors.black),
         textAlign: TextAlign.center,
       ),
     );

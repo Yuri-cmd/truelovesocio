@@ -274,7 +274,23 @@ class _PedidosViewState extends State<PedidosView> {
                               ),
                             ],
                           ),
-
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.article_sharp,
+                                color: Colors.blue,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                pedido.nota,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
                           const SizedBox(height: 10),
 
                           // Productos
