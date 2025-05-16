@@ -13,8 +13,8 @@ import 'package:truelovesocio/model/socio_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  // static String baseUrl = 'https://magusemail.com/truelove-back/public/api';
-  static const String baseUrl = 'http://192.168.100.2/truelove-back/public/api';
+  static String baseUrl = 'https://magusemail.com/truelove-back/public/api';
+  // static const String baseUrl = 'http://192.168.100.2/truelove-back/public/api';
 
   static Future<Socio?> login(String nroDocumento, String password) async {
     final url = Uri.parse('$baseUrl/socio/login');
@@ -299,5 +299,34 @@ class ApiService {
     } else {
       throw Exception('Error al cargar los datos del rating');
     }
+  }
+
+  Future<bool> actualizarEstadoRepartidor(int activo) async {
+    try {
+      final int? usuarioId = await getUsuarioId();
+      final response = await http.post(
+        Uri.parse('$baseUrl/socio/estado'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'activo': activo, 'id': usuarioId}),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        print("Error status: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error actualizando estado: $e");
+    }
+
+    return false;
+  }
+
+  static Future<void> updateLoggedUser(Socio socio) async {
+    final prefs = await SharedPreferences.getInstance();
+    final socioJson = jsonEncode(
+      socio.toJson(),
+    ); // Asegúrate de tener `toJson()` implementado
+    await prefs.setString('socio', socioJson);
   }
 }

@@ -42,6 +42,9 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
     if (!confirmar) return;
     try {
       await apiService.actualizarEstado(id, estado);
+      setState(() {
+        widget.pedido.estado = estado.toString();
+      });
     } catch (e) {
       throw ('Error actualizando pedido: $e');
     }

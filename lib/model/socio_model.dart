@@ -14,6 +14,7 @@ class Socio {
   final String? updatedAt;
   final int userId;
   final bool aprobado;
+  int activo;
 
   Socio({
     required this.id,
@@ -31,6 +32,7 @@ class Socio {
     required this.updatedAt,
     required this.userId,
     required this.aprobado,
+    required this.activo,
   });
 
   factory Socio.fromJson(Map<String, dynamic> json) {
@@ -51,6 +53,7 @@ class Socio {
       updatedAt: json['updated_at'],
       userId: json['user_id'] ?? 0,
       aprobado: json['aprobado'] ?? false,
+      activo: json['activo'],
     );
   }
 
@@ -70,7 +73,7 @@ class Socio {
       'created_at': createdAt,
       'updated_at': updatedAt,
       'user_id': userId,
-      'aprobado': aprobado,
+      'activo': activo,
     };
   }
 }

@@ -14,10 +14,11 @@ class Pedido {
   final String latitud;
   final String longitud;
   final String productos;
-  final String estado;
+  String estado;
   final String motorizado;
   final String celularMotorizado;
   final String nota;
+  final String tipoPago;
   int tiempo;
   final List<DetallePedido> detalleArray;
 
@@ -41,6 +42,7 @@ class Pedido {
     required this.motorizado,
     required this.celularMotorizado,
     required this.nota,
+    required this.tipoPago,
   });
 
   factory Pedido.fromJson(Map<String, dynamic> json) {
@@ -63,6 +65,7 @@ class Pedido {
       motorizado: json['motorizado'] ?? '',
       celularMotorizado: json['celularMotorizado'] ?? '',
       nota: json['nota'] ?? '',
+      tipoPago: json['tipo_pago'] ?? '',
       detalleArray:
           (json['detalleArray'] as List<dynamic>?)
               ?.map((item) => DetallePedido.fromJson(item))
@@ -87,6 +90,7 @@ class Pedido {
       'productos': productos,
       'estado': estado,
       'nota': nota,
+      'tipo_pago': tipoPago,
     };
   }
 }
