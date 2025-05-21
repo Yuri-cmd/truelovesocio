@@ -13,8 +13,8 @@ import 'package:truelovesocio/model/socio_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static String baseUrl = 'https://magusemail.com/truelove-back/public/api';
-  // static const String baseUrl = 'http://192.168.100.2/truelove-back/public/api';
+  // static String baseUrl = 'https://magusemail.com/truelove-back/public/api';
+  static const String baseUrl = 'http://192.168.100.2/truelove-back/public/api';
 
   static Future<Socio?> login(String nroDocumento, String password) async {
     final url = Uri.parse('$baseUrl/socio/login');
@@ -328,5 +328,53 @@ class ApiService {
       socio.toJson(),
     ); // Asegúrate de tener `toJson()` implementado
     await prefs.setString('socio', socioJson);
+  }
+
+  static Future<Map<String, dynamic>> sendCode(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse("$baseUrl/socio/sendCode"),
+        body: {'email': email},
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return data;
+      } else {
+        // Si el backend devuelve error con json (como en tu ejemplo)
+        return {
+          'success': false,
+          'message': data['message'] ?? 'Error desconocido',
+        };
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Error en la consulta: $e'};
+    }
+  }
+
+  static Future<Map<String, dynamic>> updatePassword(
+    int id,
+    String newPassword,
+  ) async {
+    try {
+      final url = Uri.parse('$baseUrl/socio/update-password');
+
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'id': id, 'password': newPassword}),
+      );
+
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': responseData['message']};
+      } else {
+        return {'success': false, 'message': responseData['message']};
+      }
+    } catch (e) {
+      return {'success': false, 'message': 'Error de conexión'};
+    }
   }
 }

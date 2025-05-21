@@ -6,13 +6,16 @@ class CustomTextField extends StatelessWidget {
   final bool obscureText;
   final Function()? onIconPressed;
   final bool isPassword; // Indicador para saber si es un campo de contraseña
+  final IconData? prefixIcon;
 
-  const CustomTextField({super.key, 
+  const CustomTextField({
+    super.key,
     required this.controller,
     required this.hintText,
     this.obscureText = false,
     this.onIconPressed,
-    required this.isPassword, // Se espera un valor para isPassword
+    required this.isPassword,
+    this.prefixIcon,
   });
 
   @override
@@ -28,17 +31,23 @@ class CustomTextField extends StatelessWidget {
           borderRadius: BorderRadius.circular(5),
           borderSide: BorderSide.none,
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 10,
+          horizontal: 12,
+        ),
         // Agregar el sufijo solo si es un campo de contraseña
-        suffixIcon: isPassword
-            ? IconButton(
-                icon: Icon(
-                  obscureText ? Icons.visibility : Icons.visibility_off,
-                  color: Colors.grey,
-                ),
-                onPressed: onIconPressed, // Llama a la función de toggling
-              )
-            : null, // No se agrega ningún sufijo si no es un campo de contraseña
+        prefixIcon:
+            prefixIcon != null ? Icon(prefixIcon, color: Colors.grey) : null,
+        suffixIcon:
+            isPassword
+                ? IconButton(
+                  icon: Icon(
+                    obscureText ? Icons.visibility : Icons.visibility_off,
+                    color: Colors.grey,
+                  ),
+                  onPressed: onIconPressed, // Llama a la función de toggling
+                )
+                : null, // No se agrega ningún sufijo si no es un campo de contraseña
       ),
     );
   }

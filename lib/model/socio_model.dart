@@ -53,7 +53,7 @@ class Socio {
       updatedAt: json['updated_at'],
       userId: json['user_id'] ?? 0,
       aprobado: json['aprobado'] ?? false,
-      activo: json['activo'],
+      activo: json['activo'] ?? 0,
     );
   }
 

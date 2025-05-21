@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart'; // Importa el paquete SpinKit
 import 'package:truelovesocio/components/custom_text_field.dart';
 import 'package:truelovesocio/model/socio_model.dart';
+import 'package:truelovesocio/screen/email_verify_screen.dart';
 import 'package:truelovesocio/screen/home_screen.dart';
 import 'package:truelovesocio/service/api_service.dart';
 
@@ -115,13 +116,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ],
               ),
-              const Row(
-                children: [
-                  Icon(Icons.language, color: Colors.black),
-                  SizedBox(width: 4),
-                  Text('ES', style: TextStyle(fontWeight: FontWeight.bold)),
-                ],
-              ),
+              // const Row(
+              //   children: [
+              //     Icon(Icons.language, color: Colors.black),
+              //     SizedBox(width: 4),
+              //     Text('ES', style: TextStyle(fontWeight: FontWeight.bold)),
+              //   ],
+              // ),
             ],
           ),
         ),
@@ -171,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     // Campo de correo electrónico
                     CustomTextField(
                       controller: _emailController,
-                      hintText: 'Correo Electrónico',
+                      hintText: 'Usuario',
                       isPassword: false,
                     ),
                     const SizedBox(height: 15),
@@ -185,13 +186,28 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 10),
                     // Enlace "¿Olvidaste tu contraseña?"
-                    const Align(
+                    Align(
                       alignment: Alignment.centerRight,
-                      child: Text(
-                        '¿Olvidaste tu contraseña?',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const EmailVerifyScreen(),
+                            ),
+                          );
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero, // Elimina padding extra
+                          minimumSize: Size(0, 0), // Evita espacio extra
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          '¿Olvidaste tu contraseña?',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
