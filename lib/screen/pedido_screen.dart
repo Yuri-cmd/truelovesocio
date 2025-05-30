@@ -132,6 +132,7 @@ class _PedidosViewState extends State<PedidosView> {
                           _bloqueoBotones[pedido.id] = bloqueado;
                         });
                       },
+                      
                     );
                   },
                 ),

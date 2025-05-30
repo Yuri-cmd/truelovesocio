@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 class ConnectionHelper extends StatefulWidget {
-  const ConnectionHelper({Key? key}) : super(key: key);
+  const ConnectionHelper({super.key});
 
   @override
   State<ConnectionHelper> createState() => _ConnectionHelperState();

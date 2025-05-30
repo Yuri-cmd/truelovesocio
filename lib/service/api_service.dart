@@ -13,8 +13,8 @@ import 'package:truelovesocio/model/socio_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  // static String baseUrl = 'https://magusemail.com/truelove-back/public/api';
-  static const String baseUrl = 'http://192.168.100.2/truelove-back/public/api';
+  static String baseUrl = 'https://magusemail.com/truelove-back/public/api';
+  // static const String baseUrl = 'http://192.168.100.2/truelove-back/public/api';
 
   static Future<Socio?> login(String nroDocumento, String password) async {
     final url = Uri.parse('$baseUrl/socio/login');
@@ -35,6 +35,11 @@ class ApiService {
           final prefs = await SharedPreferences.getInstance();
           prefs.setString('socio', jsonEncode(data["socio"]));
 
+          // Enviar el token almacenado a la API
+          String? tokenFcm = prefs.getString('token_fcm');
+          if (tokenFcm != '') {
+            await updateFcmToken(data["socio"]['id'], tokenFcm!);
+          }
           return socio;
         } else {
           throw ("No se encontró la clave 'socio' en la respuesta.");
@@ -122,12 +127,13 @@ class ApiService {
   }
 
   Future<void> createCategory(String name) async {
+    final int? idEmpresa = await getUsuarioId();
     final response = await http.post(
       Uri.parse('$baseUrl/categories'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'nombre': name,
-        'empresa_id': 2, // Agregar el id_empresa como estático
+        'empresa_id': idEmpresa, // Agregar el id_empresa como estático
       }),
     );
 
@@ -137,12 +143,13 @@ class ApiService {
   }
 
   Future<void> updateCategory(int id, String name) async {
+    final int? idEmpresa = await getUsuarioId();
     final response = await http.put(
       Uri.parse('$baseUrl/categories/$id'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'nombre': name,
-        'empresa_id': 2, // Agregar el id_empresa como estático
+        'empresa_id': idEmpresa, // Agregar el id_empresa como estático
       }),
     );
 
@@ -375,6 +382,53 @@ class ApiService {
       }
     } catch (e) {
       return {'success': false, 'message': 'Error de conexión'};
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> fetchPedidoById(int id) async {
+    final String apiUrl = '$baseUrl/socio/get/pedido/$id';
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final decodedResponse = json.decode(response.body);
+
+        if (decodedResponse is List) {
+          return List<Map<String, dynamic>>.from(decodedResponse);
+        } else {
+          throw Exception('Formato inesperado de respuesta');
+        }
+      } else {
+        throw Exception('Error al cargar los pedidos');
+      }
+    } catch (error) {
+      throw Exception('Error al obtener los pedidos: $error');
+    }
+  }
+
+  Future<bool> verificarConfirmacionPago(int idPedido) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/socio/update/verificar/confirmacion/$idPedido'),
+    );
+    return response.statusCode == 200;
+  }
+
+  static Future<bool> updateFcmToken(int idBiker, String tokenFcm) async {
+    final url = Uri.parse("$baseUrl/socio/update-token");
+    try {
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"id_reparto": idBiker, "token_fcm": tokenFcm}),
+      );
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
     }
   }
 }

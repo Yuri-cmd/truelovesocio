@@ -26,19 +26,10 @@ class HomeScreen extends StatelessWidget {
           NavOption(
             title: 'Cerrar sesión',
             icon: Icons.exit_to_app,
-            targetView: Material(
-              child: InkWell(
-                onTap: () async {
-                  Navigator.pop(context);
-                  await Future.delayed(Duration(milliseconds: 300));
-                  logout(context);
-                },
-                child: ListTile(
-                  leading: Icon(Icons.exit_to_app),
-                  title: Text("Cerrar sesión"),
-                ),
-              ),
-            ),
+            onTap: () async {
+              await logout(context);
+            },
+            targetView: LoginScreen(),
           ),
         ],
       ),

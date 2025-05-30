@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:truelovesocio/components/pedido_buttons.dart';
+import 'package:truelovesocio/components/pedido_cliente_card.dart';
+import 'package:truelovesocio/components/pedido_estado_timeline.dart';
+import 'package:truelovesocio/components/pedido_motorizado_card.dart';
+import 'package:truelovesocio/components/pedido_productos_list.dart';
 import 'package:truelovesocio/model/pedido_model.dart';
 import 'package:truelovesocio/service/api_service.dart';
 import 'package:truelovesocio/theme/app_theme.dart';
 import 'package:truelovesocio/utils/connection_helper.dart';
-import 'package:url_launcher/url_launcher.dart'; // <- AGREGA ESTO
+import 'package:url_launcher/url_launcher.dart';
 
 class SeguimientoPedidoView extends StatefulWidget {
   final Pedido pedido;
@@ -15,26 +20,67 @@ class SeguimientoPedidoView extends StatefulWidget {
 }
 
 class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
-  double total = 0.0;
   final ApiService apiService = ApiService();
+  List<Map<String, dynamic>> pedidos = [];
+  int estado = 0;
+  double total = 0.0;
+  int tiempo = 0;
+
   @override
   void initState() {
     super.initState();
-    _calcularTotal();
+    _loadInfoPedido(widget.pedido.id);
+  }
+
+  Future<void> _loadInfoPedido(int id) async {
+    try {
+      final data = await apiService.fetchPedidoById(id);
+      setState(() {
+        pedidos = data;
+      });
+      _calcularTotal();
+    } catch (e) {
+      throw ('Error al obtener pedidos: $e');
+    }
   }
 
   void _calcularTotal() {
     double tempTotal = 0.0;
-    for (var detalle in widget.pedido.detalleArray) {
-      double detalleTotal = double.parse(detalle.precio) * detalle.cantidad;
-      tempTotal += detalleTotal;
-    }
-    total = tempTotal;
-  }
 
-  Future<void> _llamar(String phoneNumber) async {
-    final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
-    await launchUrl(launchUri);
+    for (var pedido in pedidos) {
+      estado = int.tryParse(pedido['ultimo_estado_tracking']) ?? 0;
+      tiempo = pedido['tiempo'];
+
+      if (pedido['detalleArray'] is List) {
+        for (var detalle in pedido['detalleArray']) {
+          final rawCantidad = detalle['cantidad'];
+          final rawPrecio = detalle['precio'];
+
+          int cantidad = 0;
+          double precio = 0.0;
+
+          if (rawCantidad is int) {
+            cantidad = rawCantidad;
+          } else if (rawCantidad is String) {
+            cantidad = int.tryParse(rawCantidad) ?? 0;
+          }
+
+          if (rawPrecio is int) {
+            precio = rawPrecio.toDouble();
+          } else if (rawPrecio is double) {
+            precio = rawPrecio;
+          } else if (rawPrecio is String) {
+            precio = double.tryParse(rawPrecio) ?? 0.0;
+          }
+
+          tempTotal += precio * cantidad;
+        }
+      }
+    }
+
+    setState(() {
+      total = tempTotal;
+    });
   }
 
   Future<void> actualizarEstadoPedido(int id, int estado) async {
@@ -43,14 +89,13 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
     try {
       await apiService.actualizarEstado(id, estado);
       setState(() {
-        widget.pedido.estado = estado.toString();
+        this.estado = estado;
       });
     } catch (e) {
       throw ('Error actualizando pedido: $e');
     }
   }
 
-  // Método para mostrar la alerta de confirmación
   Future<bool> mostrarAlertaConfirmacion(int estado) async {
     return await showDialog(
           context: context,
@@ -93,232 +138,112 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const ConnectionHelper(),
-            const SizedBox(height: 10),
-            _buildEstadoPedidoSection(),
-            const SizedBox(height: 10),
-            _buildDatosPedidoSection(),
-            const SizedBox(height: 10),
-            _buildButtonsActions(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildButtonsActions() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Colors.white,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _buildTimelineButton(
-            'Aceptada\nTiempo Estimado Prep: ${(widget.pedido.tiempo).toString()} min',
-            false,
-            false,
-          ),
-          ['3', '4', '5', '6', '7', '8'].contains(widget.pedido.estado)
-              ? _buildTimelineButton(
-                'Indicar orden como preparada',
-                false,
-                true,
-              )
-              : _buildTimelineButton(
-                'Indicar orden como preparada',
-                true,
-                false,
-              ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEstadoPedidoSection() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      color: Colors.white,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const Text('ACEPTADA', style: TextStyle(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          _buildTimelineButtons(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTimelineButtons() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ['3', '4', '5', '6', '7', '8'].contains(widget.pedido.estado)
-            ? _buildTimelineButton('Indicar orden como preparada', false, true)
-            : _buildTimelineButton('Indicar orden como preparada', true, false),
-        Icon(Icons.keyboard_arrow_down_sharp, color: Colors.grey),
-        ['5', '6', '7', '8'].contains(widget.pedido.estado)
-            ? _buildTimelineButton('Motorizado llegó al negocio', false, true)
-            : _buildTimelineButton('Motorizado llegó al negocio', true, false),
-        Icon(Icons.keyboard_arrow_down_sharp, color: Colors.grey),
-        ['6', '7', '8'].contains(widget.pedido.estado)
-            ? _buildTimelineButton('Motorizado está en camino', false, true)
-            : _buildTimelineButton('Motorizado está en camino', true, false),
-      ],
-    );
-  }
-
-  Widget _buildTimelineButton(String label, bool isLast, bool isBlack) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isBlack ? Colors.black : Colors.white,
-        side: const BorderSide(color: Colors.grey),
-        minimumSize: const Size(double.infinity, 40),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-      onPressed: () {
-        if (isLast) {
-          if (widget.pedido.estado == '2') {
-            actualizarEstadoPedido(widget.pedido.id, 3);
-          }
-
-          if (widget.pedido.estado == '4') {
-            actualizarEstadoPedido(widget.pedido.id, 5);
-          }
-        }
-      },
-      child: Text(
-        label,
-        style: TextStyle(color: isBlack ? Colors.white : Colors.black),
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-
-  Widget _buildDatosPedidoSection() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      color: Colors.white,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildClienteCard(),
-          const SizedBox(height: 10),
-          if (widget.pedido.estado == '4') ...[_buildMotorizadoCard()],
-          const SizedBox(height: 10),
-          const Divider(),
-          _buildProductosList(),
-          const Divider(),
-          _buildTotalRow(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildClienteCard() {
-    return Card(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      elevation: 5,
-      child: ListTile(
-        leading: const CircleAvatar(
-          radius: 20,
-          backgroundColor: Colors.blue,
-          child: Icon(Icons.person, color: Colors.white),
-        ),
-        title: Text(widget.pedido.cliente),
-        trailing: ElevatedButton(
-          onPressed: () {
-            _llamar(widget.pedido.celular); // <- Asegúrate de tener este campo
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
-            minimumSize: const Size(30, 30),
-          ),
-          child: const Icon(Icons.call, color: Colors.white, size: 16),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMotorizadoCard() {
-    return Card(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      elevation: 5,
-      child: ListTile(
-        leading: const CircleAvatar(
-          radius: 20,
-          backgroundColor: Colors.orange,
-          child: Icon(Icons.delivery_dining, color: Colors.white),
-        ),
-        title: Text(widget.pedido.motorizado),
-        trailing: ElevatedButton(
-          onPressed: () {
-            _llamar(
-              widget.pedido.celularMotorizado,
-            ); // Aquí puedes pasar el número real del motorizado
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
-            minimumSize: const Size(30, 30),
-          ),
-          child: const Icon(Icons.call, color: Colors.white, size: 16),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProductosList() {
-    return Column(
-      children:
-          widget.pedido.detalleArray.map((detalle) {
-            double detalleTotal =
-                double.parse(detalle.precio) * detalle.cantidad;
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '(${detalle.cantidad}) ${detalle.nombre}',
-                    style: const TextStyle(fontSize: 16),
+      body: RefreshIndicator(
+        onRefresh: () async => await _loadInfoPedido(widget.pedido.id),
+        child:
+            pedidos.isEmpty
+                ? const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24.0),
+                    child: CircularProgressIndicator(),
                   ),
-                  Text(
-                    detalleTotal.toStringAsFixed(2),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                )
+                : SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const ConnectionHelper(),
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        color: Colors.white,
+                        child: PedidoEstadoTimeline(
+                          estado: estado,
+                          onUpdateEstado: actualizarEstadoPedido,
+                          pedidos: pedidos,
+                          id: widget.pedido.id,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        color: Colors.white,
+                        child: Column(
+                          children: [
+                            PedidoClienteCard(
+                              pedidos: pedidos,
+                              onCall: _llamar,
+                            ),
+                            const SizedBox(height: 10),
+                            if (estado >= 4) ...[
+                              PedidoMotorizadoCard(
+                                pedidos: pedidos,
+                                onCall: _llamar,
+                              ),
+                            ],
+                            const SizedBox(height: 10),
+                            const Divider(),
+                            if (pedidos.isNotEmpty &&
+                                pedidos[0]['nota'] != null &&
+                                pedidos[0]['nota'].toString().trim().isNotEmpty)
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(16),
+                                margin: const EdgeInsets.symmetric(vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: Colors.amber.shade50,
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.amber.shade300,
+                                  ),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Icon(
+                                      Icons.sticky_note_2_outlined,
+                                      color: Colors.amber,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Expanded(
+                                      child: Text(
+                                        pedidos[0]['nota'],
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            const Divider(),
+                            PedidoProductosList(
+                              pedidos: pedidos,
+                              estado: estado,
+                              total: total,
+                              onCall: _llamar,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      PedidoButtons(
+                        estado: estado,
+                        pedidos: pedidos,
+                        tiempo: tiempo,
+                        onUpdateEstado: actualizarEstadoPedido,
+                        id: widget.pedido.id,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            );
-          }).toList(),
+                ),
+      ),
     );
   }
 
-  Widget _buildTotalRow() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        const Text(
-          'Total a cobrar: ',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-        ),
-        Text(
-          total.toStringAsFixed(2),
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-            color: Colors.orange,
-          ),
-        ),
-      ],
-    );
+  Future<void> _llamar(String phoneNumber) async {
+    final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
+    await launchUrl(launchUri);
   }
 }

@@ -98,30 +98,87 @@ class PedidoCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton.icon(
-                  onPressed:
-                      int.parse(pedido.estado) == 0 ||
-                              bloqueoBotones[pedido.id] == true
-                          ? null
-                          : () {
-                            PedidosHelper.actualizarEstadoPedido(
-                              context: context,
-                              pedido: pedido,
-                              nuevoEstado: 2,
-                              apiService: apiService,
-                              onUpdate: () => onUpdate(),
-                              bloquearBoton: bloquearBoton,
+                pedido.requiereConfirmacionLocal == true
+                    ? ElevatedButton.icon(
+                      onPressed: () async {
+                        final confirmar = await showDialog<bool>(
+                          context: context,
+                          builder:
+                              (context) => AlertDialog(
+                                title: const Text('Confirmar verificación'),
+                                content: const Text(
+                                  '¿Estás seguro de que deseas verificar el pago?',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed:
+                                        () => Navigator.pop(context, false),
+                                    child: const Text('Cancelar'),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed:
+                                        () => Navigator.pop(context, true),
+                                    child: const Text('Confirmar'),
+                                  ),
+                                ],
+                              ),
+                        );
+
+                        if (confirmar == true) {
+                          await PedidosHelper.actualizarEstadoPago(
+                            context: context,
+                            pedido: pedido,
+                            apiService: apiService,
+                            onUpdate: () => onUpdate(),
+                          );
+
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Pago verificado correctamente'),
+                              ),
                             );
-                          },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                  ),
-                  icon: const Icon(Icons.check_circle, color: Colors.white),
-                  label: const Text(
-                    'Aceptar',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
+                          }
+                        }
+                      },
+
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber[700],
+                      ),
+                      icon: const Icon(Icons.verified, color: Colors.white),
+                      label: const Text(
+                        'Verificar pago',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    )
+                    : ElevatedButton.icon(
+                      onPressed:
+                          int.parse(pedido.estado) == 0 ||
+                                  bloqueoBotones[pedido.id] == true
+                              ? null
+                              : () {
+                                PedidosHelper.actualizarEstadoPedido(
+                                  context: context,
+                                  pedido: pedido,
+                                  nuevoEstado: 2,
+                                  apiService: apiService,
+                                  onUpdate: () => onUpdate(),
+                                  bloquearBoton: bloquearBoton,
+                                );
+                              },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                      ),
+                      icon: const Icon(Icons.check_circle, color: Colors.white),
+                      label: Text(
+                        int.parse(pedido.estado) == 0 ||
+                                int.parse(pedido.estado) == 1
+                            ? 'Aceptar'
+                            : 'Ver Pedido',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+
                 ElevatedButton.icon(
                   onPressed:
                       _debeDeshabilitarBotonCancelar()

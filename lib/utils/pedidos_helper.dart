@@ -166,4 +166,18 @@ class PedidosHelper {
       bloquearBoton(false);
     }
   }
+
+  static Future<void> actualizarEstadoPago({
+    required BuildContext context,
+    required Pedido pedido,
+    required ApiService apiService,
+    required Function() onUpdate,
+  }) async {
+    try {
+      await apiService.verificarConfirmacionPago(pedido.id);
+      await onUpdate();
+    } catch (_) {
+      // manejar errores
+    }
+  }
 }

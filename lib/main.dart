@@ -1,13 +1,22 @@
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:truelovesocio/model/socio_model.dart';
 import 'package:truelovesocio/screen/home_screen.dart';
 import 'package:truelovesocio/screen/screens.dart';
 import 'package:truelovesocio/service/api_service.dart';
 import 'package:screen_protector/screen_protector.dart';
+import 'package:truelovesocio/service/firebase_api.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    name: 'app dev',
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  await FirebaseApi().initNotifications();
 
   // 🔐 Previene capturas de pantalla al iniciar
   await ScreenProtector.preventScreenshotOn();

@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-// import 'package:truelove/theme/app_theme.dart';
 
+// import 'package:truelove/theme/app_theme.dart';
 class NavOption {
   final String title;
   final IconData icon;
-  final Widget targetView;
+  final Widget? targetView;
+  final VoidCallback? onTap;
 
   NavOption({
     required this.title,
     required this.icon,
-    required this.targetView,
+    this.targetView,
+    this.onTap,
   });
 }
 
@@ -25,9 +27,7 @@ class CustomNavOption extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            decoration: const BoxDecoration(
-              color: Colors.black,
-            ),
+            decoration: const BoxDecoration(color: Colors.black),
             child: Center(
               // Usamos Center para centrar la imagen
               child: Image.asset(
@@ -43,9 +43,14 @@ class CustomNavOption extends StatelessWidget {
               leading: Icon(option.icon),
               title: Text(option.title),
               onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => option.targetView),
-                );
+                Navigator.pop(context);
+                if (option.onTap != null) {
+                  option.onTap!();
+                } else if (option.targetView != null) {
+                  Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute(builder: (_) => option.targetView!));
+                }
               },
             );
           }),
