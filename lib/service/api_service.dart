@@ -37,9 +37,10 @@ class ApiService {
 
           // Enviar el token almacenado a la API
           String? tokenFcm = prefs.getString('token_fcm');
-          if (tokenFcm != '') {
-            await updateFcmToken(data["socio"]['id'], tokenFcm!);
-          }
+
+          if (tokenFcm != null && tokenFcm.isNotEmpty) {
+            await updateFcmToken(data["socio"]['id'], tokenFcm);
+          } 
           return socio;
         } else {
           throw ("No se encontró la clave 'socio' en la respuesta.");
@@ -320,12 +321,11 @@ class ApiService {
       if (response.statusCode == 200) {
         return true;
       } else {
-        print("Error status: ${response.statusCode}");
+        throw("Error status: ${response.statusCode}");
       }
     } catch (e) {
-      print("Error actualizando estado: $e");
+      //print("Error actualizando estado: $e");
     }
-
     return false;
   }
 

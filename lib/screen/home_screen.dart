@@ -1,103 +1,102 @@
 import 'package:flutter/material.dart';
 import "package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart";
-import 'package:truelovesocio/components/components.dart';
 import 'package:truelovesocio/screen/screens.dart';
 import 'package:truelovesocio/theme/app_theme.dart';
 import 'package:truelovesocio/view/views.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Definir un GlobalKey para el Scaffold
-final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      endDrawer: CustomNavOption(
-        options: [
-          NavOption(
-            title: 'Evaluaciones',
-            icon: Icons.star,
-            targetView: const ReviewView(),
-          ),
-          NavOption(
-            title: 'Cerrar sesión',
-            icon: Icons.exit_to_app,
-            onTap: () async {
-              await logout(context);
-            },
-            targetView: LoginScreen(),
-          ),
-        ],
-      ),
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
-      body: PersistentTabView(
-        context,
-        screens: [
-          const PedidosView(),
-          DashboardScreen(),
-          const MenuView(),
-          _buildScreen('Settings', Colors.red),
-        ],
-        items: [
-          PersistentBottomNavBarItem(
-            icon: const Icon(Icons.shopping_bag_outlined),
-            title: 'Pedidos',
-            activeColorPrimary: AppTheme.primary,
-            inactiveColorPrimary: Colors.grey,
-          ),
-          PersistentBottomNavBarItem(
-            icon: const Icon(Icons.dashboard),
-            title: 'Tablero',
-            activeColorPrimary: AppTheme.primary,
-            inactiveColorPrimary: Colors.grey,
-          ),
-          PersistentBottomNavBarItem(
-            icon: const Icon(Icons.menu_book_rounded),
-            title: 'Menu',
-            activeColorPrimary: AppTheme.primary,
-            inactiveColorPrimary: Colors.grey,
-          ),
-          PersistentBottomNavBarItem(
-            icon: const Icon(Icons.list),
-            title: 'Más',
-            activeColorPrimary: AppTheme.primary,
-            inactiveColorPrimary: Colors.grey,
-            onPressed: (dynamic) {
-              // Aquí mostramos el Drawer cuando se presiona "Más"
-              _scaffoldKey.currentState?.openEndDrawer();
-            },
-          ),
-        ],
-        navBarStyle: NavBarStyle.style6,
-      ),
-    );
-  }
+class _HomeScreenState extends State<HomeScreen> {
+  late PersistentTabController _controller;
+  bool isLoggingOut = false;
 
-  Widget _buildScreen(String title, Color color) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title), backgroundColor: color),
-      body: Center(
-        child: Text(
-          '$title Screen',
-          style: const TextStyle(fontSize: 24, color: Colors.white),
-        ),
-      ),
-      backgroundColor: color,
-    );
+  @override
+  void initState() {
+    super.initState();
+    _controller = PersistentTabController(initialIndex: 0);
   }
 
   Future<void> logout(BuildContext context) async {
+    setState(() {
+      isLoggingOut = true;
+    });
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('socio'); // Eliminar usuario guardado
+    await prefs.remove('socio');
+    await Future.delayed(const Duration(milliseconds: 200));
+    if (mounted) {
+      // Usar Future.microtask para asegurarse de que el widget ya no está en el árbol
+      Future.microtask(() {
+        if (!context.mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      });
+    }
+  }
 
-    // Esperar un poco para evitar conflictos con Navigator
-    await Future.delayed(Duration(milliseconds: 300));
+  @override
+  Widget build(BuildContext context) {
+    if (isLoggingOut) {
+      // Retorna un widget vacío para desmontar el tab bar antes de navegar
+      return const SizedBox.shrink();
+    }
 
-    // Redirigir a la pantalla de login y eliminar historial de navegación
-    Navigator.of(context, rootNavigator: true).pushReplacementNamed('/login');
+    return PersistentTabView(
+      context,
+      controller: _controller,
+      screens: [
+        const PedidosView(),
+        DashboardScreen(),
+        const MenuView(),
+        const ReviewView(),
+        // La pantalla "Cerrar sesión" es un widget vacío, la acción se maneja en onItemSelected
+        const SizedBox.shrink(),
+      ],
+      items: [
+        PersistentBottomNavBarItem(
+          icon: const Icon(Icons.shopping_bag_outlined),
+          title: 'Pedidos',
+          activeColorPrimary: AppTheme.primary,
+          inactiveColorPrimary: Colors.grey,
+        ),
+        PersistentBottomNavBarItem(
+          icon: const Icon(Icons.dashboard),
+          title: 'Tablero',
+          activeColorPrimary: AppTheme.primary,
+          inactiveColorPrimary: Colors.grey,
+        ),
+        PersistentBottomNavBarItem(
+          icon: const Icon(Icons.menu_book_rounded),
+          title: 'Menu',
+          activeColorPrimary: AppTheme.primary,
+          inactiveColorPrimary: Colors.grey,
+        ),
+        PersistentBottomNavBarItem(
+          icon: const Icon(Icons.star),
+          title: 'Evaluaciones',
+          activeColorPrimary: AppTheme.primary,
+          inactiveColorPrimary: Colors.grey,
+        ),
+        PersistentBottomNavBarItem(
+          icon: const Icon(Icons.exit_to_app),
+          title: 'Cerrar',
+          activeColorPrimary: AppTheme.primary,
+          inactiveColorPrimary: Colors.grey,
+        ),
+      ],
+      navBarStyle: NavBarStyle.style6,
+      onItemSelected: (int index) async {
+        if (index == 4 && !isLoggingOut) {
+          await logout(context);
+        }
+      },
+    );
   }
 }

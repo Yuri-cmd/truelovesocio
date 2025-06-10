@@ -108,11 +108,12 @@ class PedidosHelper {
       }
 
       onEstadoActualizado(nuevoEstado);
-
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Estado actualizado correctamente.')),
       );
     } else {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Error al actualizar el estado.')),
       );
@@ -132,8 +133,7 @@ class PedidosHelper {
     try {
       int? tiempoPrep;
       final int estadoActual = int.parse(pedido.estado);
-
-      if (estadoActual == 1) {
+      if (estadoActual == 1 && nuevoEstado == 2) {
         tiempoPrep = await mostrarDialogoTiempo(context);
         if (tiempoPrep == null) return;
       }

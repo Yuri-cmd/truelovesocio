@@ -197,7 +197,7 @@ class _MenuViewState extends State<MenuView> {
                                   setState(() {
                                     dishes = menus;
                                   });
-                                  
+                                  if (!context.mounted) return;
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text('Menú actualizado'),
@@ -205,6 +205,7 @@ class _MenuViewState extends State<MenuView> {
                                   );
                                 })
                                 .catchError((e) {
+                                  if (!context.mounted) return;
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(

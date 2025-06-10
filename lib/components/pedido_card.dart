@@ -82,7 +82,20 @@ class PedidoCard extends StatelessWidget {
                 ),
               ],
             ),
-
+            const SizedBox(height: 10),
+            if (pedido.tipoComprobante.isNotEmpty &&
+                pedido.documento.isNotEmpty)
+              infoRow(
+                Icons.receipt_long_rounded,
+                "${pedido.tipoComprobante}: ${pedido.documento}",
+                color: Colors.redAccent,
+              )
+            else
+              infoRow(
+                Icons.receipt_long_rounded,
+                "Comprobante: Ninguno",
+                color: Colors.redAccent,
+              ),
             const SizedBox(height: 10),
             const Text(
               '🛒 Productos:',
@@ -125,6 +138,7 @@ class PedidoCard extends StatelessWidget {
                         );
 
                         if (confirmar == true) {
+                          if (!context.mounted) return;
                           await PedidosHelper.actualizarEstadoPago(
                             context: context,
                             pedido: pedido,
