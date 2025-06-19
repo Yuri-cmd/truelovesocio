@@ -34,12 +34,18 @@ class _DishItemWidgetState extends State<DishItemWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(
+          color: isDark ? colorScheme.outlineVariant : Colors.grey.shade300,
+        ),
       ),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(
@@ -69,11 +75,13 @@ class _DishItemWidgetState extends State<DishItemWidget> {
         ),
         title: Text(
           widget.name,
-          style: const TextStyle(fontWeight: FontWeight.w600),
+          style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
           'S/. ${widget.price}',
-          style: TextStyle(color: Colors.grey.shade600),
+          style: textTheme.bodyMedium?.copyWith(
+            color: isDark ? colorScheme.onSurfaceVariant : Colors.grey.shade600,
+          ),
         ),
         trailing: SizedBox(
           width: 60.0,
@@ -85,8 +93,8 @@ class _DishItemWidgetState extends State<DishItemWidget> {
             value: status,
             borderRadius: 30.0,
             padding: 4.0,
-            activeColor: Colors.pink,
-            inactiveColor: Colors.grey.shade300,
+            activeColor: colorScheme.primary,
+            inactiveColor: colorScheme.surfaceContainerHighest,
             onToggle: (val) {
               setState(() {
                 status = val;

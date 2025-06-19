@@ -1,7 +1,5 @@
-// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
-
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart'; // Importa el paquete SpinKit
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:truelovesocio/components/custom_text_field.dart';
 import 'package:truelovesocio/model/socio_model.dart';
 import 'package:truelovesocio/screen/email_verify_screen.dart';
@@ -12,7 +10,7 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
@@ -20,7 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool isButtonActive = false;
   bool _isObscure = true;
-  bool _isLoading = false; // Variable para controlar el estado de carga
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -37,10 +35,9 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  // Cambia el estado de la visibilidad de la contraseña
   void _togglePasswordVisibility() {
     setState(() {
-      _isObscure = !_isObscure; // Cambiar la visibilidad
+      _isObscure = !_isObscure;
     });
   }
 
@@ -77,22 +74,25 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFDE5EB),
+      backgroundColor: colorScheme.surface,
       appBar: AppBar(
         elevation: 0,
-        foregroundColor: Colors.black,
-        backgroundColor: const Color(0xFFFDE5EB),
+        foregroundColor: colorScheme.onSurface,
+        backgroundColor: colorScheme.surface,
         title: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // CircleAvatar with Gray Border
+              // Logo y "Portal"
               Row(
                 children: [
                   Image.asset(
-                    'images/logo.png', // Logo
+                    'images/logo.png',
                     height: 30,
                   ),
                   const SizedBox(width: 8),
@@ -116,30 +116,22 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ],
               ),
-              // const Row(
-              //   children: [
-              //     Icon(Icons.language, color: Colors.black),
-              //     SizedBox(width: 4),
-              //     Text('ES', style: TextStyle(fontWeight: FontWeight.bold)),
-              //   ],
-              // ),
             ],
           ),
         ),
       ),
       body: Column(
         children: [
-          const Padding(
-            padding: EdgeInsets.all(20),
+          Padding(
+            padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Gestiona tu negocio desde la palma de tu mano',
-                  style: TextStyle(
-                    fontSize: 22,
+                  style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -150,9 +142,9 @@ class _LoginScreenState extends State<LoginScreen> {
               width: double.infinity,
               child: Container(
                 padding: const EdgeInsets.all(16.0),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: colorScheme.surface,
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(15),
                     topRight: Radius.circular(15),
                   ),
@@ -160,23 +152,20 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Inicia sesión con tu correo electrónico',
-                      style: TextStyle(
-                        fontSize: 16,
+                      style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Campo de correo electrónico
                     CustomTextField(
                       controller: _emailController,
                       hintText: 'Usuario',
                       isPassword: false,
                     ),
                     const SizedBox(height: 15),
-                    // Campo de contraseña
                     CustomTextField(
                       controller: _passwordController,
                       hintText: 'Contraseña',
@@ -185,7 +174,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       isPassword: true,
                     ),
                     const SizedBox(height: 10),
-                    // Enlace "¿Olvidaste tu contraseña?"
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
@@ -198,8 +186,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           );
                         },
                         style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero, // Elimina padding extra
-                          minimumSize: Size(0, 0), // Evita espacio extra
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size(0, 0),
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
                         child: Text(
@@ -212,38 +200,32 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Botón de iniciar sesión con SpinKit
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed:
-                            isButtonActive && !_isLoading
-                                ? _login // Llamamos a la función de login
-                                : null,
+                        onPressed: isButtonActive && !_isLoading ? _login : null,
                         style: ElevatedButton.styleFrom(
                           foregroundColor:
-                              isButtonActive ? Colors.white : Colors.grey,
+                              isButtonActive ? Colors.white : colorScheme.onSurface,
                           backgroundColor:
-                              isButtonActive ? Colors.red : Colors.grey[300],
+                              isButtonActive ? Colors.red : colorScheme.surfaceContainerHighest,
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5),
                           ),
                         ),
-                        child:
-                            _isLoading
-                                ? const SpinKitCircle(
-                                  // Mostramos el SpinKit si está cargando
-                                  color: Colors.white,
-                                  size: 30.0,
-                                )
-                                : const Text(
-                                  'Iniciar sesión',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                        child: _isLoading
+                            ? const SpinKitCircle(
+                                color: Colors.white,
+                                size: 30.0,
+                              )
+                            : Text(
+                                'Iniciar sesión',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: isButtonActive ? Colors.white : colorScheme.onSurface,
                                 ),
+                              ),
                       ),
                     ),
                   ],

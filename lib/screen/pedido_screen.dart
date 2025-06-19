@@ -4,8 +4,9 @@ import 'package:truelovesocio/components/pedido_card.dart';
 import 'package:truelovesocio/model/pedido_model.dart';
 import 'package:truelovesocio/model/socio_model.dart';
 import 'package:truelovesocio/service/api_service.dart';
-import 'package:truelovesocio/theme/app_theme.dart';
 import 'package:truelovesocio/utils/pedidos_helper.dart';
+// Importa el themeNotifier y setThemeMode si los usas globalmente
+import 'package:truelovesocio/main.dart';
 
 class PedidosView extends StatefulWidget {
   const PedidosView({super.key});
@@ -58,24 +59,36 @@ class _PedidosViewState extends State<PedidosView> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'Pedidos Pendientes',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: AppTheme.primary,
+        backgroundColor: Colors.red,
         foregroundColor: Colors.white,
         actions: [
+          // Switch para dark/light theme
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Icon(isDark ? Icons.dark_mode : Icons.light_mode, color: colorScheme.onPrimary),
+              Switch(
+                value: isDark,
+                onChanged: (val) {
+                  // setThemeMode es la función global que persiste y cambia theme
+                  setThemeMode(val ? ThemeMode.dark : ThemeMode.light);
+                },
+              ),
+              const SizedBox(width: 8),
               Text(
                 activo == 1 ? "Activo" : "Inactivo",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: activo == 1 ? Colors.white : Colors.white,
+                  color: colorScheme.onPrimary,
                 ),
               ),
               Switch(
@@ -96,48 +109,44 @@ class _PedidosViewState extends State<PedidosView> {
       ),
       body: RefreshIndicator(
         onRefresh: loadPedidos,
-        child:
-            pedidos.isEmpty
-                ? ListView(
-                  // Necesario para que RefreshIndicator funcione también cuando está vacío
-                  children: const [
-                    SizedBox(
-                      height: 400, // Para permitir el scroll cuando está vacío
-                      child: Center(
-                        child: Text(
-                          '📭 Sin pedidos pendientes',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey,
-                          ),
+        child: pedidos.isEmpty
+            ? ListView(
+                children: [
+                  SizedBox(
+                    height: 400,
+                    child: Center(
+                      child: Text(
+                        '📭 Sin pedidos pendientes',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
                         ),
                       ),
                     ),
-                  ],
-                )
-                : ListView.builder(
-                  itemCount: pedidos.length,
-                  padding: const EdgeInsets.all(10),
-                  itemBuilder: (context, index) {
-                    final pedido = pedidos[index];
-
-                    return PedidoCard(
-                      pedido: pedido,
-                      apiService: apiService,
-                      bloqueoBotones: _bloqueoBotones,
-                      onUpdate: loadPedidos,
-                      bloquearBoton: (bloqueado) {
-                        setState(() {
-                          _bloqueoBotones[pedido.id] = bloqueado;
-                        });
-                      },
-                      
-                    );
-                  },
-                ),
+                  ),
+                ],
+              )
+            : ListView.builder(
+                itemCount: pedidos.length,
+                padding: const EdgeInsets.all(10),
+                itemBuilder: (context, index) {
+                  final pedido = pedidos[index];
+                  return PedidoCard(
+                    pedido: pedido,
+                    apiService: apiService,
+                    bloqueoBotones: _bloqueoBotones,
+                    onUpdate: loadPedidos,
+                    bloquearBoton: (bloqueado) {
+                      setState(() {
+                        _bloqueoBotones[pedido.id] = bloqueado;
+                      });
+                    },
+                  );
+                },
+              ),
       ),
-      backgroundColor: Colors.grey[200],
+      backgroundColor: colorScheme.surface,
     );
   }
 }
