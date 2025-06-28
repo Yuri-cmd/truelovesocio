@@ -53,7 +53,9 @@ class Socio {
       updatedAt: json['updated_at'],
       userId: json['user_id'] ?? 0,
       aprobado: json['aprobado'] ?? false,
-      activo: json['activo'] ?? 0,
+      activo: json['activo'] == true || json['activo'] == 1
+          ? 1
+          : 0, // Convertir booleano o int a int
     );
   }
 
