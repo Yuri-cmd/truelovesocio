@@ -11,6 +11,8 @@ import 'package:truelovesocio/utils/connection_helper.dart';
 import 'package:truelovesocio/utils/helpers.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'dart:async';
+
 class SeguimientoPedidoView extends StatefulWidget {
   final Pedido pedido;
 
@@ -27,10 +29,20 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
   double total = 0.0;
   int tiempo = 0;
 
+  Timer? _timer;
+
   @override
   void initState() {
     super.initState();
     _loadInfoPedido(widget.pedido.id);
+    _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
+      _loadInfoPedido(widget.pedido.id);
+    });
+  }
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadInfoPedido(int id) async {

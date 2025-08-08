@@ -115,43 +115,72 @@ class PedidoCard extends StatelessWidget {
                 pedido.requiereConfirmacionLocal == true
                     ? ElevatedButton.icon(
                         onPressed: () async {
-                          final confirmar = await showDialog<bool>(
+                          // Verificar si hay foto de pago
+                          if (pedido.fotoPago.isEmpty) {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('No hay foto'),
+                                content: const Text('No se ha cargado una foto del pago.'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              ),
+                            );
+                            return;
+                          }
+
+                          // Mostrar la imagen del pago
+                          showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
-                              title: const Text('Confirmar verificación'),
-                              content: const Text(
-                                '¿Estás seguro de que deseas verificar el pago?',
+                              title: const Text('Foto del pago'),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Image.network(
+                                    pedido.fotoPago,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return const Text('Error al cargar la imagen');
+                                    },
+                                  ),
+                                  const SizedBox(height: 16),
+                                  const Text('¿Deseas verificar este pago?'),
+                                ],
                               ),
                               actions: [
                                 TextButton(
-                                  onPressed: () => Navigator.pop(context, false),
+                                  onPressed: () => Navigator.pop(context),
                                   child: const Text('Cancelar'),
                                 ),
                                 ElevatedButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  child: const Text('Confirmar'),
+                                  onPressed: () async {
+                                    Navigator.pop(context);
+                                    if (!context.mounted) return;
+                                    await PedidosHelper.actualizarEstadoPago(
+                                      context: context,
+                                      pedido: pedido,
+                                      apiService: apiService,
+                                      onUpdate: () => onUpdate(),
+                                    );
+
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content: Text('Pago verificado correctamente'),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  child: const Text('Verificar'),
                                 ),
                               ],
                             ),
                           );
-
-                          if (confirmar == true) {
-                            if (!context.mounted) return;
-                            await PedidosHelper.actualizarEstadoPago(
-                              context: context,
-                              pedido: pedido,
-                              apiService: apiService,
-                              onUpdate: () => onUpdate(),
-                            );
-
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Pago verificado correctamente'),
-                                ),
-                              );
-                            }
-                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.amber[700],

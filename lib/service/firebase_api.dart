@@ -17,20 +17,17 @@ class FirebaseApi {
     );
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print("✅ Notificaciones permitidas");
     }
 
     // Obtener el token de FCM
     String? token = await _firebaseMessaging.getToken();
-    if (token != null) {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('token_fcm', token);
-      final idUser = await ApiService.getUsuarioId();
-      if (idUser != null) {
-        ApiService.updateFcmToken(idUser, token);
-      }
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token_fcm', token!);
+    final idUser = await ApiService.getUsuarioId();
+    if (idUser != null) {
+      ApiService.updateFcmToken(idUser, token);
     }
-
+  
     // Configurar `flutter_local_notifications`
     const AndroidInitializationSettings androidInitializationSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');

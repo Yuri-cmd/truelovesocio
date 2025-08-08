@@ -93,7 +93,7 @@ class _PedidosViewState extends State<PedidosView> {
               ),
               Switch(
                 value: activo == 1,
-                activeThumbColor: Colors.white,
+                activeTrackColor: Colors.green,
                 inactiveThumbColor: Colors.grey,
                 onChanged: (value) {
                   PedidosHelper.cambiarEstadoRepartidor(

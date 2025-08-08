@@ -13,8 +13,15 @@ import 'package:truelovesocio/model/socio_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static String baseUrl = 'https://magusemail.com/truelove-back/public/api';
-  // static const String baseUrl = 'http://192.168.100.2/truelove-back/public/api';
+  static const String _productionUrl =
+      'https://magusemail.com/truelove-back/public/api';
+  static const String _localUrl =
+      'http://192.168.100.2/truelove-back/public/api';
+
+  // Cambiar este valor para alternar entre desarrollo y producción
+  static const bool _useProduction = true;
+
+  static String get baseUrl => _useProduction ? _productionUrl : _localUrl;
 
   static Future<Socio?> login(String nroDocumento, String password) async {
     final url = Uri.parse('$baseUrl/socio/login');
@@ -38,9 +45,9 @@ class ApiService {
           // Enviar el token almacenado a la API
           String? tokenFcm = prefs.getString('token_fcm');
 
-          if (tokenFcm != null && tokenFcm.isNotEmpty) {
+          if (tokenFcm!.isNotEmpty) {
             await updateFcmToken(data["socio"]['id'], tokenFcm);
-          } 
+          }
           return socio;
         } else {
           throw ("No se encontró la clave 'socio' en la respuesta.");
@@ -321,7 +328,7 @@ class ApiService {
       if (response.statusCode == 200) {
         return true;
       } else {
-        throw("Error status: ${response.statusCode}");
+        throw ("Error status: ${response.statusCode}");
       }
     } catch (e) {
       //print("Error actualizando estado: $e");
