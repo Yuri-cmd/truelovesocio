@@ -20,13 +20,21 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
     return TextField(
       controller: controller,
       obscureText: obscureText,
+      style: TextStyle(
+        color: isDark ? Colors.white : Colors.black,
+      ),
       decoration: InputDecoration(
         hintText: hintText,
+        hintStyle: TextStyle(
+          color: isDark ? Colors.grey[400] : Colors.grey[600],
+        ),
         filled: true,
-        fillColor: Colors.grey[100],
+        fillColor: isDark ? Colors.grey[800] : Colors.grey[100],
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5),
           borderSide: BorderSide.none,
@@ -37,13 +45,13 @@ class CustomTextField extends StatelessWidget {
         ),
         // Agregar el sufijo solo si es un campo de contraseña
         prefixIcon:
-            prefixIcon != null ? Icon(prefixIcon, color: Colors.grey) : null,
+            prefixIcon != null ? Icon(prefixIcon, color: isDark ? Colors.grey[400] : Colors.grey) : null,
         suffixIcon:
             isPassword
                 ? IconButton(
                   icon: Icon(
                     obscureText ? Icons.visibility : Icons.visibility_off,
-                    color: Colors.grey,
+                    color: isDark ? Colors.grey[400] : Colors.grey,
                   ),
                   onPressed: onIconPressed, // Llama a la función de toggling
                 )

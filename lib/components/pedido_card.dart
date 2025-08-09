@@ -24,7 +24,6 @@ class PedidoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
       elevation: 5,
@@ -116,7 +115,7 @@ class PedidoCard extends StatelessWidget {
                     ? ElevatedButton.icon(
                         onPressed: () async {
                           // Verificar si hay foto de pago
-                          if (pedido.fotoPago.isEmpty) {
+                          if (pedido.fotoPago.isEmpty || pedido.fotoPago == 'null') {
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
@@ -142,7 +141,7 @@ class PedidoCard extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Image.network(
-                                    pedido.fotoPago,
+                                    'https://magusemail.com/truelove-back/public/${pedido.fotoPago}',
                                     fit: BoxFit.contain,
                                     errorBuilder: (context, error, stackTrace) {
                                       return const Text('Error al cargar la imagen');

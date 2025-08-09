@@ -250,7 +250,6 @@ class ApiService {
 
   Future<Map<String, dynamic>> fetchRestaurantReviews() async {
     final int? idEmpresa = await getUsuarioId();
-
     final url = Uri.parse("$baseUrl/getRestaurante/$idEmpresa");
     final response = await http.get(url);
 

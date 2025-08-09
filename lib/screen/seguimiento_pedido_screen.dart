@@ -187,7 +187,7 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
                               onCall: _llamar,
                             ),
                             const SizedBox(height: 10),
-                            if (estado >= 4) ...[
+                            if (estado >= 2 && pedidos[0]['motorizado'].isNotEmpty) ...[
                               PedidoMotorizadoCard(
                                 pedidos: pedidos,
                                 onCall: _llamar,
