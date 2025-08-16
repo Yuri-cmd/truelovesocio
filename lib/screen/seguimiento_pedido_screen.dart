@@ -59,6 +59,7 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
 
   void _calcularTotal() {
     double tempTotal = 0.0;
+    int estadoAnterior = estado;
 
     for (var pedido in pedidos) {
       estado = int.tryParse(pedido['ultimo_estado_tracking']) ?? 0;
@@ -93,6 +94,28 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
 
     setState(() {
       total = tempTotal;
+    });
+    // Verificar si el estado cambió a 8 (entregado)
+    if (estadoAnterior != 8 && estado == 8) {
+      _mostrarToastPedidoEntregado();
+    }
+  }
+
+  void _mostrarToastPedidoEntregado() {
+    // Mostrar toast
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('El pedido fue entregado exitosamente'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 3),
+      ),
+    );
+    
+    // Regresar a la pantalla anterior después de un breve delay
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
     });
   }
 
