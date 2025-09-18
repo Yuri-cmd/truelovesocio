@@ -1,10 +1,19 @@
-import 'package:flutter/material.dart';
-import 'package:truelovesocio/model/pedido_model.dart';
-import 'package:truelovesocio/model/socio_model.dart';
-import 'package:truelovesocio/screen/seguimiento_pedido_screen.dart';
-import 'package:truelovesocio/service/api_service.dart';
+
+  import 'package:flutter/material.dart';
+  import 'package:truelovesocio/model/pedido_model.dart';
+  import 'package:truelovesocio/model/socio_model.dart';
+  import 'package:truelovesocio/screen/seguimiento_pedido_screen.dart';
+  import 'package:truelovesocio/service/api_service.dart';
 
 class PedidosHelper {
+  static Future<dynamic> navegarASeguimiento(BuildContext context, Pedido pedido) async {
+    return await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SeguimientoPedidoView(pedido: pedido),
+      ),
+    );
+  }
   static Future<int?> mostrarDialogoTiempo(BuildContext context) async {
     final TextEditingController controller = TextEditingController();
     return showDialog<int>(
@@ -153,12 +162,15 @@ class PedidosHelper {
         pedido.estado = nuevoEstado.toString();
 
         if (!context.mounted) return;
-        Navigator.push(
+        final result = await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (_) => SeguimientoPedidoView(pedido: pedido),
           ),
         );
+        if (result == true && context.mounted) {
+          onUpdate();
+        }
       }
     } catch (_) {
       // manejar errores

@@ -141,7 +141,7 @@ class PedidoCard extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Image.network(
-                                    'https://magusemail.com/truelove-back/public/${pedido.fotoPago}',
+                                    pedido.fotoPago,
                                     fit: BoxFit.contain,
                                     errorBuilder: (context, error, stackTrace) {
                                       return const Text('Error al cargar la imagen');

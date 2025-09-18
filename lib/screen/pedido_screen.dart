@@ -132,16 +132,24 @@ class _PedidosViewState extends State<PedidosView> {
                 padding: const EdgeInsets.all(10),
                 itemBuilder: (context, index) {
                   final pedido = pedidos[index];
-                  return PedidoCard(
-                    pedido: pedido,
-                    apiService: apiService,
-                    bloqueoBotones: _bloqueoBotones,
-                    onUpdate: loadPedidos,
-                    bloquearBoton: (bloqueado) {
-                      setState(() {
-                        _bloqueoBotones[pedido.id] = bloqueado;
-                      });
+                  return GestureDetector(
+                    onTap: () async {
+                      final result = await PedidosHelper.navegarASeguimiento(context, pedido);
+                      if (result == true) {
+                        loadPedidos();
+                      }
                     },
+                    child: PedidoCard(
+                      pedido: pedido,
+                      apiService: apiService,
+                      bloqueoBotones: _bloqueoBotones,
+                      onUpdate: loadPedidos,
+                      bloquearBoton: (bloqueado) {
+                        setState(() {
+                          _bloqueoBotones[pedido.id] = bloqueado;
+                        });
+                      },
+                    ),
                   );
                 },
               ),

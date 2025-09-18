@@ -110,11 +110,10 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
         duration: Duration(seconds: 3),
       ),
     );
-    
-    // Regresar a la pantalla anterior después de un breve delay
+    // Regresar a la pantalla anterior después de un breve delay y devolver true
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
-        Navigator.of(context).pop();
+        Navigator.of(context).pop(true);
       }
     });
   }
