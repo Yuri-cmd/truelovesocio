@@ -59,6 +59,42 @@ class ApiService {
     }
   }
 
+  static Future<Map<String, dynamic>?> loginWithQuotaValidation(String nroDocumento, String password) async {
+    final url = Uri.parse('$baseUrl/socio/login');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'usuario': nroDocumento, 'password': password}),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data["status"] == "success" && data["socio"] != null) {
+          final prefs = await SharedPreferences.getInstance();
+          prefs.setString('socio', jsonEncode(data["socio"]));
+
+          // Enviar el token almacenado a la API
+          String? tokenFcm = prefs.getString('token_fcm');
+
+          if (tokenFcm!.isNotEmpty) {
+            await updateFcmToken(data["socio"]['id'], tokenFcm);
+          }
+
+          // Retornar toda la respuesta incluyendo información de cuota
+          return data;
+        } else {
+          throw ("No se encontró la clave 'socio' en la respuesta.");
+        }
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   static Future<Socio?> getLoggedUser() async {
     final prefs = await SharedPreferences.getInstance();
     final conductorJson = prefs.getString('socio');

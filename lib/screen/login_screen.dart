@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:truelovesocio/components/custom_text_field.dart';
-import 'package:truelovesocio/model/socio_model.dart';
 import 'package:truelovesocio/screen/email_verify_screen.dart';
 import 'package:truelovesocio/screen/home_screen.dart';
 import 'package:truelovesocio/service/api_service.dart';
@@ -47,22 +46,172 @@ class _LoginScreenState extends State<LoginScreen> {
     String user = _emailController.text.trim();
     String password = _passwordController.text.trim();
 
-    Socio? conductor = await ApiService.login(user, password);
+    try {
+      final loginResponse = await ApiService.loginWithQuotaValidation(user, password);
+      
+      if (!mounted) return;
+      setState(() => _isLoading = false);
 
-    if (!mounted) return;
+      if (loginResponse != null && loginResponse['socio'] != null) {
+        final puedeAcceder = loginResponse['puede_acceder'] ?? false;
+        final motivo = loginResponse['motivo'] ?? '';
+        final mensaje = loginResponse['mensaje'] ?? '';
+        final diasVencimiento = loginResponse['dias_vencimiento'] ?? 0;
+        final alerta = loginResponse['alerta'] ?? '';
 
-    setState(() => _isLoading = false);
+        if (puedeAcceder) {
+          // Si puede acceder, navegar a HomeScreen
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          );
 
-    if (conductor != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+          // Si hay alerta (cuota próxima a vencer), mostrar mensaje
+          if (alerta == 'critico' && mensaje.isNotEmpty) {
+            Future.delayed(const Duration(milliseconds: 500), () {
+              if (mounted) {
+                _mostrarAlertaCuotaProximaVencer(mensaje, diasVencimiento);
+              }
+            });
+          }
+        } else {
+          // No puede acceder - mostrar alerta de bloqueo
+          _mostrarAlertaCuotaVencida(motivo.isNotEmpty ? motivo : 'Tu cuota ha vencido y no puedes acceder al sistema.');
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Credenciales incorrectas"))
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Error al iniciar sesión"))
       );
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Credenciales incorrectas")));
     }
+  }
+
+  void _mostrarAlertaCuotaProximaVencer(String mensaje, int diasVencimiento) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.amber[50],
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          title: Row(
+            children: [
+              Icon(Icons.warning, color: Colors.amber[700], size: 30),
+              const SizedBox(width: 10),
+              const Text(
+                'Cuota Próxima a Vencer',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                mensaje,
+                style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.amber[100],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.amber[300]!),
+                ),
+                child: Text(
+                  'Recuerda realizar tu pago antes del vencimiento para evitar suspensión de acceso.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.amber[800],
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amber[700],
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Entendido'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _mostrarAlertaCuotaVencida(String motivo) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.red[50],
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          title: Row(
+            children: [
+              Icon(Icons.block, color: Colors.red[700], size: 30),
+              const SizedBox(width: 10),
+              const Text(
+                'Acceso Denegado',
+                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                motivo,
+                style: const TextStyle(fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 15),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red[100],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red[300]!),
+                ),
+                child: Text(
+                  'Contacta al administrador para regularizar tu situación.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.red[800],
+                    fontWeight: FontWeight.w500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red[700],
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
