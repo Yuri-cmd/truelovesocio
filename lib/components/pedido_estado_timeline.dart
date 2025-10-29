@@ -5,12 +5,15 @@ class PedidoEstadoTimeline extends StatelessWidget {
   final List<Map<String, dynamic>> pedidos;
   final Function(int id, int estado) onUpdateEstado;
   final int id;
+  final int tipoPedido;
+
   const PedidoEstadoTimeline({
     super.key,
     required this.estado,
     required this.pedidos,
     required this.onUpdateEstado,
     required this.id,
+    required this.tipoPedido,
   });
 
   @override
@@ -18,17 +21,29 @@ class PedidoEstadoTimeline extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        [3, 4, 5, 6, 7, 8].contains(estado)
+        [3, 4, 5, 6, 7, 8, 9].contains(estado)
             ? _buildTimelineButton('Indicar orden como preparada', false, true)
             : _buildTimelineButton('Indicar orden como preparada', true, false),
-        Icon(Icons.keyboard_arrow_down_sharp, color: Colors.grey),
-        [5, 6, 7, 8].contains(estado)
-            ? _buildTimelineButton('Motorizado llegó al negocio', false, true)
-            : _buildTimelineButton('Motorizado llegó al negocio', true, false),
-        Icon(Icons.keyboard_arrow_down_sharp, color: Colors.grey),
-        [6, 7, 8].contains(estado)
-            ? _buildTimelineButton('Motorizado está en camino', false, true)
-            : _buildTimelineButton('Motorizado está en camino', true, false),
+        if (tipoPedido == 0) ...[
+          Icon(Icons.keyboard_arrow_down_sharp, color: Colors.grey),
+          [5, 6, 7, 8].contains(estado)
+              ? _buildTimelineButton('Motorizado llegó al negocio', false, true)
+              : _buildTimelineButton(
+                'Motorizado llegó al negocio',
+                true,
+                false,
+              ),
+          Icon(Icons.keyboard_arrow_down_sharp, color: Colors.grey),
+          [6, 7, 8].contains(estado)
+              ? _buildTimelineButton('Motorizado está en camino', false, true)
+              : _buildTimelineButton('Motorizado está en camino', true, false),
+        ],
+        if (tipoPedido == 1) ...[
+          Icon(Icons.keyboard_arrow_down_sharp, color: Colors.grey),
+          [8].contains(estado)
+              ? _buildTimelineButton('Pedido Entregado', false, true)
+              : _buildTimelineButton('Pedido Entregado', true, false),
+        ],
       ],
     );
   }
@@ -45,11 +60,19 @@ class PedidoEstadoTimeline extends StatelessWidget {
       onPressed: () {
         if (isLast) {
           if (estado == 2) {
-            onUpdateEstado(id, 3);
+            if (tipoPedido == 0) {
+              onUpdateEstado(id, 9);
+            } else {
+              onUpdateEstado(id, 3);
+            }
           }
 
           if (estado == 4) {
             onUpdateEstado(id, 5);
+          }
+
+          if (estado == 9) {
+            onUpdateEstado(id, 8);
           }
         }
       },

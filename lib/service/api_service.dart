@@ -126,7 +126,6 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final dynamic decodedResponse = json.decode(response.body);
-
         // Verificar si la respuesta es una lista
         if (decodedResponse is List) {
           return decodedResponse

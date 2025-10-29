@@ -66,6 +66,7 @@ class PedidoCard extends StatelessWidget {
               color: Colors.indigo,
             ),
             infoRow(context, Icons.phone, pedido.celular, color: Colors.green),
+            infoRow(context, Icons.person, pedido.cliente, color: Colors.orange),
             infoRow(context, Icons.timer, '${pedido.tiempo} min', color: Colors.orange),
             infoRow(context, Icons.article_sharp, pedido.nota, color: Colors.blue),
 

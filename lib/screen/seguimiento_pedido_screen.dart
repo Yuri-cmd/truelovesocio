@@ -196,6 +196,7 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
                           onUpdateEstado: actualizarEstadoPedido,
                           pedidos: pedidos,
                           id: widget.pedido.id,
+                          tipoPedido: widget.pedido.tipoPedido,
                         ),
                       ),
                       const SizedBox(height: 10),

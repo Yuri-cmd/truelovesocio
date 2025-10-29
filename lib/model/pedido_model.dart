@@ -25,6 +25,7 @@ class Pedido {
   final String tipoComprobante;
   final String documento;
   final String fotoPago;
+  final int tipoPedido;
 
   Pedido({
     required this.id,
@@ -51,6 +52,7 @@ class Pedido {
     required this.tipoComprobante,
     required this.documento,
     required this.fotoPago,
+    required this.tipoPedido,
   });
 
   factory Pedido.fromJson(Map<String, dynamic> json) {
@@ -78,6 +80,7 @@ class Pedido {
       tipoComprobante: json['tipo_comprobante'] ?? '',
       documento: json['documento'] ?? '',
       fotoPago: json['foto_pago'] ?? '',
+      tipoPedido: json['tipo_pedido'],
       detalleArray:
           (json['detalleArray'] as List<dynamic>?)
               ?.map((item) => DetallePedido.fromJson(item))
@@ -104,6 +107,7 @@ class Pedido {
       'nota': nota,
       'tipo_pago': tipoPago,
       'requiere_confirmacion_local': requiereConfirmacionLocal,
+      'tipo_pedido': tipoPedido,
     };
   }
 }
