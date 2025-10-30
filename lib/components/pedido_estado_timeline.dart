@@ -60,7 +60,7 @@ class PedidoEstadoTimeline extends StatelessWidget {
       onPressed: () {
         if (isLast) {
           if (estado == 2) {
-            if (tipoPedido == 0) {
+            if (tipoPedido == 1) {
               onUpdateEstado(id, 9);
             } else {
               onUpdateEstado(id, 3);
