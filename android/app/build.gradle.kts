@@ -37,6 +37,16 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            // Ensure resources aren't shrunk/removed in release
+            isMinifyEnabled = false
+            isShrinkResources = false
+        }
+    }
+
+    // Asegurar que se incluyan los recursos raw
+    sourceSets {
+        getByName("main") {
+            res.srcDirs("src/main/res")
         }
     }
 }

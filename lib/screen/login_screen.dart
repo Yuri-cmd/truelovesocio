@@ -53,12 +53,11 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => _isLoading = false);
 
       if (loginResponse != null && loginResponse['socio'] != null) {
-        final puedeAcceder = loginResponse['puede_acceder'] ?? false;
-        final motivo = loginResponse['motivo'] ?? '';
-        final mensaje = loginResponse['mensaje'] ?? '';
-        final diasVencimiento = loginResponse['dias_vencimiento'] ?? 0;
-        final alerta = loginResponse['alerta'] ?? '';
-
+        final puedeAcceder = loginResponse['estado_cuota']['puede_acceder'] ?? false;
+        final motivo = loginResponse['estado_cuota']['motivo'] ?? '';
+        final mensaje = loginResponse['estado_cuota']['mensaje'] ?? '';
+        final diasVencimiento = loginResponse['estado_cuota']['dias_vencimiento'] ?? 0;
+        final alerta = loginResponse['estado_cuota']['alerta'] ?? '';
         if (puedeAcceder) {
           // Si puede acceder, navegar a HomeScreen
           Navigator.pushReplacement(

@@ -34,3 +34,4 @@ flutter:
   uses-material-design: true
   assets: 
     - images/
+    # - assets/sounds/  <-- removed: use Android res/raw for custom notification sounds

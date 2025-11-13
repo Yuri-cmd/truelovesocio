@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Keep raw notification sounds so names are preserved in release builds -->
+    <public type="raw" name="nuevo_pedido" />
+    <public type="raw" name="pedido_sound" />
+</resources>
