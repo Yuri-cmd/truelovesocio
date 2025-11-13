@@ -26,6 +26,10 @@ class Pedido {
   final String documento;
   final String fotoPago;
   final int tipoPedido;
+  final String fecha;
+  final String subtotal;
+  final String precioDelivery;
+  final String descuento;
 
   Pedido({
     required this.id,
@@ -53,6 +57,10 @@ class Pedido {
     required this.documento,
     required this.fotoPago,
     required this.tipoPedido,
+    required this.fecha,
+    this.subtotal = '0.00',
+    this.precioDelivery = '0.00',
+    this.descuento = '0.00',
   });
 
   factory Pedido.fromJson(Map<String, dynamic> json) {
@@ -81,6 +89,10 @@ class Pedido {
       documento: json['documento'] ?? '',
       fotoPago: json['foto_pago'] ?? '',
       tipoPedido: json['tipo_pedido'],
+      fecha: json['created_at'] ?? '',
+      subtotal: json['subtotal']?.toString() ?? '0.00',
+      precioDelivery: json['precio_delivery']?.toString() ?? '0.00',
+      descuento: json['descuento']?.toString() ?? '0.00',
       detalleArray:
           (json['detalleArray'] as List<dynamic>?)
               ?.map((item) => DetallePedido.fromJson(item))
@@ -108,6 +120,10 @@ class Pedido {
       'tipo_pago': tipoPago,
       'requiere_confirmacion_local': requiereConfirmacionLocal,
       'tipo_pedido': tipoPedido,
+      'created_at': fecha,
+      'subtotal': subtotal,
+      'precio_delivery': precioDelivery,
+      'descuento': descuento,
     };
   }
 }

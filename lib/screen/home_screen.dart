@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import "package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart";
+import 'package:truelovesocio/screen/historico_pedidos_screen.dart';
 import 'package:truelovesocio/screen/screens.dart';
 import 'package:truelovesocio/theme/app_theme.dart';
 import 'package:truelovesocio/view/views.dart';
@@ -53,10 +54,9 @@ class _HomeScreenState extends State<HomeScreen> {
       controller: _controller,
       screens: [
         const PedidosView(),
-        DashboardScreen(),
+        const HistoricoPedidosScreen(),
         const MenuView(),
         const ReviewView(),
-        // La pantalla "Cerrar sesión" es un widget vacío, la acción se maneja en onItemSelected
         const SizedBox.shrink(),
       ],
       items: [
@@ -67,8 +67,8 @@ class _HomeScreenState extends State<HomeScreen> {
           inactiveColorPrimary: Colors.grey,
         ),
         PersistentBottomNavBarItem(
-          icon: const Icon(Icons.dashboard),
-          title: 'Tablero',
+          icon: const Icon(Icons.book),
+          title: 'Historico',
           activeColorPrimary: AppTheme.primary,
           inactiveColorPrimary: Colors.grey,
         ),

@@ -142,6 +142,34 @@ class ApiService {
     }
   }
 
+  Future<List<Pedido>> fetchPedidosConFiltros({
+    String fecha = 'todas',
+    String tipo = 'todos',
+  }) async {
+    final int? idBiker = await getUsuarioId();
+    print('$baseUrl/socio/get/pedidos/$idBiker?fecha=$fecha&tipo=$tipo'); // Línea de depuración
+    final String apiUrl = '$baseUrl/socio/get/pedidos/$idBiker?fecha=$fecha&tipo=$tipo';
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        final dynamic decodedResponse = json.decode(response.body);
+        // Verificar si la respuesta es una lista
+        if (decodedResponse is List) {
+          return decodedResponse
+              .map((pedido) => Pedido.fromJson(pedido))
+              .toList();
+        } else {
+          throw Exception('Formato inesperado de respuesta');
+        }
+      } else {
+        throw Exception('Error al cargar los pedidos');
+      }
+    } catch (error) {
+      throw Exception('Error al obtener los pedidos: $error');
+    }
+  }
+
   Future<bool> actualizarEstado(int id, int estado, {int tiempo = 0}) async {
     final response = await http.put(
       Uri.parse('$baseUrl/socio/update/estado/pedido/$id'),
