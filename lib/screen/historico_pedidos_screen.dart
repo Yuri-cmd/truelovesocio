@@ -70,7 +70,8 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
     if (!mounted) return;
     await showDialog(
       context: context,
-      builder: (_) => Dialog(
+      barrierDismissible: true, // Permitir cerrar el diálogo al hacer clic fuera
+      builder: (dialogContext) => Dialog(
         backgroundColor: Colors.black,
         insetPadding: const EdgeInsets.all(16),
         child: Stack(
@@ -81,7 +82,10 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
             ),
             IconButton(
               icon: const Icon(Icons.close, color: Colors.white),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                // Usar el context del builder para cerrar correctamente el diálogo
+                Navigator.of(dialogContext).pop();
+              },
             ),
           ],
         ),
