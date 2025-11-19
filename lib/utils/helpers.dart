@@ -20,29 +20,59 @@ String obtenerEstado(int estado) {
       return 'Motorizado llegó al domicilio';
     case 8:
       return 'Pedido entregado';
+    case 9:
+      return 'Pedido listo para recoger';
     default:
       return 'Desconocido';
   }
 }
 
+/// Paleta propuesta para cada estado con hex y un sentido semántico:
+/// 0: error (rojo), 1: advertencia (ámbar), 2: en preparación (naranja),
+/// 3: listo en local (índigo), 4: aceptado (azul), 5: en restaurante (azul claro),
+/// 6: en camino (naranja/alerta), 7: llegó (teal), 8: entregado (éxito/verde),
+/// 9: listo para recoger (púrpura).
 Color obtenerColorEstado(int estado) {
   switch (estado) {
     case 0:
-      return Colors.redAccent;
+      return const Color(0xFFD32F2F); // Red 700 - #D32F2F (Cancelado)
     case 1:
-      return Colors.amber;
+      return const Color(0xFFFFA000); // Amber 700 - #FFA000 (Pendiente)
     case 2:
-      return Colors.green;
+      return const Color(
+        0xFFFB8C00,
+      ); // Orange 600 - #FB8C00 (Preparando pedido)
     case 3:
+      return const Color(0xFF3949AB); // Indigo 600 - #3949AB (Pedido listo)
     case 4:
+      return const Color(0xFF1976D2); // Blue 700 - #1976D2 (Motorizado aceptó)
     case 5:
+      return const Color(
+        0xFF0288D1,
+      ); // Light Blue 600 - #0288D1 (Motorizado en restaurante)
     case 6:
-      return Colors.blueAccent;
+      return const Color(
+        0xFFFF7043,
+      ); // Deep Orange 400 - #FF7043 (Motorizado en camino)
     case 7:
-      return Colors.teal;
+      return const Color(
+        0xFF00796B,
+      ); // Teal 700 - #00796B (Motorizado llegó al domicilio)
+    case 8:
+      return const Color(0xFF2E7D32); // Green 700 - #2E7D32 (Pedido entregado)
+    case 9:
+      return const Color(
+        0xFF8E24AA,
+      ); // Purple 600 - #8E24AA (Pedido listo para recoger)
     default:
-      return Colors.grey;
+      return Colors.grey; // Desconocido
   }
+}
+
+/// Helper: devuelve color de texto (black/white) según contraste con el fondo.
+Color textoContraste(Color background) {
+  // computeLuminance devuelve 0 (oscuro) a 1 (claro). Umbral ~0.5 funciona bien.
+  return background.computeLuminance() > 0.5 ? Colors.black : Colors.white;
 }
 
 Widget getMetodoPagoImage(String? tipoPago) {
