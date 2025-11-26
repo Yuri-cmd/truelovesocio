@@ -81,7 +81,7 @@ class Pedido {
       estado: json['ultimo_estado_tracking'] ?? '',
       tiempo: json['tiempo'] ?? 0,
       motorizado: json['motorizado'] ?? '',
-      celularMotorizado: json['celularMotorizado'] ?? '',
+      celularMotorizado: json['celularMotorizado'] ?? json['celular_motorizado'] ?? '',
       nota: json['nota'] ?? '',
       tipoPago: json['tipo_pago'] ?? '',
       requiereConfirmacionLocal: json['requiere_confirmacion_local'] ?? false,

@@ -7,7 +7,7 @@ import 'package:truelovesocio/model/pedido_model.dart';
 import 'package:truelovesocio/service/api_service.dart';
 import 'package:truelovesocio/theme/app_theme.dart';
 import 'package:truelovesocio/utils/helpers.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 class HistoricoPedidosScreen extends StatefulWidget {
   const HistoricoPedidosScreen({super.key});
 
@@ -158,6 +158,11 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
     return 0.0;
   }
 
+  Future<void> _llamar(String phoneNumber) async {
+    final Uri launchUri = Uri(scheme: 'tel', path: phoneNumber);
+    await launchUrl(launchUri);
+  }
+
   @override
   Widget build(BuildContext context) {
     final primary = AppTheme.primary;
@@ -294,6 +299,30 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
                                     const SizedBox(height: 8),
                                     Text('Dirección: ${pedido.direccionEntrega}',
                                         style: const TextStyle(color: Colors.grey)),
+                                    GestureDetector(
+                                      onTap: () => _llamar(pedido.celular),
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.phone, color: Colors.green, size: 16),
+                                          const SizedBox(width: 4),
+                                          Text('Cliente: ${pedido.celular}',
+                                              style: const TextStyle(color: Colors.grey)),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    GestureDetector(
+                                      onTap: () => _llamar(pedido.celularMotorizado),
+                                      child: Row(
+                                        children: [
+                                          const Icon(Icons.phone, color: Colors.green, size: 16),
+                                          const SizedBox(width: 4),
+                                          Text('Motorizado: ${pedido.celularMotorizado}',
+                                              style: const TextStyle(color: Colors.grey)),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
                                     Text('Fecha: ${_formatDate(pedido.fecha)}',
                                         style: const TextStyle(color: Colors.grey)),
                                     const Divider(height: 20),
