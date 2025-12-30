@@ -45,6 +45,25 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:718991696253:android:9326040e17dae16e82ec14",
+        "android_client_info": {
+          "package_name": "com.example.trueloveclient"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEDm76HqDpWVX4FYnyZCGwirAWfx_pEFY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:718991696253:android:7fb1ae6fe7d94ada82ec14",
         "android_client_info": {
           "package_name": "com.example.truelovesocio"
@@ -67,6 +86,44 @@
         "mobilesdk_app_id": "1:718991696253:android:fe446d1530977b6282ec14",
         "android_client_info": {
           "package_name": "com.example.tuapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEDm76HqDpWVX4FYnyZCGwirAWfx_pEFY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:718991696253:android:36159d957d13b4c282ec14",
+        "android_client_info": {
+          "package_name": "com.truelove.trueloveclient"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEDm76HqDpWVX4FYnyZCGwirAWfx_pEFY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:718991696253:android:ca24632635e0d4fd82ec14",
+        "android_client_info": {
+          "package_name": "com.truelove.truelovesocio"
         }
       },
       "oauth_client": [],

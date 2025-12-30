@@ -1,7 +1,7 @@
 name: truelovesocio
-description: "A new Flutter project."
+description: "Aplicación para gestión de pedidos y comercios Truelove"
 publish_to: 'none'
-version: 0.1.0
+version: 1.1.5+08
 
 environment:
   sdk: ^3.7.0-207.0.dev

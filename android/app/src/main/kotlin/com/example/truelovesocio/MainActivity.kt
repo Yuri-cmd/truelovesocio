@@ -1,4 +1,4 @@
-package com.example.truelovesocio
+package com.truelove.truelovesocio
 
 import android.content.ContentValues
 import android.media.MediaScannerConnection
