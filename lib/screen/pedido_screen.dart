@@ -74,7 +74,10 @@ class _PedidosViewState extends State<PedidosView> {
           // Switch para dark/light theme
           Row(
             children: [
-              Icon(isDark ? Icons.dark_mode : Icons.light_mode, color: colorScheme.onPrimary),
+              Icon(
+                isDark ? Icons.dark_mode : Icons.light_mode,
+                color: colorScheme.onPrimary,
+              ),
               Switch(
                 value: isDark,
                 onChanged: (val) {
@@ -109,50 +112,56 @@ class _PedidosViewState extends State<PedidosView> {
       ),
       body: RefreshIndicator(
         onRefresh: loadPedidos,
-        child: pedidos.isEmpty
-            ? ListView(
-                children: [
-                  SizedBox(
-                    height: 400,
-                    child: Center(
-                      child: Text(
-                        '📭 Sin pedidos pendientes',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
+        child:
+            pedidos.isEmpty
+                ? ListView(
+                  children: [
+                    SizedBox(
+                      height: 400,
+                      child: Center(
+                        child: Text(
+                          '📭 Sin pedidos pendientes',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: colorScheme.onSurface.withAlpha(
+                              (0.7 * 255).toInt(),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              )
-            : ListView.builder(
-                itemCount: pedidos.length,
-                padding: const EdgeInsets.all(10),
-                itemBuilder: (context, index) {
-                  final pedido = pedidos[index];
-                  return GestureDetector(
-                    onTap: () async {
-                      final result = await PedidosHelper.navegarASeguimiento(context, pedido);
-                      if (result == true) {
-                        loadPedidos();
-                      }
-                    },
-                    child: PedidoCard(
-                      pedido: pedido,
-                      apiService: apiService,
-                      bloqueoBotones: _bloqueoBotones,
-                      onUpdate: loadPedidos,
-                      bloquearBoton: (bloqueado) {
-                        setState(() {
-                          _bloqueoBotones[pedido.id] = bloqueado;
-                        });
+                  ],
+                )
+                : ListView.builder(
+                  itemCount: pedidos.length,
+                  padding: const EdgeInsets.all(10),
+                  itemBuilder: (context, index) {
+                    final pedido = pedidos[index];
+                    return GestureDetector(
+                      onTap: () async {
+                        final result = await PedidosHelper.navegarASeguimiento(
+                          context,
+                          pedido,
+                        );
+                        if (result == true) {
+                          loadPedidos();
+                        }
                       },
-                    ),
-                  );
-                },
-              ),
+                      child: PedidoCard(
+                        pedido: pedido,
+                        apiService: apiService,
+                        bloqueoBotones: _bloqueoBotones,
+                        onUpdate: loadPedidos,
+                        bloquearBoton: (bloqueado) {
+                          setState(() {
+                            _bloqueoBotones[pedido.id] = bloqueado;
+                          });
+                        },
+                      ),
+                    );
+                  },
+                ),
       ),
       backgroundColor: colorScheme.surface,
     );

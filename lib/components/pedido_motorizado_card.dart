@@ -28,7 +28,7 @@ class PedidoMotorizadoCard extends StatelessWidget {
                   backgroundColor: Colors.orange,
                   child: Icon(Icons.delivery_dining, color: Colors.white),
                 ),
-                title: Text(motorizado),
+                title: Text(motorizado, style: TextStyle(color: Colors.black),),
                 trailing: ElevatedButton(
                   onPressed: () {
                     onCall(

@@ -20,18 +20,21 @@ class PedidoListoView extends StatelessWidget {
                 color: Colors.green,
               ),
               const SizedBox(height: 30),
-              const Text(
+              Text(
                 '¡Pedido Listo!',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               const SizedBox(height: 10),
-              const Text(
+              Text(
                 'El pedido ha sido aceptado y está listo para entregar.',
-                style: TextStyle(fontSize: 18, color: Colors.black54),
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 30),

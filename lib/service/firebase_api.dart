@@ -61,9 +61,6 @@ class FirebaseApi {
 
   // Método para probar inmediatamente las notificaciones de pedidos
   Future<void> testPedidoNotification() async {
-    bool isDebug = false;
-    assert(isDebug = true);
-    
     final testMessage = RemoteMessage(
       notification: const RemoteNotification(
         title: '🛒 Test Nuevo Pedido',
@@ -75,7 +72,6 @@ class FirebaseApi {
       },
     );
     
-    print('🧪 Enviando notificación de prueba en modo ${isDebug ? 'DEBUG' : 'RELEASE'}');
     await _showPedidoNotification(testMessage);
   }
 
@@ -84,8 +80,6 @@ class FirebaseApi {
       // Detectar si es debug o release
       bool isDebug = false;
       assert(isDebug = true); // Solo se ejecuta en debug
-      
-      print('🔧 Creando canales de notificación - Modo: ${isDebug ? 'DEBUG' : 'RELEASE'}');
       
       // Usar IDs únicos para forzar recreación
       final String channelId = isDebug ? 'pedidos_debug_v1' : 'pedidos_release_v1';
@@ -105,7 +99,6 @@ class FirebaseApi {
           enableLights: true,
           ledColor: const Color(0xFF00FF00),
         );
-        print('🎵 Canal debug configurado con sonido personalizado');
       } else {
         // En release, usar configuración especial
         pedidosChannelWithSound = AndroidNotificationChannel(
@@ -118,7 +111,6 @@ class FirebaseApi {
           ledColor: const Color(0xFF0000FF),
           // Sin sonido personalizado, usará el del sistema
         );
-        print('🔊 Canal release configurado con sonido del sistema');
       }
 
       // Canal alternativo con sonido diferente (solo debug)
@@ -183,7 +175,6 @@ class FirebaseApi {
           await androidPlugin?.deleteNotificationChannel('pedidos_alt_debug_v1');
           await androidPlugin?.deleteNotificationChannel('pedidos_alt_release_v1');
           
-          print('🗑️ Canales anteriores eliminados (force recreate)');
         } catch (delErr) {
           print('⚠️ Error al eliminar canales anteriores: $delErr');
         }
@@ -192,13 +183,10 @@ class FirebaseApi {
       // Intentar crear el canal principal con sonido personalizado
       try {
         await androidPlugin?.createNotificationChannel(pedidosChannelWithSound);
-        print('✅ Canal principal de pedidos creado exitosamente: ${pedidosChannelWithSound.id}');
       } catch (e) {
-        print('❌ Error con canal principal: $e');
         // Intentar canal alternativo
         try {
           await androidPlugin?.createNotificationChannel(pedidosChannelAlternative);
-          print('✅ Canal alternativo de pedidos creado: ${pedidosChannelAlternative.id}');
         } catch (e2) {
           print('❌ Error con canal alternativo: $e2');
         }
@@ -208,7 +196,6 @@ class FirebaseApi {
       await androidPlugin?.createNotificationChannel(generalChannel);
       await androidPlugin?.createNotificationChannel(basicChannel);
       
-      print('✅ Todos los canales de notificación configurados');
     } catch (e) {
       print('❌ Error general creando canales: $e');
     }
@@ -217,23 +204,14 @@ class FirebaseApi {
   Future<void> _showNotification(RemoteMessage message) async {
     try {
       // Logging detallado para debug
-      print('🔔 Recibiendo notificación...');
       String? soundFile = message.data['sound'];
-      print('🎵 Archivo de sonido: $soundFile');
-      print('📝 Título: ${message.notification?.title}');
-      print('📝 Cuerpo: ${message.notification?.body}');
-      print('🔧 Data completa: ${message.data}');
-      
       // Determinar qué tipo de notificación mostrar
       if (soundFile != null && soundFile == 'nuevo_pedido') {
-        print('🎯 Intentando notificación con sonido personalizado...');
         await _showPedidoNotification(message);
       } else {
-        print('🔊 Usando notificación general...');
         await _showGeneralNotification(message);
       }
     } catch (e) {
-      print('❌ Error general: $e');
       await _showFallbackNotification(message);
     }
   }
@@ -289,7 +267,6 @@ class FirebaseApi {
           showWhen: true,
           when: DateTime.now().millisecondsSinceEpoch,
         );
-        print('🎵 Configurando notificación DEBUG con sonido: $soundFile');
       } else {
         // En release, usar vibración ULTRA específica y sonido del sistema
         final vibrationPattern = Int64List.fromList([
@@ -318,7 +295,6 @@ class FirebaseApi {
           fullScreenIntent: false,
           category: AndroidNotificationCategory.call, // Categoría de alta prioridad
         );
-        print('🔊 Configurando notificación RELEASE con vibración especial');
       }
 
       NotificationDetails details = NotificationDetails(android: androidDetails);
@@ -330,10 +306,8 @@ class FirebaseApi {
         details,
       );
       
-      print('✅ Notificación mostrada en modo ${isDebug ? 'DEBUG' : 'RELEASE'} en canal $channelId');
       return true;
     } catch (e) {
-      print('❌ Error con notificación en canal $channelId: $e');
       return false;
     }
   }
@@ -373,7 +347,6 @@ class FirebaseApi {
         details,
       );
       
-      print('✅ Notificación de pedido con vibración personalizada mostrada');
     } catch (e) {
       print('❌ Error con notificación de pedido fallback: $e');
     }
@@ -402,7 +375,6 @@ class FirebaseApi {
         details,
       );
       
-      print('Notificación general mostrada');
     } catch (e) {
       print('Error mostrando notificación general: $e');
     }
@@ -431,7 +403,6 @@ class FirebaseApi {
         details,
       );
       
-      print('Notificación básica de respaldo mostrada');
     } catch (e) {
       print('Error mostrando notificación de respaldo: $e');
     }

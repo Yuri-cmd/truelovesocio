@@ -7,6 +7,7 @@ import 'package:truelovesocio/screen/screens.dart';
 import 'package:truelovesocio/service/api_service.dart';
 import 'package:screen_protector/screen_protector.dart';
 import 'package:truelovesocio/service/firebase_api.dart';
+import 'package:truelovesocio/theme/app_theme.dart';
 import 'firebase_options.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -69,13 +70,14 @@ class _MyAppState extends State<MyApp> {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Delivery True Love',
-          theme: ThemeData.light(useMaterial3: true),
-          darkTheme: ThemeData.dark(useMaterial3: true),
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
           themeMode: mode,
           initialRoute: '/',
           routes: {
             '/': (context) => const SplashScreen(),
-            '/login': (context) => widget.isLoggedIn ? HomeScreen() : LoginScreen(),
+            '/login':
+                (context) => widget.isLoggedIn ? HomeScreen() : LoginScreen(),
           },
         );
       },

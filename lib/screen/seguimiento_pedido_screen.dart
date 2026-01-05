@@ -39,6 +39,7 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
       _loadInfoPedido(widget.pedido.id);
     });
   }
+
   @override
   void dispose() {
     _timer?.cancel();
@@ -160,8 +161,10 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: colorScheme.surfaceContainerLowest,
       appBar: AppBar(
         backgroundColor: AppTheme.primary,
         title: const Text(
@@ -210,7 +213,8 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
                               onCall: _llamar,
                             ),
                             const SizedBox(height: 10),
-                            if (estado >= 2 && pedidos[0]['motorizado'].isNotEmpty) ...[
+                            if (estado >= 2 &&
+                                pedidos[0]['motorizado'].isNotEmpty) ...[
                               PedidoMotorizadoCard(
                                 pedidos: pedidos,
                                 onCall: _llamar,
@@ -243,10 +247,10 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
                                     Expanded(
                                       child: Text(
                                         pedidos[0]['nota'],
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
-                                          color: Colors.black87,
+                                          color: Colors.black,
                                         ),
                                       ),
                                     ),
@@ -262,10 +266,18 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
                                 vertical: 14,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.blue.shade50,
+                                color: Color(
+                                  int.parse(
+                                        getMetodoPagoColor(
+                                          widget.pedido.tipoPago,
+                                        ).substring(1, 7),
+                                        radix: 16,
+                                      ) +
+                                      0xFF000000,
+                                ),
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
-                                  color: Colors.blue.shade100,
+                                  color: colorScheme.outline,
                                   width: 1.2,
                                 ),
                               ),
@@ -283,7 +295,7 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
                                         'Método de pago',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.blue.shade900,
+                                          color: Colors.white,
                                           fontSize: 15,
                                           letterSpacing: 0.2,
                                         ),
@@ -291,10 +303,10 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
                                       const SizedBox(height: 4),
                                       Text(
                                         widget.pedido.tipoPago,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
-                                          color: Colors.black87,
+                                          color: Colors.white,
                                         ),
                                       ),
                                     ],
@@ -315,7 +327,7 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
                                 color: Colors.green.shade50,
                                 borderRadius: BorderRadius.circular(14),
                                 border: Border.all(
-                                  color: Colors.green.shade100,
+                                  color: colorScheme.outline,
                                   width: 1.2,
                                 ),
                               ),
@@ -324,7 +336,7 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
                                 children: [
                                   Icon(
                                     Icons.receipt_long_rounded,
-                                    color: Colors.green.shade700,
+                                    color: colorScheme.onSecondaryContainer,
                                     size: 30,
                                   ),
                                   const SizedBox(width: 14),
@@ -336,7 +348,7 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
                                         'Comprobante',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.green.shade900,
+                                          color: Colors.black,
                                           fontSize: 15,
                                           letterSpacing: 0.2,
                                         ),
@@ -346,19 +358,22 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
                                         children: [
                                           Text(
                                             widget.pedido.tipoComprobante,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w500,
-                                              color: Colors.black87,
+                                              color: Colors.black,
                                             ),
                                           ),
                                           const SizedBox(width: 6),
                                           Text(
                                             widget.pedido.documento,
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w500,
-                                              color: Colors.black54,
+                                              color:
+                                                  Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
                                             ),
                                           ),
                                         ],

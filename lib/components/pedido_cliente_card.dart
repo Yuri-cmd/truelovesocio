@@ -11,6 +11,8 @@ class PedidoClienteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       children:
           pedidos.map((pedido) {
@@ -24,12 +26,12 @@ class PedidoClienteCard extends StatelessWidget {
               ),
               elevation: 5,
               child: ListTile(
-                leading: const CircleAvatar(
+                leading: CircleAvatar(
                   radius: 20,
-                  backgroundColor: Colors.blue,
-                  child: Icon(Icons.person, color: Colors.white),
+                  backgroundColor: colorScheme.primary,
+                  child: Icon(Icons.person, color: colorScheme.onPrimary),
                 ),
-                title: Text(cliente),
+                title: Text(cliente, style: TextStyle(color: Colors.black),),
                 trailing: ElevatedButton(
                   onPressed: () {
                     onCall(celular);

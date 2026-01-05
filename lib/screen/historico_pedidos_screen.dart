@@ -8,6 +8,7 @@ import 'package:truelovesocio/service/api_service.dart';
 import 'package:truelovesocio/theme/app_theme.dart';
 import 'package:truelovesocio/utils/helpers.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 class HistoricoPedidosScreen extends StatefulWidget {
   const HistoricoPedidosScreen({super.key});
 
@@ -42,10 +43,10 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
       });
     } catch (e) {
       setState(() => _isLoading = false);
-      if(!mounted) return;  
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al cargar pedidos: $e')),
-      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error al cargar pedidos: $e')));
     }
   }
 
@@ -70,26 +71,28 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
     if (!mounted) return;
     await showDialog(
       context: context,
-      barrierDismissible: true, // Permitir cerrar el diálogo al hacer clic fuera
-      builder: (dialogContext) => Dialog(
-        backgroundColor: Colors.black,
-        insetPadding: const EdgeInsets.all(16),
-        child: Stack(
-          alignment: Alignment.topRight,
-          children: [
-            InteractiveViewer(
-              child: Image.network(photoUrl, fit: BoxFit.contain),
+      barrierDismissible:
+          true, // Permitir cerrar el diálogo al hacer clic fuera
+      builder:
+          (dialogContext) => Dialog(
+            backgroundColor: Colors.black,
+            insetPadding: const EdgeInsets.all(16),
+            child: Stack(
+              alignment: Alignment.topRight,
+              children: [
+                InteractiveViewer(
+                  child: Image.network(photoUrl, fit: BoxFit.contain),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white),
+                  onPressed: () {
+                    // Usar el context del builder para cerrar correctamente el diálogo
+                    Navigator.of(dialogContext).pop();
+                  },
+                ),
+              ],
             ),
-            IconButton(
-              icon: const Icon(Icons.close, color: Colors.white),
-              onPressed: () {
-                // Usar el context del builder para cerrar correctamente el diálogo
-                Navigator.of(dialogContext).pop();
-              },
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
@@ -112,10 +115,10 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
       const platform = MethodChannel('app.channel.documents');
       try {
         final displayName = fileName; // e.g. 163...jpg
-        final out = await platform.invokeMethod<String>(
-          'saveFileToDownloads',
-          {'path': savePath, 'displayName': displayName},
-        );
+        final out = await platform.invokeMethod<String>('saveFileToDownloads', {
+          'path': savePath,
+          'displayName': displayName,
+        });
 
         if (!mounted) return;
         if (out != null) {
@@ -124,10 +127,10 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
             final tmp = File(savePath);
             if (await tmp.exists()) await tmp.delete();
           } catch (_) {}
-          if(!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Imagen guardada en: $out')),
-          );
+          if (!mounted) return;
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Imagen guardada en: $out')));
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Imagen descargada (temporal): $savePath')),
@@ -137,14 +140,18 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
         // If native saving fails, at least inform about local temp path
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Descargado en: $savePath (no se guardó en Downloads): ${e.message}')),
+          SnackBar(
+            content: Text(
+              'Descargado en: $savePath (no se guardó en Downloads): ${e.message}',
+            ),
+          ),
         );
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al descargar: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error al descargar: $e')));
     }
   }
 
@@ -187,7 +194,9 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
                     value: _selectedFecha,
                     decoration: InputDecoration(
                       labelText: 'Fecha',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                     items: const [
                       DropdownMenuItem(value: 'todas', child: Text('Todas')),
@@ -207,12 +216,20 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
                     value: _selectedTipo,
                     decoration: InputDecoration(
                       labelText: 'Tipo',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                     items: const [
                       DropdownMenuItem(value: 'todos', child: Text('Todos')),
-                      DropdownMenuItem(value: 'finalizados', child: Text('Finalizados')),
-                      DropdownMenuItem(value: 'activos', child: Text('Activos')),
+                      DropdownMenuItem(
+                        value: 'finalizados',
+                        child: Text('Finalizados'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'activos',
+                        child: Text('Activos'),
+                      ),
                     ],
                     onChanged: (v) {
                       if (v != null) {
@@ -228,173 +245,267 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
 
           // Lista
           Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _pedidos.isEmpty
+            child:
+                _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : _pedidos.isEmpty
                     ? const Center(child: Text('No hay pedidos disponibles'))
                     : RefreshIndicator(
-                        onRefresh: _loadPedidos,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.all(12),
-                          itemCount: _pedidos.length,
-                          itemBuilder: (context, idx) {
-                            final pedido = _pedidos[idx];
-                            final photoUrl = _getPhotoUrl(pedido);
-                            final estadoText = obtenerEstado(int.parse(pedido.estado));
-                            final estadoColor = obtenerColorEstado(int.parse(pedido.estado));
+                      onRefresh: _loadPedidos,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(12),
+                        itemCount: _pedidos.length,
+                        itemBuilder: (context, idx) {
+                          final pedido = _pedidos[idx];
+                          final photoUrl = _getPhotoUrl(pedido);
+                          final estadoText = obtenerEstado(
+                            int.parse(pedido.estado),
+                          );
+                          final estadoColor = obtenerColorEstado(
+                            int.parse(pedido.estado),
+                          );
 
-                            final subtotal = _toDouble(pedido.subtotal);
-                            final delivery = _toDouble(pedido.precioDelivery);
-                            final descuento = _toDouble(pedido.descuento);
-                            final total = subtotal + delivery - descuento;
-                            final isExpanded = _expanded.contains(pedido.id);
+                          final subtotal = _toDouble(pedido.subtotal);
+                          final delivery = _toDouble(pedido.precioDelivery);
+                          final descuento = _toDouble(pedido.descuento);
+                          final total = subtotal + delivery - descuento;
+                          final isExpanded = _expanded.contains(pedido.id);
 
-                            return AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              margin: const EdgeInsets.symmetric(vertical: 6),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(14),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withAlpha(25),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 3),
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            margin: const EdgeInsets.symmetric(vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withAlpha(25),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(14),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              'Pedido #${pedido.id}',
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            Text(
+                                              pedido.cliente,
+                                              style: TextStyle(
+                                                color:
+                                                    Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurfaceVariant,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 6,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: estadoColor.withAlpha(38),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          estadoText,
+                                          style: TextStyle(
+                                            color: estadoColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(14),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Dirección: ${pedido.direccionEntrega}',
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () => _llamar(pedido.celular),
+                                    child: Row(
                                       children: [
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text('Pedido #${pedido.id}',
-                                                  style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-                                              Text(pedido.cliente,
-                                                  style: const TextStyle(color: Colors.black54)),
-                                            ],
-                                          ),
+                                        const Icon(
+                                          Icons.phone,
+                                          color: Colors.green,
+                                          size: 16,
                                         ),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                          decoration: BoxDecoration(
-                                            color: estadoColor.withAlpha(38),
-                                            borderRadius: BorderRadius.circular(20),
-                                          ),
-                                          child: Text(
-                                            estadoText,
-                                            style: TextStyle(color: estadoColor, fontWeight: FontWeight.bold, fontSize: 12),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          'Cliente: ${pedido.celular}',
+                                          style: TextStyle(
+                                            color:
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurfaceVariant,
                                           ),
                                         ),
                                       ],
                                     ),
-
-                                    const SizedBox(height: 8),
-                                    Text('Dirección: ${pedido.direccionEntrega}',
-                                        style: const TextStyle(color: Colors.grey)),
-                                    GestureDetector(
-                                      onTap: () => _llamar(pedido.celular),
-                                      child: Row(
-                                        children: [
-                                          const Icon(Icons.phone, color: Colors.green, size: 16),
-                                          const SizedBox(width: 4),
-                                          Text('Cliente: ${pedido.celular}',
-                                              style: const TextStyle(color: Colors.grey)),
-                                        ],
-                                      ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  GestureDetector(
+                                    onTap:
+                                        () => _llamar(pedido.celularMotorizado),
+                                    child: Row(
+                                      children: [
+                                        const Icon(
+                                          Icons.phone,
+                                          color: Colors.green,
+                                          size: 16,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          'Motorizado: ${pedido.celularMotorizado}',
+                                          style: TextStyle(
+                                            color:
+                                                Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurfaceVariant,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(height: 4),
-                                    GestureDetector(
-                                      onTap: () => _llamar(pedido.celularMotorizado),
-                                      child: Row(
-                                        children: [
-                                          const Icon(Icons.phone, color: Colors.green, size: 16),
-                                          const SizedBox(width: 4),
-                                          Text('Motorizado: ${pedido.celularMotorizado}',
-                                              style: const TextStyle(color: Colors.grey)),
-                                        ],
-                                      ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Fecha: ${_formatDate(pedido.fecha)}',
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.onSurfaceVariant,
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text('Fecha: ${_formatDate(pedido.fecha)}',
-                                        style: const TextStyle(color: Colors.grey)),
-                                    const Divider(height: 20),
+                                  ),
+                                  const Divider(height: 20),
 
-                                    if (isExpanded)
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          const Text('Productos:', style: TextStyle(fontWeight: FontWeight.bold)),
-                                          const SizedBox(height: 8),
-                                          ...(pedido.detalleArray).map((d) => Padding(
-                                                padding: const EdgeInsets.symmetric(vertical: 2),
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(child: Text('${d.cantidad}x ${d.nombre}')),
-                                                    Text('S/. ${d.precio}'),
-                                                  ],
+                                  if (isExpanded)
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Productos:',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        ...(pedido.detalleArray).map(
+                                          (d) => Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 2,
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    '${d.cantidad}x ${d.nombre}',
+                                                  ),
                                                 ),
-                                              )),
-                                          const Divider(),
-                                        ],
-                                      ),
-
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text('Total: S/. ${total.toStringAsFixed(2)}',
-                                            style: const TextStyle(
-                                                fontWeight: FontWeight.bold, color: Colors.black87)),
-                                        TextButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              if (isExpanded) {
-                                                _expanded.remove(pedido.id);
-                                              } else {
-                                                _expanded.add(pedido.id);
-                                              }
-                                            });
-                                          },
-                                          child: Text(isExpanded ? 'Ver menos' : 'Ver más'),
-                                        ),
-                                      ],
-                                    ),
-
-                                    if (photoUrl != null)
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.end,
-                                        children: [
-                                          ElevatedButton.icon(
-                                            onPressed: () => _showPhotoDialog(photoUrl),
-                                            icon: const Icon(Icons.remove_red_eye, size: 16),
-                                            label: const Text('Ver pago'),
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.green,
-                                              foregroundColor: Colors.white,
+                                                Text('S/. ${d.precio}'),
+                                              ],
                                             ),
                                           ),
-                                          const SizedBox(width: 8),
-                                          IconButton(
-                                            onPressed: () => _downloadImage(photoUrl),
-                                            icon: const Icon(Icons.download),
-                                            tooltip: 'Descargar comprobante',
-                                          ),
-                                        ],
+                                        ),
+                                        const Divider(),
+                                      ],
+                                    ),
+
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Total: S/. ${total.toStringAsFixed(2)}',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color:
+                                              Theme.of(
+                                                context,
+                                              ).colorScheme.onSurface,
+                                        ),
                                       ),
-                                  ],
-                                ),
+                                      TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            if (isExpanded) {
+                                              _expanded.remove(pedido.id);
+                                            } else {
+                                              _expanded.add(pedido.id);
+                                            }
+                                          });
+                                        },
+                                        child: Text(
+                                          isExpanded ? 'Ver menos' : 'Ver más',
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  if (photoUrl != null)
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        ElevatedButton.icon(
+                                          onPressed:
+                                              () => _showPhotoDialog(photoUrl),
+                                          icon: const Icon(
+                                            Icons.remove_red_eye,
+                                            size: 16,
+                                          ),
+                                          label: const Text('Ver pago'),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.green,
+                                            foregroundColor: Colors.white,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        IconButton(
+                                          onPressed:
+                                              () => _downloadImage(photoUrl),
+                                          icon: const Icon(Icons.download),
+                                          tooltip: 'Descargar comprobante',
+                                        ),
+                                      ],
+                                    ),
+                                ],
                               ),
-                            );
-                          },
-                        ),
+                            ),
+                          );
+                        },
                       ),
+                    ),
           ),
         ],
       ),

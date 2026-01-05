@@ -5,10 +5,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return AppBar(
       elevation: 0,
-      foregroundColor: Colors.black,
-      backgroundColor: Colors.white,
+      foregroundColor: colorScheme.onSurface,
+      backgroundColor: colorScheme.surface,
       title: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -17,8 +19,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             // CircleAvatar with Gray Border
             Container(
               padding: const EdgeInsets.all(2.0),
-              decoration: const BoxDecoration(
-                color: Color.fromRGBO(245, 245, 245, 1), // Border color
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest, // Border color
                 shape: BoxShape.circle,
               ),
               child: PopupMenuButton<String>(
@@ -30,13 +32,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 },
                 itemBuilder: (BuildContext context) {
                   return [
-                    const PopupMenuItem<String>(
+                    PopupMenuItem<String>(
                       value: 'profile',
                       child: Row(
                         children: [
-                          Icon(Icons.person, color: Colors.black),
-                          SizedBox(width: 8),
-                          Text('Mi perfil'),
+                          Icon(Icons.person, color: colorScheme.onSurface),
+                          const SizedBox(width: 8),
+                          const Text('Mi perfil'),
                         ],
                       ),
                     ),
@@ -45,28 +47,27 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 },
                 // Usamos offset para que el menú se despliegue debajo del CircleAvatar
                 offset: const Offset(
-                    0, 50), // Cambia el valor según la distancia que quieras
-                child: const CircleAvatar(
-                  backgroundColor: Colors.white,
+                  0,
+                  50,
+                ), // Cambia el valor según la distancia que quieras
+                child: CircleAvatar(
+                  backgroundColor: colorScheme.surface,
                   child: Text(
                     'JS',
-                    style: TextStyle(color: Colors.black),
+                    style: TextStyle(color: colorScheme.onSurface),
                   ),
                 ),
               ),
             ),
             Container(
               padding: const EdgeInsets.all(2.0), // Border thickness
-              decoration: const BoxDecoration(
-                color: Color.fromRGBO(245, 245, 245, 1), // Border color
+              decoration: BoxDecoration(
+                color: colorScheme.surfaceContainerHighest, // Border color
                 shape: BoxShape.circle,
               ),
-              child: const CircleAvatar(
-                backgroundColor: Colors.white,
-                child: Icon(
-                  Icons.notifications,
-                  color: Colors.black,
-                ),
+              child: CircleAvatar(
+                backgroundColor: colorScheme.surface,
+                child: Icon(Icons.notifications, color: colorScheme.onSurface),
               ),
             ),
           ],

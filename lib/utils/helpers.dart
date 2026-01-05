@@ -108,3 +108,28 @@ Widget getMetodoPagoImage(String? tipoPago) {
     ),
   );
 }
+
+String getMetodoPagoColor(String? tipoPago) {
+  String colorHex;
+
+  switch (tipoPago?.toLowerCase()) {
+    case 'yape':
+      colorHex = '#9900FF'; // Example color for Yape
+      break;
+    case 'plin':
+      colorHex = '#00A1FF'; // Example color for Plin
+      break;
+    case 'efectivo':
+      colorHex = '#00702E'; // Example color for Efectivo
+      break;
+    case 'pos tarjeta credito':
+    case 'pos':
+      colorHex = '#FF00BB'; // Example color for POS
+      break;
+    default:
+      return '#000000'; // Default color if not recognized
+  }
+
+
+  return colorHex;
+}

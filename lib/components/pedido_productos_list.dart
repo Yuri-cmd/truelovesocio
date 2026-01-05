@@ -41,13 +41,14 @@ class PedidoProductosList extends StatelessWidget {
                 children: [
                   Text(
                     '($cantidad) $nombre',
-                    style: const TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 16, color: Colors.black), 
                   ),
                   Text(
                     (precio * cantidad).toStringAsFixed(2),
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      color: Colors.black
                     ),
                   ),
                 ],
@@ -67,7 +68,7 @@ class PedidoProductosList extends StatelessWidget {
       children: [
         const Text(
           'Total a cobrar: ',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
         ),
         Text(
           total.toStringAsFixed(2),
