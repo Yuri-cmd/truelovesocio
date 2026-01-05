@@ -147,7 +147,6 @@ class ApiService {
     String tipo = 'todos',
   }) async {
     final int? idBiker = await getUsuarioId();
-    print('$baseUrl/socio/get/pedidos/$idBiker?fecha=$fecha&tipo=$tipo'); // Línea de depuración
     final String apiUrl = '$baseUrl/socio/get/pedidos/$idBiker?fecha=$fecha&tipo=$tipo';
     try {
       final response = await http.get(Uri.parse(apiUrl));
