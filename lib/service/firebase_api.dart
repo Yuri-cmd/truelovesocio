@@ -28,6 +28,9 @@ class FirebaseApi {
 
       // Obtener el token de FCM
       String? token = await _firebaseMessaging.getToken();
+      log(token != null
+          ? "✅ Token FCM obtenido: $token"
+          : "❌ No se pudo obtener el token FCM");
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('token_fcm', token!);
       final idUser = await ApiService.getUsuarioId();
