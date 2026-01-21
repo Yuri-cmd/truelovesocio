@@ -47,13 +47,33 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        
+        ndk {
+            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86_64"))
+        }
+    }
+
+    // Configuración de splits para arquitecturas
+    splits {
+        abi {
+            isEnable = false
+            reset()
+            include("armeabi-v7a", "arm64-v8a", "x86_64")
+            isUniversalApk = true
+        }
     }
 
     buildTypes {
+        debug {
+            isMinifyEnabled = false
+            isShrinkResources = false
+            isDebuggable = true
+        }
         release {
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             isShrinkResources = false
+            isDebuggable = false
         }
     }
 
@@ -64,10 +84,15 @@ android {
         }
     }
     
-    // Preservar recursos específicos
-    packagingOptions {
+    // Configuración de empaquetado para librerías nativas
+    packaging {
         pickFirst("**/libc++_shared.so")
         pickFirst("**/libjsc.so")
+        pickFirst("**/libflutter.so")
+        pickFirst("**/libapp.so")
+        // Asegurar que todas las librerías se incluyan
+        merge("**/libflutter.so")
+        merge("**/libapp.so")
     }
 }
 
@@ -79,5 +104,13 @@ dependencies {
     implementation("androidx.core:core-ktx:1.9.0")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
     implementation ("org.slf4j:slf4j-api:1.7.30")
-    implementation("org.slf4j:slf4j-simple:1.7.30") 
+    implementation("org.slf4j:slf4j-simple:1.7.30")
+    
+    // Excluir explícitamente cualquier dependencia de ads que pueda venir de Firebase u otras librerías
+    configurations.all {
+        exclude(group = "com.google.android.gms", module = "play-services-ads")
+        exclude(group = "com.google.android.gms", module = "play-services-ads-lite")  
+        exclude(group = "com.google.android.gms", module = "play-services-ads-identifier")
+        exclude(group = "com.google.firebase", module = "firebase-ads")
+    }
 }

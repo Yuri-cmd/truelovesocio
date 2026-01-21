@@ -102,6 +102,25 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:718991696253:android:9c03efa9e513fb1382ec14",
+        "android_client_info": {
+          "package_name": "com.truelove.truelovebiker"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEDm76HqDpWVX4FYnyZCGwirAWfx_pEFY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:718991696253:android:36159d957d13b4c282ec14",
         "android_client_info": {
           "package_name": "com.truelove.trueloveclient"
