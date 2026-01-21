@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_print
 
+import 'dart:developer';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -13,47 +14,51 @@ class FirebaseApi {
       FlutterLocalNotificationsPlugin();
 
   Future<void> initNotifications() async {
-    // Solicitar permisos
-    NotificationSettings settings = await _firebaseMessaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+    try{
+      // Solicitar permisos
+      NotificationSettings settings = await _firebaseMessaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
 
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print("Permisos de notificación concedidos");
+      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+        log("Permisos de notificación concedidos");
+      }
+
+      // Obtener el token de FCM
+      String? token = await _firebaseMessaging.getToken();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('token_fcm', token!);
+      final idUser = await ApiService.getUsuarioId();
+      if (idUser != null) {
+        ApiService.updateFcmToken(idUser, token);
+      }
+    
+      // Configurar flutter_local_notifications
+      const AndroidInitializationSettings androidSettings =
+          AndroidInitializationSettings('@mipmap/ic_launcher');
+
+      const InitializationSettings initSettings =
+          InitializationSettings(android: androidSettings);
+
+      await _flutterLocalNotificationsPlugin.initialize(initSettings);
+
+      // Crear canales de notificación
+      await _createNotificationChannels();
+
+      // Manejo de notificaciones recibidas
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        _showNotification(message);
+      });
+
+      // Manejar notificaciones cuando la app está en segundo plano pero abierta
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        log('Notificación abierta: ${message.notification?.title}');
+      });
+    } catch (e) {
+      log('❌ Error inicializando notificaciones: $e');
     }
-
-    // Obtener el token de FCM
-    String? token = await _firebaseMessaging.getToken();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('token_fcm', token!);
-    final idUser = await ApiService.getUsuarioId();
-    if (idUser != null) {
-      ApiService.updateFcmToken(idUser, token);
-    }
-  
-    // Configurar flutter_local_notifications
-    const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    const InitializationSettings initSettings =
-        InitializationSettings(android: androidSettings);
-
-    await _flutterLocalNotificationsPlugin.initialize(initSettings);
-
-    // Crear canales de notificación
-    await _createNotificationChannels();
-
-    // Manejo de notificaciones recibidas
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      _showNotification(message);
-    });
-
-    // Manejar notificaciones cuando la app está en segundo plano pero abierta
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('Notificación abierta: ${message.notification?.title}');
-    });
   }
 
   // Método público para testing
