@@ -1,7 +1,6 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
     id("com.google.gms.google-services")
 }
@@ -9,7 +8,6 @@ plugins {
 import java.util.Properties
 import java.io.FileInputStream
 
-// Configurar propiedades de firmado
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")
 if (keystorePropertiesFile.exists()) {
@@ -31,7 +29,6 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
-    // Configuración de firma
     signingConfigs {
         create("release") {
             keyAlias = keystoreProperties.getProperty("keyAlias")
@@ -49,50 +46,47 @@ android {
         versionName = flutter.versionName
         
         ndk {
+            // Asegura compatibilidad con el celular que fallaba (32 bits)
             abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86_64"))
         }
     }
 
-    // Configuración de splits para arquitecturas
-    splits {
-        abi {
-            isEnable = false
-            reset()
-            include("armeabi-v7a", "arm64-v8a", "x86_64")
-            isUniversalApk = true
-        }
-    }
-
-    buildTypes {
-        debug {
-            isMinifyEnabled = false
-            isShrinkResources = false
-            isDebuggable = true
-        }
-        release {
-            signingConfig = signingConfigs.getByName("release")
-            isMinifyEnabled = false
-            isShrinkResources = false
-            isDebuggable = false
-        }
-    }
-
-    // Asegurar que se incluyan los recursos raw
+    // REINTEGRADO: Esto asegura que tus sonidos en src/main/res/raw sean visibles
     sourceSets {
         getByName("main") {
             res.srcDirs("src/main/res")
         }
     }
-    
-    // Configuración de empaquetado para librerías nativas
+
+    buildTypes {
+        release {
+            signingConfig = signingConfigs.getByName("release")
+            
+            // Optimización activada para quitar advertencias de peso en Google Play
+            isMinifyEnabled = true 
+            isShrinkResources = true
+            
+            // Usa el archivo proguard-rules.pro que ya tienes en la carpeta
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+        debug {
+            isMinifyEnabled = false
+            isShrinkResources = false
+            isDebuggable = true
+        }
+    }
+
     packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
         pickFirst("**/libc++_shared.so")
         pickFirst("**/libjsc.so")
         pickFirst("**/libflutter.so")
         pickFirst("**/libapp.so")
-        // Asegurar que todas las librerías se incluyan
-        merge("**/libflutter.so")
-        merge("**/libapp.so")
     }
 }
 
@@ -103,10 +97,9 @@ flutter {
 dependencies {
     implementation("androidx.core:core-ktx:1.9.0")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
-    implementation ("org.slf4j:slf4j-api:1.7.30")
+    implementation("org.slf4j:slf4j-api:1.7.30")
     implementation("org.slf4j:slf4j-simple:1.7.30")
     
-    // Excluir explícitamente cualquier dependencia de ads que pueda venir de Firebase u otras librerías
     configurations.all {
         exclude(group = "com.google.android.gms", module = "play-services-ads")
         exclude(group = "com.google.android.gms", module = "play-services-ads-lite")  
