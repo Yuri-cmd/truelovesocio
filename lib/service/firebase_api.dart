@@ -92,8 +92,8 @@ class FirebaseApi {
       assert(isDebug = true); // Solo se ejecuta en debug
       
       // Usar IDs únicos para forzar recreación
-      final String channelId = isDebug ? 'pedidos_debug_v1' : 'pedidos_release_v1';
-      final String altChannelId = isDebug ? 'pedidos_alt_debug_v1' : 'pedidos_alt_release_v1';
+      final String channelId = isDebug ? 'pedidos_debug_v1' : 'pedidos_channel_v2';
+      final String altChannelId = isDebug ? 'pedidos_alt_debug_v1' : 'pedidos_channel_alt_v2';
       
       AndroidNotificationChannel pedidosChannelWithSound;
       
@@ -110,16 +110,16 @@ class FirebaseApi {
           ledColor: const Color(0xFF00FF00),
         );
       } else {
-        // En release, usar configuración especial
+        // En release, también asignar sonido personalizado y usar el id que está en el AndroidManifest
         pedidosChannelWithSound = AndroidNotificationChannel(
           channelId,
           'Nuevos Pedidos (Release)',
           description: 'Notificaciones de nuevos pedidos en release',
           importance: Importance.max,
+          sound: const RawResourceAndroidNotificationSound('nuevo_pedido'),
           enableVibration: true,
           enableLights: true,
           ledColor: const Color(0xFF0000FF),
-          // Sin sonido personalizado, usará el del sistema
         );
       }
 
@@ -141,6 +141,7 @@ class FirebaseApi {
           'Nuevos Pedidos Alt (Release)',
           description: 'Canal alternativo para pedidos release',
           importance: Importance.max,
+          sound: const RawResourceAndroidNotificationSound('pedido_sound'),
           enableVibration: true,
           enableLights: true,
         );
@@ -184,6 +185,9 @@ class FirebaseApi {
           await androidPlugin?.deleteNotificationChannel('pedidos_release_v1');
           await androidPlugin?.deleteNotificationChannel('pedidos_alt_debug_v1');
           await androidPlugin?.deleteNotificationChannel('pedidos_alt_release_v1');
+          // Eliminar canales con los ids nuevos/manifest para forzar recreación
+          await androidPlugin?.deleteNotificationChannel('pedidos_channel_v2');
+          await androidPlugin?.deleteNotificationChannel('pedidos_channel_alt_v2');
           
         } catch (delErr) {
           print('⚠️ Error al eliminar canales anteriores: $delErr');
@@ -278,7 +282,7 @@ class FirebaseApi {
           when: DateTime.now().millisecondsSinceEpoch,
         );
       } else {
-        // En release, usar vibración ULTRA específica y sonido del sistema
+        // En release, usar vibración ULTRA específica y también intentar sonido raw personalizado
         final vibrationPattern = Int64List.fromList([
           0, 200, 100, 200, 100, 200, 100, 400, 200, 400, 200, 400
         ]); // Patrón único: 3 cortos, 3 largos
@@ -289,7 +293,8 @@ class FirebaseApi {
           channelDescription: 'Notificaciones de nuevos pedidos en release',
           importance: Importance.max,
           priority: Priority.max,
-          playSound: true, // Usar sonido por defecto del sistema
+          sound: RawResourceAndroidNotificationSound(soundFile),
+          playSound: true,
           enableVibration: true,
           vibrationPattern: vibrationPattern, // Patrón SOS modificado
           enableLights: true,

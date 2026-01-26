@@ -63,8 +63,8 @@ android {
             signingConfig = signingConfigs.getByName("release")
             
             // Optimización activada para quitar advertencias de peso en Google Play
-            isMinifyEnabled = true 
-            isShrinkResources = true
+            isMinifyEnabled = false 
+            isShrinkResources = false
             
             // Usa el archivo proguard-rules.pro que ya tienes en la carpeta
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
