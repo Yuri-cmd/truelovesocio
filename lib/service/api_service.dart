@@ -59,7 +59,10 @@ class ApiService {
     }
   }
 
-  static Future<Map<String, dynamic>?> loginWithQuotaValidation(String nroDocumento, String password) async {
+  static Future<Map<String, dynamic>?> loginWithQuotaValidation(
+    String nroDocumento,
+    String password,
+  ) async {
     final url = Uri.parse('$baseUrl/socio/login');
 
     try {
@@ -147,7 +150,8 @@ class ApiService {
     String tipo = 'todos',
   }) async {
     final int? idBiker = await getUsuarioId();
-    final String apiUrl = '$baseUrl/socio/get/pedidos/$idBiker?fecha=$fecha&tipo=$tipo';
+    final String apiUrl =
+        '$baseUrl/socio/get/pedidos/$idBiker?fecha=$fecha&tipo=$tipo';
     try {
       final response = await http.get(Uri.parse(apiUrl));
 
@@ -283,11 +287,15 @@ class ApiService {
     }
   }
 
-  Future<List<Menu>> fetchMenu() async {
+  Future<List<Menu>> fetchMenu({int? categoriaId}) async {
     final int? idEmpresa = await getUsuarioId();
-    final response = await http.get(
-      Uri.parse('$baseUrl/listar/menus/$idEmpresa'),
-    );
+    final String url =
+        categoriaId != null
+            ? '$baseUrl/listar/menus/$idEmpresa?categoria=$categoriaId'
+            : '$baseUrl/listar/menus/$idEmpresa';
+
+    final response = await http.get(Uri.parse(url));
+
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
       return data.map((json) => Menu.fromJson(json)).toList();
@@ -300,7 +308,11 @@ class ApiService {
     final response = await http.put(
       Uri.parse('$baseUrl/menu/$id/status'),
       headers: {'Content-Type': 'application/json'},
-      body: json.encode({'status': isActive ? 'active' : 'inactive'}),
+      // Enviar ambos campos por compatibilidad con distintos backends
+      body: json.encode({
+        'status': isActive ? 'active' : 'inactive',
+        'estado': isActive ? 'active' : 'inactive',
+      }),
     );
 
     if (response.statusCode == 200) {
@@ -497,6 +509,18 @@ class ApiService {
       }
     } catch (e) {
       return false;
+    }
+  }
+
+  Future<void> updateCategoryStatus(int id, int estado) async {
+    final int? idEmpresa = await getUsuarioId();
+    final response = await http.put(
+      Uri.parse('$baseUrl/categories/$id/status'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'estado': estado, 'empresa_id': idEmpresa}),
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Error al actualizar el estado de la categoría');
     }
   }
 }

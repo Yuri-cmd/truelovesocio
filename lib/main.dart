@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:truelovesocio/model/socio_model.dart';
@@ -23,12 +22,6 @@ Future<void> main() async {
 
   await FirebaseApi().initNotifications();
 
-  // 🔐 Previene capturas de pantalla al iniciar
-  await ScreenProtector.preventScreenshotOn();
-
-  if (Platform.isIOS) {
-    await ScreenProtector.protectDataLeakageWithBlur();
-  }
 
   // 2. Cargar preferencia del tema antes de runApp
   final prefs = await SharedPreferences.getInstance();

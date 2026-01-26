@@ -58,19 +58,6 @@ class _CategoryViewState extends State<CategoryView> {
     }
   }
 
-  // Eliminar una categoría
-  Future<void> _deleteCategory(int id) async {
-    try {
-      await _apiService.deleteCategory(id);
-      _loadCategories(); // Recargar las categorías después de eliminar una
-    } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al eliminar la categoría: $e')),
-      );
-    }
-  }
-
   // Mostrar el cuadro de diálogo para agregar una categoría
   void _showAddCategoryDialog() {
     showDialog(
@@ -190,19 +177,29 @@ class _CategoryViewState extends State<CategoryView> {
                                       Icons.edit,
                                       color: Colors.blue,
                                     ),
-                                    onPressed:
-                                        () => _showEditCategoryDialog(
-                                          category.id,
-                                          category.name,
-                                        ),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.delete,
-                                      color: Colors.red,
+                                    onPressed: () => _showEditCategoryDialog(
+                                      category.id,
+                                      category.name,
                                     ),
-                                    onPressed:
-                                        () => _deleteCategory(category.id),
+                                  ),
+                                  Switch(
+                                    value: category.estado == 1,
+                                    activeThumbColor: Colors.green,
+                                    inactiveThumbColor: Colors.red,
+                                    onChanged: (val) async {
+                                      final nuevoEstado = val ? 1 : 0;
+                                      try {
+                                        await _apiService.updateCategoryStatus(category.id, nuevoEstado);
+                                        setState(() {
+                                          category.estado = nuevoEstado;
+                                        });
+                                      } catch (e) {
+                                        if (!context.mounted) return;
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Error al cambiar el estado: $e')),
+                                        );
+                                      }
+                                    },
                                   ),
                                 ],
                               ),

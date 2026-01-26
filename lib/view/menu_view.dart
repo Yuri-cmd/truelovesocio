@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:truelovesocio/components/components.dart';
 import 'package:truelovesocio/model/menu_model.dart';
+import 'package:truelovesocio/model/category_model.dart';
 import 'package:truelovesocio/service/api_service.dart';
 import 'package:truelovesocio/view/category_view.dart';
 import 'package:truelovesocio/view/crear_menu_view.dart';
@@ -16,27 +17,42 @@ class MenuView extends StatefulWidget {
 
 class _MenuViewState extends State<MenuView> {
   List<Menu> dishes = [];
+  List<Category> categories = [];
+  int? selectedCategoryId;
 
   @override
   void initState() {
     super.initState();
+    _loadCategories();
     _loadMenu();
   }
 
   void _loadMenu() {
     ApiService()
-        .fetchMenu()
+        .fetchMenu(categoriaId: selectedCategoryId)
         .then((menus) {
-          setState(() {
-            dishes = menus;
-          });
-        })
-        .catchError((e) {
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error al cargar los menús: $e')),
-          );
-        });
+      setState(() {
+        dishes = menus;
+      });
+    }).catchError((e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cargar los menús: $e')),
+      );
+    });
+  }
+
+  void _loadCategories() {
+    ApiService().fetchCategories().then((cats) {
+      setState(() {
+        categories = cats;
+      });
+    }).catchError((e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error al cargar las categorías: $e')),
+      );
+    });
   }
 
   void _toggleDishStatus(Menu dish, bool isActive) {
@@ -180,16 +196,22 @@ class _MenuViewState extends State<MenuView> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        DropdownButton<String>(
-                          value: 'Menú Almuerzo',
-                          items: ['Menú Almuerzo', 'Menú Cena']
-                              .map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                          onChanged: (newValue) {},
+                        DropdownButton<int?>(
+                          value: selectedCategoryId,
+                          hint: const Text('Seleccionar categoría'),
+                          items: categories
+                              .where((cat) => cat.estado == 1)
+                              .map((cat) => DropdownMenuItem<int?>(
+                                    value: cat.id,
+                                    child: Text(cat.name),
+                                  ))
+                              .toList(),
+                          onChanged: (int? newValue) {
+                            setState(() {
+                              selectedCategoryId = newValue;
+                            });
+                            _loadMenu();
+                          },
                         ),
                         TextButton.icon(
                           onPressed: _loadMenu,
