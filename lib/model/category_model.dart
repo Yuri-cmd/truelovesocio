@@ -4,7 +4,17 @@ class Category {
   final int idEmpresa; // Campo id_empresa
   int estado; // 1 activo, 0 desactivado
 
-  Category({required this.id, required this.name, required this.idEmpresa, required this.estado});
+  final String? horaInicio;
+  final String? horaFin;
+
+  Category({
+    required this.id,
+    required this.name,
+    required this.idEmpresa,
+    required this.estado,
+    this.horaInicio,
+    this.horaFin,
+  });
 
   // Convertir JSON a modelo
   factory Category.fromJson(Map<String, dynamic> json) {
@@ -13,6 +23,8 @@ class Category {
       name: json['nombre'],
       idEmpresa: json['empresa_id'], // Leer el campo id_empresa
       estado: json['estado'] ?? 1,
+      horaInicio: json['hora_inicio'],
+      horaFin: json['hora_fin'],
     );
   }
 
@@ -23,6 +35,8 @@ class Category {
       'nombre': name,
       'empresa_id': idEmpresa,
       'estado': estado,
+      'hora_inicio': horaInicio,
+      'hora_fin': horaFin,
     };
   }
 }

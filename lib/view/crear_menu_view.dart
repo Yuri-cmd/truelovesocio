@@ -125,99 +125,261 @@ class _CrearMenuViewState extends State<CrearMenuView> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      const Text(
+                        "Información del Platillo",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Color.fromRGBO(255, 36, 36, 1),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
                       TextField(
                         controller: _tituloController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Título',
-                          border: OutlineInputBorder(),
-                          icon: Icon(Icons.title),
+                          hintText: 'Ej. Hamburguesa Doble',
+                          prefixIcon: const Icon(
+                            Icons.fastfood_outlined,
+                            color: Color.fromRGBO(255, 36, 36, 1),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(
+                              color: Color.fromRGBO(255, 36, 36, 1),
+                              width: 2,
+                            ),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 16,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 15),
                       TextField(
                         controller: _descripcionController,
-                        decoration: const InputDecoration(
+                        maxLines: 2,
+                        decoration: InputDecoration(
                           labelText: 'Descripción',
-                          border: OutlineInputBorder(),
-                          icon: Icon(Icons.description),
+                          hintText: 'Ingredientes y detalles...',
+                          prefixIcon: const Icon(
+                            Icons.description_outlined,
+                            color: Color.fromRGBO(255, 36, 36, 1),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(
+                              color: Color.fromRGBO(255, 36, 36, 1),
+                              width: 2,
+                            ),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 16,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 15),
                       TextField(
                         controller: _precioController,
-                        keyboardType: TextInputType.numberWithOptions(
+                        keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
-                        // inputFormatters: [
-                        //   // Restringir el precio a solo decimales
-                        //   FilteringTextInputFormatter.allow(RegExp(r'^\d+(\.\d{0,2})?')),
-                        // ],
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Precio',
-                          border: OutlineInputBorder(),
-                          icon: Icon(Icons.attach_money),
+                          prefixIcon: const Icon(
+                            Icons.attach_money,
+                            color: Color.fromRGBO(255, 36, 36, 1),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: const BorderSide(
+                              color: Color.fromRGBO(255, 36, 36, 1),
+                              width: 2,
+                            ),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 16,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 15),
                       GestureDetector(
                         onTap: _pickImage,
                         child: AbsorbPointer(
                           child: TextField(
                             controller: _fotoController,
-                            decoration: const InputDecoration(
-                              labelText: 'Foto (URL o Seleccionar Imagen)',
-                              border: OutlineInputBorder(),
-                              icon: Icon(Icons.image),
+                            decoration: InputDecoration(
+                              labelText: 'Foto del Platillo',
+                              hintText: 'Selecciona una imagen',
+                              prefixIcon: const Icon(
+                                Icons.image_outlined,
+                                color: Color.fromRGBO(255, 36, 36, 1),
+                              ),
+                              suffixIcon: const Icon(
+                                Icons.upload_file,
+                                color: Colors.grey,
+                              ),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(15),
+                                borderSide: BorderSide(
+                                  color: Colors.grey.shade300,
+                                ),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 16,
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey.shade50,
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      DropdownButton<String>(
-                        value: _status,
-                        onChanged: (value) {
-                          setState(() {
-                            _status = value!;
-                          });
-                        },
-                        items: const [
-                          DropdownMenuItem(
-                            value: 'active',
-                            child: Text('Activo'),
+                      const SizedBox(height: 25),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 15,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(color: Colors.grey.shade300),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  value: _status,
+                                  isExpanded: true,
+                                  icon: const Icon(
+                                    Icons.keyboard_arrow_down,
+                                    color: Color.fromRGBO(255, 36, 36, 1),
+                                  ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _status = value!;
+                                    });
+                                  },
+                                  items: const [
+                                    DropdownMenuItem(
+                                      value: 'active',
+                                      child: Text('Activo'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'inactive',
+                                      child: Text('Inactivo'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'out-of-stock',
+                                      child: Text('Agotado'),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
-                          DropdownMenuItem(
-                            value: 'inactive',
-                            child: Text('Inactivo'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'out-of-stock',
-                            child: Text('Agotado'),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 15,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15),
+                                border: Border.all(color: Colors.grey.shade300),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<int>(
+                                  value: selectedCategoryId,
+                                  hint: const Text(
+                                    'Categoría',
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  isExpanded: true,
+                                  icon: const Icon(
+                                    Icons.category_outlined,
+                                    color: Color.fromRGBO(255, 36, 36, 1),
+                                  ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedCategoryId = value;
+                                    });
+                                  },
+                                  items:
+                                      categories
+                                          .map(
+                                            (category) => DropdownMenuItem<int>(
+                                              value: category.id,
+                                              child: Text(
+                                                category.name,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          )
+                                          .toList(),
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
-                      DropdownButton<int>(
-                        value: selectedCategoryId,
-                        hint: const Text('Seleccionar Categoría'),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedCategoryId = value;
-                          });
-                        },
-                        items:
-                            categories
-                                .map(
-                                  (category) => DropdownMenuItem<int>(
-                                    value: category.id,
-                                    child: Text(category.name),
-                                  ),
-                                )
-                                .toList(),
-                      ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 40),
                       ElevatedButton(
                         onPressed: _crearMenu,
-                        child: const Text('Crear Menú'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color.fromRGBO(255, 36, 36, 1),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          elevation: 2,
+                          shadowColor: const Color.fromRGBO(255, 36, 36, 1),
+                        ),
+                        child: const Text(
+                          'Crear Menú',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ],
                   ),

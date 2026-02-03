@@ -200,7 +200,11 @@ class ApiService {
     }
   }
 
-  Future<void> createCategory(String name) async {
+  Future<void> createCategory(
+    String name, {
+    String? horaInicio,
+    String? horaFin,
+  }) async {
     final int? idEmpresa = await getUsuarioId();
     final response = await http.post(
       Uri.parse('$baseUrl/categories'),
@@ -208,6 +212,8 @@ class ApiService {
       body: jsonEncode({
         'nombre': name,
         'empresa_id': idEmpresa, // Agregar el id_empresa como estático
+        'hora_inicio': horaInicio,
+        'hora_fin': horaFin,
       }),
     );
 
@@ -216,7 +222,12 @@ class ApiService {
     }
   }
 
-  Future<void> updateCategory(int id, String name) async {
+  Future<void> updateCategory(
+    int id,
+    String name, {
+    String? horaInicio,
+    String? horaFin,
+  }) async {
     final int? idEmpresa = await getUsuarioId();
     final response = await http.put(
       Uri.parse('$baseUrl/categories/$id'),
@@ -224,6 +235,8 @@ class ApiService {
       body: jsonEncode({
         'nombre': name,
         'empresa_id': idEmpresa, // Agregar el id_empresa como estático
+        'hora_inicio': horaInicio,
+        'hora_fin': horaFin,
       }),
     );
 

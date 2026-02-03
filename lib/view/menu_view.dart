@@ -31,28 +31,32 @@ class _MenuViewState extends State<MenuView> {
     ApiService()
         .fetchMenu(categoriaId: selectedCategoryId)
         .then((menus) {
-      setState(() {
-        dishes = menus;
-      });
-    }).catchError((e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al cargar los menús: $e')),
-      );
-    });
+          setState(() {
+            dishes = menus;
+          });
+        })
+        .catchError((e) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error al cargar los menús: $e')),
+          );
+        });
   }
 
   void _loadCategories() {
-    ApiService().fetchCategories().then((cats) {
-      setState(() {
-        categories = cats;
-      });
-    }).catchError((e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al cargar las categorías: $e')),
-      );
-    });
+    ApiService()
+        .fetchCategories()
+        .then((cats) {
+          setState(() {
+            categories = cats;
+          });
+        })
+        .catchError((e) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error al cargar las categorías: $e')),
+          );
+        });
   }
 
   void _toggleDishStatus(Menu dish, bool isActive) {
@@ -90,7 +94,10 @@ class _MenuViewState extends State<MenuView> {
         actions: [
           Row(
             children: [
-              Icon(isDark ? Icons.dark_mode : Icons.light_mode, color: colorScheme.onPrimary),
+              Icon(
+                isDark ? Icons.dark_mode : Icons.light_mode,
+                color: colorScheme.onPrimary,
+              ),
               Switch(
                 value: isDark,
                 onChanged: (val) {
@@ -99,7 +106,7 @@ class _MenuViewState extends State<MenuView> {
               ),
               const SizedBox(width: 8),
             ],
-          )
+          ),
         ],
       ),
       drawer: Drawer(
@@ -128,7 +135,9 @@ class _MenuViewState extends State<MenuView> {
                 children: [
                   Text(
                     'Producto',
-                    style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   GestureDetector(
@@ -143,7 +152,9 @@ class _MenuViewState extends State<MenuView> {
                     },
                     child: Text(
                       'Categorías',
-                      style: textTheme.bodyMedium?.copyWith(color: colorScheme.secondary),
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.secondary,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -159,7 +170,9 @@ class _MenuViewState extends State<MenuView> {
                     },
                     child: Text(
                       'Adicional',
-                      style: textTheme.bodyMedium?.copyWith(color: colorScheme.secondary),
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colorScheme.secondary,
+                      ),
                     ),
                   ),
                 ],
@@ -190,7 +203,9 @@ class _MenuViewState extends State<MenuView> {
                       padding: const EdgeInsets.only(top: 16.0),
                       child: Text(
                         'Menú',
-                        style: textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                        style: textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     Row(
@@ -199,13 +214,16 @@ class _MenuViewState extends State<MenuView> {
                         DropdownButton<int?>(
                           value: selectedCategoryId,
                           hint: const Text('Seleccionar categoría'),
-                          items: categories
-                              .where((cat) => cat.estado == 1)
-                              .map((cat) => DropdownMenuItem<int?>(
-                                    value: cat.id,
-                                    child: Text(cat.name),
-                                  ))
-                              .toList(),
+                          items:
+                              categories
+                                  .where((cat) => cat.estado == 1)
+                                  .map(
+                                    (cat) => DropdownMenuItem<int?>(
+                                      value: cat.id,
+                                      child: Text(cat.name),
+                                    ),
+                                  )
+                                  .toList(),
                           onChanged: (int? newValue) {
                             setState(() {
                               selectedCategoryId = newValue;
@@ -214,7 +232,10 @@ class _MenuViewState extends State<MenuView> {
                           },
                         ),
                         TextButton.icon(
-                          onPressed: _loadMenu,
+                          onPressed: () {
+                            _loadCategories();
+                            _loadMenu();
+                          },
                           icon: const Icon(Icons.refresh),
                           label: const Text('Cambios'),
                         ),
@@ -224,7 +245,9 @@ class _MenuViewState extends State<MenuView> {
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Text(
                         'Platos principales',
-                        style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                        style: textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     Expanded(
