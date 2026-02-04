@@ -16,10 +16,10 @@ class ApiService {
   static const String _productionUrl =
       'https://magusemail.com/truelove-back/public/api';
   static const String _localUrl =
-      'http://192.168.100.2/truelove-back/public/api';
+      'http://192.168.100.50/truelove-back/public/api';
 
   // Cambiar este valor para alternar entre desarrollo y producción
-  static const bool _useProduction = true;
+  static const bool _useProduction = false;
 
   static String get baseUrl => _useProduction ? _productionUrl : _localUrl;
 
@@ -188,6 +188,7 @@ class ApiService {
 
   Future<List<Category>> fetchCategories() async {
     final int? idEmpresa = await getUsuarioId();
+    print('$baseUrl/categories/$idEmpresa');
     final response = await http.get(
       Uri.parse('$baseUrl/categories/$idEmpresa'),
     );
@@ -202,18 +203,20 @@ class ApiService {
 
   Future<void> createCategory(
     String name, {
-    String? horaInicio,
-    String? horaFin,
+    List<CategorySchedule>? horarios,
   }) async {
     final int? idEmpresa = await getUsuarioId();
+    print('$baseUrl/categories');
     final response = await http.post(
       Uri.parse('$baseUrl/categories'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'nombre': name,
         'empresa_id': idEmpresa, // Agregar el id_empresa como estático
-        'hora_inicio': horaInicio,
-        'hora_fin': horaFin,
+        'horarios':
+            horarios
+                ?.map((e) => e.toJson())
+                .toList(), // Enviar horarios como lista JSON
       }),
     );
 
@@ -225,8 +228,7 @@ class ApiService {
   Future<void> updateCategory(
     int id,
     String name, {
-    String? horaInicio,
-    String? horaFin,
+    List<CategorySchedule>? horarios,
   }) async {
     final int? idEmpresa = await getUsuarioId();
     final response = await http.put(
@@ -235,8 +237,10 @@ class ApiService {
       body: jsonEncode({
         'nombre': name,
         'empresa_id': idEmpresa, // Agregar el id_empresa como estático
-        'hora_inicio': horaInicio,
-        'hora_fin': horaFin,
+        'horarios':
+            horarios
+                ?.map((e) => e.toJson())
+                .toList(), // Enviar horarios como lista JSON
       }),
     );
 
