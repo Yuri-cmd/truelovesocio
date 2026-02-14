@@ -81,10 +81,13 @@ class Pedido {
       estado: json['ultimo_estado_tracking'] ?? '',
       tiempo: json['tiempo'] ?? 0,
       motorizado: json['motorizado'] ?? '',
-      celularMotorizado: json['celularMotorizado'] ?? json['celular_motorizado'] ?? '',
+      celularMotorizado:
+          json['celularMotorizado'] ?? json['celular_motorizado'] ?? '',
       nota: json['nota'] ?? '',
       tipoPago: json['tipo_pago'] ?? '',
-      requiereConfirmacionLocal: json['requiere_confirmacion_local'] ?? false,
+      requiereConfirmacionLocal:
+          json['requiere_confirmacion_local'] == true ||
+          json['requiere_confirmacion_local'] == 1,
       tipoComprobante: json['tipo_comprobante'] ?? '',
       documento: json['documento'] ?? '',
       fotoPago: json['foto_pago'] ?? '',

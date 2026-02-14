@@ -188,7 +188,7 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
                         style: TextStyle(color: Colors.grey, fontSize: 13),
                       ),
                       const SizedBox(height: 16),
-                      ..._daysOfWeek.map((day) => _buildDayRow(day)).toList(),
+                      ..._daysOfWeek.map((day) => _buildDayRow(day)),
                       const SizedBox(height: 30),
                       SizedBox(
                         width: double.infinity,

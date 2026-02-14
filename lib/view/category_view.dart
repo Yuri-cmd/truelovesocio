@@ -83,7 +83,7 @@ class _CategoryViewState extends State<CategoryView> {
                         borderRadius: BorderRadius.circular(15),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
+                            color: Colors.grey.withValues(alpha: 0.1),
                             spreadRadius: 1,
                             blurRadius: 5,
                             offset: const Offset(0, 3),
@@ -192,7 +192,7 @@ class _CategoryViewState extends State<CategoryView> {
                                 scale: 0.8,
                                 child: Switch(
                                   value: category.estado == 1,
-                                  activeColor: const Color(0xFF4CAF50),
+                                  activeThumbColor: const Color(0xFF4CAF50),
                                   activeTrackColor: const Color(0xFFC8E6C9),
                                   inactiveThumbColor: const Color(0xFFEF5350),
                                   inactiveTrackColor: const Color(0xFFFFCDD2),

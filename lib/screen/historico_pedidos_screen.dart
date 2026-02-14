@@ -259,16 +259,15 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
                           final pedido = _pedidos[idx];
                           final photoUrl = _getPhotoUrl(pedido);
                           final estadoText = obtenerEstado(
-                            int.parse(pedido.estado),
+                            int.tryParse(pedido.estado) ?? 0,
                           );
                           final estadoColor = obtenerColorEstado(
-                            int.parse(pedido.estado),
+                            int.tryParse(pedido.estado) ?? 0,
                           );
 
                           final subtotal = _toDouble(pedido.subtotal);
-                          final delivery = _toDouble(pedido.precioDelivery);
                           final descuento = _toDouble(pedido.descuento);
-                          final total = subtotal + delivery - descuento;
+                          final total = subtotal - descuento;
                           final isExpanded = _expanded.contains(pedido.id);
 
                           return AnimatedContainer(
@@ -442,6 +441,20 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
                                       ],
                                     ),
 
+                                  Text(
+                                    'Subtotal: S/. ${subtotal.toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      color:
+                                          Theme.of(
+                                            context,
+                                          ).colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                  if (descuento > 0)
+                                    Text(
+                                      'Descuento: S/. ${descuento.toStringAsFixed(2)}',
+                                      style: TextStyle(color: Colors.redAccent),
+                                    ),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
