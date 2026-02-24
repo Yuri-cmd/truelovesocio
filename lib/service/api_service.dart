@@ -45,7 +45,7 @@ class ApiService {
           // Enviar el token almacenado a la API
           String? tokenFcm = prefs.getString('token_fcm');
 
-          if (tokenFcm!.isNotEmpty) {
+          if (tokenFcm != null && tokenFcm.isNotEmpty) {
             await updateFcmToken(data["socio"]['id'], tokenFcm);
           }
           return socio;
@@ -82,7 +82,7 @@ class ApiService {
           // Enviar el token almacenado a la API
           String? tokenFcm = prefs.getString('token_fcm');
 
-          if (tokenFcm!.isNotEmpty) {
+          if (tokenFcm != null && tokenFcm.isNotEmpty) {
             await updateFcmToken(data["socio"]['id'], tokenFcm);
           }
 
