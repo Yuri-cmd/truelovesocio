@@ -538,4 +538,41 @@ class ApiService {
       throw Exception('Error al actualizar el estado de la categoría');
     }
   }
+
+  Future<Map<String, dynamic>> getAppVersion(String appName) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/app-version/$appName'),
+      );
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        return {
+          'status': response.statusCode,
+          'message': 'Error al obtener la versión',
+        };
+      }
+    } catch (e) {
+      return {'status': 500, 'message': 'Error de conexión'};
+    }
+  }
+
+  static Future<void> acknowledgeNotification(
+    String? notificationId,
+    String status,
+  ) async {
+    if (notificationId == null || notificationId.isEmpty) return;
+
+    try {
+      final String baseUrl = _productionUrl;
+
+      await http.post(
+        Uri.parse('$baseUrl/notifications/update-status'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'notification_id': notificationId, 'status': status}),
+      );
+    } catch (e) {
+      log('Error acknowledging notification: $e');
+    }
+  }
 }
