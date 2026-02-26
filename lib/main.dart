@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:truelovesocio/model/socio_model.dart';
 import 'package:truelovesocio/screen/home_screen.dart';
@@ -15,10 +16,18 @@ final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    name: 'app dev',
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // IMPORTANTE: registrar el background handler ANTES de initializeApp
+  FirebaseMessaging.onBackgroundMessage(firebaseBackgroundHandler);
+  // try-catch es más robusto que Firebase.apps.isEmpty para evitar duplicate-app
+  try {
+    await Firebase.initializeApp(
+      name: 'app dev',
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } on FirebaseException catch (e) {
+    if (e.code != 'duplicate-app') rethrow;
+    // Si ya existe, Firebase está listo — no es un error real
+  }
 
   await FirebaseApi().initNotifications();
 
