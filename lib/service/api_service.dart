@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:truelovesocio/model/category_model.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:truelovesocio/model/cuota_model.dart';
 import 'package:truelovesocio/model/heatmap_data.dart';
 import 'package:truelovesocio/model/menu_model.dart';
 import 'package:truelovesocio/model/pedido_model.dart';
@@ -573,6 +574,162 @@ class ApiService {
       );
     } catch (e) {
       log('Error acknowledging notification: $e');
+    }
+  }
+
+  // --- CUOTAS ENDPOINTS ---
+
+  static Future<CuotaActiva?> getCuotaActiva(int socioId) async {
+    final url = Uri.parse('$baseUrl/socio/cuota-activa?socio_id=$socioId');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true && data['data'] != null) {
+          return CuotaActiva.fromJson(data['data']);
+        }
+      }
+    } catch (e) {
+      log("Error fetching cuota activa: $e");
+    }
+    return null;
+  }
+
+  static Future<Map<String, dynamic>?> getMiPeriodoActual(int socioId) async {
+    final url = Uri.parse('$baseUrl/socio/mi-periodo-actual?socio_id=$socioId');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true) {
+          return data['data'];
+        }
+      }
+    } catch (e) {
+      log("Error fetching periodo actual: $e");
+    }
+    return null;
+  }
+
+  static Future<List<PeriodoCuota>> getMisPeriodos(int socioId) async {
+    final url = Uri.parse('$baseUrl/socio/mis-periodos?socio_id=$socioId');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true && data['data'] != null) {
+          return (data['data'] as List)
+              .map((p) => PeriodoCuota.fromJson(p))
+              .toList();
+        }
+      }
+    } catch (e) {
+      log("Error fetching periodos: $e");
+    }
+    return [];
+  }
+
+  static Future<List<PagoCuota>> getMisPagos(int socioId) async {
+    final url = Uri.parse('$baseUrl/socio/mis-pagos?socio_id=$socioId');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true && data['data'] != null) {
+          return (data['data'] as List)
+              .map((p) => PagoCuota.fromJson(p))
+              .toList();
+        }
+      }
+    } catch (e) {
+      log("Error fetching pagos: $e");
+    }
+    return [];
+  }
+
+  static Future<List<PedidoPeriodo>> getPedidosPeriodo(int periodoId, int socioId) async {
+    final url = Uri.parse('$baseUrl/socio/pedidos-periodo/$periodoId?socio_id=$socioId');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        if (data['success'] == true && data['data'] != null && data['data']['pedidos'] != null) {
+          return (data['data']['pedidos'] as List)
+              .map((p) => PedidoPeriodo.fromJson(p))
+              .toList();
+        }
+      }
+    } catch (e) {
+      log("Error fetching pedidos periodo: $e");
+    }
+    return [];
+  }
+
+  static Future<bool> subirComprobante({
+    required int socioId,
+    required int cuotaSocioId,
+    required XFile file,
+    required String fechaPago,
+    required String montoPagado,
+    required String metodoPago,
+    String? numeroOperacion,
+    String? observaciones,
+  }) async {
+    final url = Uri.parse('$baseUrl/socio/subir-comprobante?socio_id=$socioId');
+    try {
+      var request = http.MultipartRequest('POST', url);
+      request.fields['cuota_socio_id'] = cuotaSocioId.toString();
+      request.fields['fecha_pago'] = fechaPago;
+      request.fields['monto_pagado'] = montoPagado;
+      request.fields['metodo_pago'] = metodoPago;
+      if (numeroOperacion != null) request.fields['numero_operacion'] = numeroOperacion;
+      if (observaciones != null) request.fields['observaciones'] = observaciones;
+
+      request.files.add(await http.MultipartFile.fromPath(
+        'comprobante_pago',
+        file.path,
+        contentType: MediaType('image', 'jpeg'),
+      ));
+
+      var response = await request.send();
+      return response.statusCode == 200;
+    } catch (e) {
+      log("Error subir comprobante: $e");
+      return false;
+    }
+  }
+
+  static Future<bool> subirComprobantePeriodo({
+    required int socioId,
+    required int periodoId,
+    required XFile file,
+    required String fechaPago,
+    required String montoPagado,
+    required String metodoPago,
+    String? numeroOperacion,
+    String? observaciones,
+  }) async {
+    final url = Uri.parse('$baseUrl/socio/subir-comprobante-periodo?socio_id=$socioId');
+    try {
+      var request = http.MultipartRequest('POST', url);
+      request.fields['periodo_id'] = periodoId.toString();
+      request.fields['fecha_pago'] = fechaPago;
+      request.fields['monto_pagado'] = montoPagado;
+      request.fields['metodo_pago'] = metodoPago;
+      if (numeroOperacion != null) request.fields['numero_operacion'] = numeroOperacion;
+      if (observaciones != null) request.fields['observaciones'] = observaciones;
+
+      request.files.add(await http.MultipartFile.fromPath(
+        'comprobante_pago',
+        file.path,
+        contentType: MediaType('image', 'jpeg'),
+      ));
+
+      var response = await request.send();
+      return response.statusCode == 200;
+    } catch (e) {
+      log("Error subir comprobante periodo: $e");
+      return false;
     }
   }
 }

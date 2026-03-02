@@ -56,6 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
         const PedidosView(),
         const HistoricoPedidosScreen(),
         const MenuView(),
+        const CuotasScreen(),
         const ReviewView(),
         const SizedBox.shrink(),
       ],
@@ -79,6 +80,12 @@ class _HomeScreenState extends State<HomeScreen> {
           inactiveColorPrimary: Colors.grey,
         ),
         PersistentBottomNavBarItem(
+          icon: const Icon(Icons.receipt_long),
+          title: 'Cuotas',
+          activeColorPrimary: AppTheme.primary,
+          inactiveColorPrimary: Colors.grey,
+        ),
+        PersistentBottomNavBarItem(
           icon: const Icon(Icons.star),
           title: 'Evaluaciones',
           activeColorPrimary: AppTheme.primary,
@@ -93,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
       navBarStyle: NavBarStyle.style6,
       onItemSelected: (int index) async {
-        if (index == 4 && !isLoggingOut) {
+        if (index == 5 && !isLoggingOut) {
           await logout(context);
         }
       },

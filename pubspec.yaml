@@ -1,7 +1,7 @@
 name: truelovesocio
 description: "Aplicación para gestión de pedidos y comercios Truelove"
 publish_to: 'none'
-version: 1.1.26+29
+version: 1.1.27+30
 
 environment:
   sdk: ^3.7.0-207.0.dev
@@ -19,13 +19,14 @@ dependencies:
   http_parser: ^4.1.2
   shared_preferences: ^2.5.2
   connectivity_plus: ^6.1.4
-  url_launcher: ^6.3.1
+  url_launcher: ^6.3.2
   package_info_plus: ^8.3.1
   screen_protector: ^1.4.2+1
   firebase_messaging: ^15.2.2
   firebase_core: ^3.11.0
   flutter_local_notifications: ^18.0.1
   path_provider: ^2.1.5
+  intl: ^0.20.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
