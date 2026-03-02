@@ -31,6 +31,8 @@ class Pedido {
   final String subtotal;
   final String precioDelivery;
   final String descuento;
+  final String? fechaInicio;
+  final String? fechaHoraInicio;
 
   Pedido({
     required this.id,
@@ -63,6 +65,8 @@ class Pedido {
     this.subtotal = '0.00',
     this.precioDelivery = '0.00',
     this.descuento = '0.00',
+    this.fechaInicio,
+    this.fechaHoraInicio,
   });
 
   factory Pedido.fromJson(Map<String, dynamic> json) {
@@ -99,9 +103,11 @@ class Pedido {
       subtotal: json['subtotal']?.toString() ?? '0.00',
       precioDelivery: json['precio_delivery']?.toString() ?? '0.00',
       descuento: json['descuento']?.toString() ?? '0.00',
+      fechaInicio: json['fecha_inicio'],
+      fechaHoraInicio: json['fecha_hora_inicio'],
       detalleArray:
           (json['detalleArray'] as List<dynamic>?)
-              ?.map((item) => DetallePedido.fromJson(item))
+               ?.map((item) => DetallePedido.fromJson(item))
               .toList() ??
           [],
     );
@@ -131,6 +137,8 @@ class Pedido {
       'subtotal': subtotal,
       'precio_delivery': precioDelivery,
       'descuento': descuento,
+      'fecha_inicio': fechaInicio,
+      'fecha_hora_inicio': fechaHoraInicio,
     };
   }
 }

@@ -387,11 +387,11 @@ class _PedidoCardState extends State<PedidoCard> {
                       ),
                     ),
                 Tooltip(
-                  message: widget.pedido.motorizado.trim().isNotEmpty
-                      ? 'No se puede cancelar: ya hay un motorizado asignado'
-                      : int.parse(widget.pedido.estado) == 0
+                  message: int.parse(widget.pedido.estado) == 0
                           ? 'El pedido ya está cancelado'
-                          : 'Cancelar pedido',
+                          : int.parse(widget.pedido.estado) == 6
+                              ? 'No se puede cancelar en este estado'
+                              : 'Cancelar pedido',
                   child: ElevatedButton.icon(
                     onPressed:
                         _debeDeshabilitarBotonCancelar()
@@ -426,16 +426,14 @@ class _PedidoCardState extends State<PedidoCard> {
 
   bool _debeDeshabilitarBotonCancelar() {
     final estado = int.parse(widget.pedido.estado);
-    final tieneMotorizado = widget.pedido.motorizado.trim().isNotEmpty;
     final bloqueado = widget.bloqueoBotones[widget.pedido.id] == true;
 
     // No se puede cancelar si:
     // - Ya fue cancelado (estado 0)
+    // - Esta en estado 6
     // - Ya fue entregado o en etapas finales (estado >= 8)
-    // - Ya hay un motorizado asignado (ya salió a entregar)
     // - El botón está bloqueado por una acción en curso
-    if (estado == 0 || estado >= 8) return true;
-    if (tieneMotorizado) return true;
+    if (estado == 0 || estado == 6 || estado >= 8) return true;
     if (bloqueado) return true;
     return false;
   }

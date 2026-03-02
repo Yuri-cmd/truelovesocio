@@ -57,113 +57,195 @@ class _PedidosViewState extends State<PedidosView> {
     super.dispose();
   }
 
+  Widget _buildTabContent(List<Pedido> tabPedidos, ColorScheme colorScheme) {
+    return RefreshIndicator(
+      onRefresh: loadPedidos,
+      child: tabPedidos.isEmpty
+          ? ListView(
+              children: [
+                SizedBox(
+                  height: 400,
+                  child: Center(
+                    child: Text(
+                      '📭 Sin pedidos en esta lista',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onSurface.withAlpha((0.7 * 255).toInt()),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : ListView.builder(
+              itemCount: tabPedidos.length,
+              padding: const EdgeInsets.all(10),
+              itemBuilder: (context, index) {
+                final pedido = tabPedidos[index];
+                return GestureDetector(
+                  onTap: () async {
+                    final result = await PedidosHelper.navegarASeguimiento(
+                      context,
+                      pedido,
+                    );
+                    if (result == true) {
+                      loadPedidos();
+                    }
+                  },
+                  child: PedidoCard(
+                    pedido: pedido,
+                    apiService: apiService,
+                    bloqueoBotones: _bloqueoBotones,
+                    onUpdate: loadPedidos,
+                    bloquearBoton: (bloqueado) {
+                      setState(() {
+                        _bloqueoBotones[pedido.id] = bloqueado;
+                      });
+                    },
+                  ),
+                );
+              },
+            ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Pedidos Pendientes',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.red,
-        foregroundColor: Colors.white,
-        actions: [
-          // Switch para dark/light theme
-          Row(
-            children: [
-              Icon(
-                isDark ? Icons.dark_mode : Icons.light_mode,
-                color: colorScheme.onPrimary,
-              ),
-              Switch(
-                value: isDark,
-                onChanged: (val) {
-                  // setThemeMode es la función global que persiste y cambia theme
-                  setThemeMode(val ? ThemeMode.dark : ThemeMode.light);
-                },
-              ),
-              const SizedBox(width: 8),
-              Text(
-                activo == 1 ? "Activo" : "Inactivo",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: colorScheme.onPrimary,
-                ),
-              ),
-              Switch(
-                value: activo == 1,
-                activeTrackColor: Colors.green,
-                inactiveThumbColor: Colors.grey,
-                onChanged: (value) {
-                  PedidosHelper.cambiarEstadoRepartidor(
-                    context,
-                    activo,
-                    (nuevo) => setState(() => activo = nuevo),
-                  );
-                },
-              ),
-            ],
+    final porAceptar = pedidos.where((p) => p.estado == '1').toList();
+    final enPreparacion = pedidos.where((p) => p.estado == '2').toList();
+    final porEntregar = pedidos.where((p) => p.estado != '1' && p.estado != '2').toList();
+
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Órdenes activas',
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: loadPedidos,
-        child:
-            pedidos.isEmpty
-                ? ListView(
+          backgroundColor: Colors.red,
+          foregroundColor: Colors.white,
+          bottom: TabBar(
+            isScrollable: true,
+            indicatorColor: Colors.white,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white70,
+            tabs: [
+              Tab(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SizedBox(
-                      height: 400,
-                      child: Center(
-                        child: Text(
-                          '📭 Sin pedidos pendientes',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: colorScheme.onSurface.withAlpha(
-                              (0.7 * 255).toInt(),
-                            ),
-                          ),
-                        ),
+                    const Text("Por Aceptar"),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.black87,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '${porAceptar.length}',
+                        style: const TextStyle(fontSize: 12, color: Colors.white),
                       ),
                     ),
                   ],
-                )
-                : ListView.builder(
-                  itemCount: pedidos.length,
-                  padding: const EdgeInsets.all(10),
-                  itemBuilder: (context, index) {
-                    final pedido = pedidos[index];
-                    return GestureDetector(
-                      onTap: () async {
-                        final result = await PedidosHelper.navegarASeguimiento(
-                          context,
-                          pedido,
-                        );
-                        if (result == true) {
-                          loadPedidos();
-                        }
-                      },
-                      child: PedidoCard(
-                        pedido: pedido,
-                        apiService: apiService,
-                        bloqueoBotones: _bloqueoBotones,
-                        onUpdate: loadPedidos,
-                        bloquearBoton: (bloqueado) {
-                          setState(() {
-                            _bloqueoBotones[pedido.id] = bloqueado;
-                          });
-                        },
+                ),
+              ),
+              Tab(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("En Preparación"),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.black87,
+                        borderRadius: BorderRadius.circular(12),
                       ),
+                      child: Text(
+                        '${enPreparacion.length}',
+                        style: const TextStyle(fontSize: 12, color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Tab(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Por Entregar"),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.black87,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        '${porEntregar.length}',
+                        style: const TextStyle(fontSize: 12, color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            // Switch para dark/light theme
+            Row(
+              children: [
+                Icon(
+                  isDark ? Icons.dark_mode : Icons.light_mode,
+                  color: colorScheme.onPrimary,
+                ),
+                Switch(
+                  value: isDark,
+                  onChanged: (val) {
+                    // setThemeMode es la función global que persiste y cambia theme
+                    setThemeMode(val ? ThemeMode.dark : ThemeMode.light);
+                  },
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  activo == 1 ? "Activo" : "Inactivo",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onPrimary,
+                  ),
+                ),
+                Switch(
+                  value: activo == 1,
+                  activeTrackColor: Colors.green,
+                  inactiveThumbColor: Colors.grey,
+                  onChanged: (value) {
+                    PedidosHelper.cambiarEstadoRepartidor(
+                      context,
+                      activo,
+                      (nuevo) => setState(() => activo = nuevo),
                     );
                   },
                 ),
+              ],
+            ),
+          ],
+        ),
+        body: TabBarView(
+          children: [
+            _buildTabContent(porAceptar, colorScheme),
+            _buildTabContent(enPreparacion, colorScheme),
+            _buildTabContent(porEntregar, colorScheme),
+          ],
+        ),
+        backgroundColor: colorScheme.surface,
       ),
-      backgroundColor: colorScheme.surface,
     );
   }
 }
