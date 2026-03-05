@@ -264,8 +264,10 @@ class _CuotasScreenState extends State<CuotasScreen> {
           ),
           const Divider(color: Colors.white10),
           _buildPremiumRow(
-            label: 'Día de Facturación',
-            value: 'Cada día ${_cuotaActiva!.diaPago}',
+            label: (_cuotaActiva!.diaPago == null || _cuotaActiva!.diaPago == 0) ? 'Vencimiento' : 'Día de Facturación',
+            value: (_cuotaActiva!.diaPago == null || _cuotaActiva!.diaPago == 0) 
+              ? 'Al fin de cada periodo' 
+              : 'Cada día ${_cuotaActiva!.diaPago}',
           ),
           const SizedBox(height: 15),
           Container(
