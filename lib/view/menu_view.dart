@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:truelovesocio/components/components.dart';
 import 'package:truelovesocio/model/menu_model.dart';
 import 'package:truelovesocio/model/category_model.dart';
 import 'package:truelovesocio/service/api_service.dart';
 import 'package:truelovesocio/view/category_view.dart';
 import 'package:truelovesocio/view/crear_menu_view.dart';
+import 'package:truelovesocio/screen/screens.dart';
 // Importa el setThemeMode si lo tienes
 import 'package:truelovesocio/main.dart';
 
@@ -179,6 +181,18 @@ class _MenuViewState extends State<MenuView> {
               ),
               onTap: () {},
             ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.person_remove_outlined, color: Colors.red),
+              title: const Text(
+                'Eliminar Cuenta',
+                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              ),
+              subtitle: const Text('Borrar mis datos definitivamente'),
+              onTap: () {
+                _showDeleteAccountDialog(context);
+              },
+            ),
           ],
         ),
       ),
@@ -295,6 +309,38 @@ class _MenuViewState extends State<MenuView> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showDeleteAccountDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('¿Eliminar cuenta?'),
+        content: const Text(
+          'Esta acción es irreversible y eliminará todos sus datos de nuestros servidores. ¿Desea continuar?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.remove('socio');
+              if (mounted) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Sí, eliminar definitivamente'),
+          ),
+        ],
       ),
     );
   }

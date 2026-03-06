@@ -21,7 +21,6 @@ Future<void> main() async {
   // try-catch es más robusto que Firebase.apps.isEmpty para evitar duplicate-app
   try {
     await Firebase.initializeApp(
-      name: 'app dev',
       options: DefaultFirebaseOptions.currentPlatform,
     );
   } on FirebaseException catch (e) {

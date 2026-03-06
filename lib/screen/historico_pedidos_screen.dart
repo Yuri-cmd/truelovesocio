@@ -199,8 +199,8 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
                       ),
                     ),
                     items: const [
-                      DropdownMenuItem(value: 'todas', child: Text('Todas')),
-                      DropdownMenuItem(value: 'hoy', child: Text('Hoy')),
+                      DropdownMenuItem(value: 'todas', child: Text('Todas', style: TextStyle(color: Colors.black))),
+                      DropdownMenuItem(value: 'hoy', child: Text('Hoy', style: TextStyle(color: Colors.black))),
                     ],
                     onChanged: (v) {
                       if (v != null) {
@@ -221,10 +221,10 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
                       ),
                     ),
                     items: const [
-                      DropdownMenuItem(value: 'todos', child: Text('Todos')),
+                      DropdownMenuItem(value: 'todos', child: Text('Todos', style: TextStyle(color: Colors.black))),
                       DropdownMenuItem(
                         value: 'finalizados',
-                        child: Text('Finalizados'),
+                        child: Text('Finalizados', style: TextStyle(color: Colors.black)),
                       ),
                       DropdownMenuItem(
                         value: 'activos',
@@ -303,15 +303,13 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
                                               style: const TextStyle(
                                                 fontWeight: FontWeight.w700,
                                                 fontSize: 16,
+                                                color: Colors.black,
                                               ),
                                             ),
                                             Text(
                                               pedido.cliente,
                                               style: TextStyle(
-                                                color:
-                                                    Theme.of(context)
-                                                        .colorScheme
-                                                        .onSurfaceVariant,
+                                                color: Colors.black,
                                               ),
                                             ),
                                           ],
@@ -344,10 +342,7 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
                                   Text(
                                     'Dirección: ${pedido.direccionEntrega}',
                                     style: TextStyle(
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.onSurfaceVariant,
+                                      color: Colors.black,
                                     ),
                                   ),
                                   GestureDetector(
@@ -363,10 +358,7 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
                                         Text(
                                           'Cliente: ${pedido.celular}',
                                           style: TextStyle(
-                                            color:
-                                                Theme.of(
-                                                  context,
-                                                ).colorScheme.onSurfaceVariant,
+                                            color: Colors.black,
                                           ),
                                         ),
                                       ],
@@ -387,10 +379,7 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
                                         Text(
                                           'Motorizado: ${pedido.celularMotorizado}',
                                           style: TextStyle(
-                                            color:
-                                                Theme.of(
-                                                  context,
-                                                ).colorScheme.onSurfaceVariant,
+                                            color: Colors.black,
                                           ),
                                         ),
                                       ],
@@ -400,10 +389,7 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
                                   Text(
                                     'Fecha: ${_formatDate(pedido.fecha)}',
                                     style: TextStyle(
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.onSurfaceVariant,
+                                      color: Colors.black,
                                     ),
                                   ),
                                   const Divider(height: 20),
@@ -417,6 +403,7 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
                                           'Productos:',
                                           style: TextStyle(
                                             fontWeight: FontWeight.bold,
+                                            color: Colors.black,
                                           ),
                                         ),
                                         const SizedBox(height: 8),
@@ -430,9 +417,10 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
                                                 Expanded(
                                                   child: Text(
                                                     '${d.cantidad}x ${d.nombre}',
+                                                    style: TextStyle(color: Colors.black),
                                                   ),
                                                 ),
-                                                Text('S/. ${d.precio}'),
+                                                Text('S/. ${d.precio}', style: TextStyle(color: Colors.black)),
                                               ],
                                             ),
                                           ),
@@ -444,10 +432,7 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
                                   Text(
                                     'Subtotal: S/. ${subtotal.toStringAsFixed(2)}',
                                     style: TextStyle(
-                                      color:
-                                          Theme.of(
-                                            context,
-                                          ).colorScheme.onSurfaceVariant,
+                                      color: Colors.black,
                                     ),
                                   ),
                                   if (descuento > 0)
@@ -463,10 +448,7 @@ class _HistoricoPedidosScreenState extends State<HistoricoPedidosScreen> {
                                         'Total: S/. ${total.toStringAsFixed(2)}',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          color:
-                                              Theme.of(
-                                                context,
-                                              ).colorScheme.onSurface,
+                                          color: Colors.black,
                                         ),
                                       ),
                                       TextButton(
