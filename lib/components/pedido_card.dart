@@ -389,23 +389,25 @@ class _PedidoCardState extends State<PedidoCard> {
                 Tooltip(
                   message: int.parse(widget.pedido.estado) == 0
                           ? 'El pedido ya está cancelado'
-                          : int.parse(widget.pedido.estado) == 6
-                              ? 'No se puede cancelar en este estado'
-                              : 'Cancelar pedido',
+                          : 'Cancelar pedido',
                   child: ElevatedButton.icon(
                     onPressed:
                         _debeDeshabilitarBotonCancelar()
                             ? null
-                            : () {
-                              PedidosHelper.actualizarEstadoPedido(
-                                context: context,
-                                pedido: widget.pedido,
-                                nuevoEstado: 0,
-                                apiService: widget.apiService,
-                                onUpdate: () => widget.onUpdate(),
-                                bloquearBoton: widget.bloquearBoton,
-                              );
-                            },
+                            : () async {
+                                final confirmar = await PedidosHelper.mostrarAlertaConfirmacion(context, 0);
+                                if (!confirmar) return;
+                                
+                                if (!context.mounted) return;
+                                PedidosHelper.actualizarEstadoPedido(
+                                  context: context,
+                                  pedido: widget.pedido,
+                                  nuevoEstado: 0,
+                                  apiService: widget.apiService,
+                                  onUpdate: () => widget.onUpdate(),
+                                  bloquearBoton: widget.bloquearBoton,
+                                );
+                              },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.redAccent,
                     ),
@@ -433,7 +435,7 @@ class _PedidoCardState extends State<PedidoCard> {
     // - Esta en estado 6
     // - Ya fue entregado o en etapas finales (estado >= 8)
     // - El botón está bloqueado por una acción en curso
-    if (estado == 0 || estado == 6 || estado >= 8) return true;
+    if (estado == 0 || estado >= 8) return true;
     if (bloqueado) return true;
     return false;
   }

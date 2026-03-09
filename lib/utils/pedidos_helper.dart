@@ -147,12 +147,23 @@ class PedidosHelper {
         if (tiempoPrep == null) return;
       }
 
-      if (estadoActual == 0 || estadoActual == 1) {
-        await apiService.actualizarEstado(
+      if (nuevoEstado == 0 || estadoActual == 0 || estadoActual == 1) {
+        final success = await apiService.actualizarEstado(
           pedido.id,
           nuevoEstado,
           tiempo: tiempoPrep ?? 0,
         );
+        
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(success 
+                ? 'Estado del pedido actualizado correctamente' 
+                : 'Error al actualizar el estado del pedido'),
+              backgroundColor: success ? Colors.green : Colors.red,
+            ),
+          );
+        }
       }
 
       await onUpdate();
