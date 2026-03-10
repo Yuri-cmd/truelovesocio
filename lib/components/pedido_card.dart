@@ -30,6 +30,47 @@ class PedidoCard extends StatefulWidget {
 
 class _PedidoCardState extends State<PedidoCard> {
 
+  Future<void> _showPhotoDialog(String photoUrl) async {
+    if (!mounted) return;
+    await showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder:
+          (dialogContext) => Dialog(
+            backgroundColor: Colors.black,
+            insetPadding: const EdgeInsets.all(16),
+            child: Stack(
+              alignment: Alignment.topRight,
+              children: [
+                InteractiveViewer(
+                  child: Image.network(photoUrl, fit: BoxFit.contain),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.download, color: Colors.white),
+                        onPressed: () async {
+                          await _downloadImage(photoUrl);
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white),
+                        onPressed: () {
+                          Navigator.of(dialogContext).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+    );
+  }
+
   Future<void> _downloadImage(String url) async {
     // NOTE
     // Writing into the app's documents directory does NOT require the
@@ -85,6 +126,26 @@ class _PedidoCardState extends State<PedidoCard> {
     }
   }
 
+  String _obtenerTiempoTranscurrido(String fecha) {
+    if (fecha.isEmpty) return '';
+    try {
+      final DateTime orderDate = DateTime.parse(fecha);
+      final Duration diff = DateTime.now().difference(orderDate);
+      if (diff.isNegative) return '0m';
+
+      final int hours = diff.inHours;
+      final int minutes = diff.inMinutes.remainder(60);
+
+      if (hours > 0) {
+        return '${hours}h ${minutes}m';
+      } else {
+        return '${minutes}m';
+      }
+    } catch (e) {
+      return '';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -99,18 +160,48 @@ class _PedidoCardState extends State<PedidoCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Cliente y Estado
+            // Header: ID, Tiempo transcurrido y Estado
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Text(
-                    widget.pedido.cliente,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+               Expanded(
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[800],
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '#${widget.pedido.id}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      if (_obtenerTiempoTranscurrido(widget.pedido.fecha).isNotEmpty)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.green[600],
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            _obtenerTiempoTranscurrido(widget.pedido.fecha),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
                 Chip(
@@ -122,8 +213,16 @@ class _PedidoCardState extends State<PedidoCard> {
                 ),
               ],
             ),
-
             const SizedBox(height: 8),
+            Text(
+              widget.pedido.cliente,
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+            const SizedBox(height: 4),
             Divider(color: colorScheme.surfaceContainerHighest),
 
             infoRow(
@@ -154,15 +253,36 @@ class _PedidoCardState extends State<PedidoCard> {
 
             const SizedBox(height: 6),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                getMetodoPagoImage(widget.pedido.tipoPago),
-                const SizedBox(width: 6),
-                Text(
-                  widget.pedido.tipoPago,
-                  style: textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
+                Row(
+                  children: [
+                    getMetodoPagoImage(widget.pedido.tipoPago),
+                    const SizedBox(width: 6),
+                    Text(
+                      widget.pedido.tipoPago,
+                      style: textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
+                if (widget.pedido.fotoPago.isNotEmpty &&
+                    widget.pedido.fotoPago != 'null')
+                  TextButton.icon(
+                    onPressed: () => _showPhotoDialog(widget.pedido.fotoPago),
+                    icon: const Icon(Icons.remove_red_eye, size: 20),
+                    label: const Text('Ver pago'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.green,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ),
               ],
             ),
             const SizedBox(height: 10),
