@@ -309,6 +309,18 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
                                           color: Colors.white,
                                         ),
                                       ),
+                                      if (widget.pedido.pagaCon != null && widget.pedido.pagaCon!.isNotEmpty) ...[
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          widget.pedido.pagaCon!.toLowerCase() == 'exacto'
+                                              ? 'Monto: Exacto'
+                                              : 'Paga con: S/ ${widget.pedido.pagaCon}',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            color: Colors.white70,
+                                          ),
+                                        ),
+                                      ],
                                     ],
                                   ),
                                 ],

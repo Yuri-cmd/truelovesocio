@@ -331,6 +331,7 @@ class _MenuViewState extends State<MenuView> {
               final prefs = await SharedPreferences.getInstance();
               await prefs.remove('socio');
               if (mounted) {
+                if(!context.mounted) return;
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const LoginScreen()),
                   (route) => false,

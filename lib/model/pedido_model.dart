@@ -20,6 +20,7 @@ class Pedido {
   final String celularMotorizado;
   final String nota;
   final String tipoPago;
+  final String? pagaCon;
   int tiempo;
   bool requiereConfirmacionLocal;
   final List<DetallePedido> detalleArray;
@@ -56,6 +57,7 @@ class Pedido {
     required this.celularMotorizado,
     required this.nota,
     required this.tipoPago,
+    this.pagaCon,
     required this.requiereConfirmacionLocal,
     required this.tipoComprobante,
     required this.documento,
@@ -92,6 +94,7 @@ class Pedido {
           json['celularMotorizado']?.toString() ?? json['celular_motorizado']?.toString() ?? '',
       nota: json['nota'] ?? '',
       tipoPago: json['tipo_pago'] ?? '',
+      pagaCon: json['paga_con']?.toString(),
       requiereConfirmacionLocal:
           json['requiere_confirmacion_local'] == true ||
           json['requiere_confirmacion_local'] == 1 ||
@@ -132,6 +135,7 @@ class Pedido {
       'estado': estado,
       'nota': nota,
       'tipo_pago': tipoPago,
+      'paga_con': pagaCon,
       'requiere_confirmacion_local': requiereConfirmacionLocal,
       'tipo_pedido': tipoPedido,
       'created_at': fecha,

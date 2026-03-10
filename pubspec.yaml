@@ -1,7 +1,7 @@
 name: truelovesocio
 description: "Aplicación para gestión de pedidos y comercios Truelove"
 publish_to: 'none'
-version: 1.1.30+33
+version: 1.1.31+34
 
 environment:
   sdk: ^3.7.0-207.0.dev
