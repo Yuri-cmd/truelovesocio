@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:io';
 import 'package:truelovesocio/model/category_model.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
@@ -543,8 +544,9 @@ class ApiService {
 
   Future<Map<String, dynamic>> getAppVersion(String appName) async {
     try {
+      String platform = Platform.isAndroid ? 'android' : (Platform.isIOS ? 'ios' : 'unknown');
       final response = await http.get(
-        Uri.parse('$baseUrl/app-version/$appName'),
+        Uri.parse('$baseUrl/app-version/$appName?platform=$platform'),
       );
       if (response.statusCode == 200) {
         return json.decode(response.body);
