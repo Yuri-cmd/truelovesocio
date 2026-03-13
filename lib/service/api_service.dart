@@ -126,7 +126,7 @@ class ApiService {
   Future<List<Pedido>> fetchPedidos() async {
     final int? idBiker = await getUsuarioId();
     // Agregamos ?fecha=todas para que traiga pedidos de cualquier fecha que sigan activos
-    final String apiUrl = '$baseUrl/socio/get/pedidos/$idBiker?fecha=todas';
+    final String apiUrl = '$baseUrl/socio/get/pedidos/$idBiker?fecha=hoy';
     try {
       final response = await http.get(Uri.parse(apiUrl));
 
