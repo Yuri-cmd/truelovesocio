@@ -1,49 +1,46 @@
-
-  import 'package:flutter/material.dart';
-  import 'package:truelovesocio/model/pedido_model.dart';
-  import 'package:truelovesocio/model/socio_model.dart';
-  import 'package:truelovesocio/screen/seguimiento_pedido_screen.dart';
-  import 'package:truelovesocio/service/api_service.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:truelovesocio/core/storage/secure_storage.dart';
+import 'package:truelovesocio/data/services/auth_service.dart';
+import 'package:truelovesocio/data/services/order_service.dart';
+import 'package:truelovesocio/model/pedido_model.dart';
+import 'package:truelovesocio/model/socio_model.dart';
+import 'package:truelovesocio/features/orders/presentation/screens/seguimiento_pedido_view.dart';
+import 'dart:convert';
 
 class PedidosHelper {
-  static Future<dynamic> navegarASeguimiento(BuildContext context, Pedido pedido) async {
-    return await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => SeguimientoPedidoView(pedido: pedido),
-      ),
-    );
+  static Future<void> navegarASeguimiento(Pedido pedido) async {
+    await Get.to(() => SeguimientoPedidoView(pedido: pedido));
   }
+
   static Future<int?> mostrarDialogoTiempo(BuildContext context) async {
     final TextEditingController controller = TextEditingController();
-    return showDialog<int>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Tiempo de preparación'),
-            content: TextField(
-              controller: controller,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Minutos estimados',
-                hintText: 'Ej: 20',
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(null),
-                child: const Text('Cancelar'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  final String text = controller.text;
-                  final int? minutos = int.tryParse(text);
-                  Navigator.of(context).pop(minutos);
-                },
-                child: const Text('Aceptar'),
-              ),
-            ],
+    return await Get.dialog<int>(
+      AlertDialog(
+        title: const Text('Tiempo de preparación'),
+        content: TextField(
+          controller: controller,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            labelText: 'Minutos estimados',
+            hintText: 'Ej: 20',
           ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: null),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final String text = controller.text;
+              final int? minutos = int.tryParse(text);
+              Get.back(result: minutos);
+            },
+            child: const Text('Aceptar'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -51,28 +48,25 @@ class PedidosHelper {
     BuildContext context,
     int estado,
   ) async {
-    return await showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Confirmación'),
-              content: Text(
-                estado == 0
-                    ? '¿Estás seguro de cancelar este pedido?'
-                    : '¿Marcar pedido como listo?',
+    return await Get.dialog<bool>(
+          AlertDialog(
+            title: const Text('Confirmación'),
+            content: Text(
+              estado == 0
+                  ? '¿Estás seguro de cancelar este pedido?'
+                  : '¿Marcar pedido como listo?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Get.back(result: false),
+                child: const Text('No'),
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('No'),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('Sí'),
-                ),
-              ],
-            );
-          },
+              ElevatedButton(
+                onPressed: () => Get.back(result: true),
+                child: const Text('Sí'),
+              ),
+            ],
+          ),
         ) ??
         false;
   }
@@ -83,49 +77,45 @@ class PedidosHelper {
     Function(int) onEstadoActualizado,
   ) async {
     final nuevoEstado = estadoActual == 1 ? 0 : 1;
+    final AuthService authService = Get.find<AuthService>();
 
-    final confirmar = await showDialog<bool>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Confirmar cambio de estado'),
-            content: Text(
-              '¿Estás seguro de ${nuevoEstado == 1 ? 'activar' : 'desactivar'} al local?',
-            ),
-            actions: [
-              TextButton(
-                child: const Text('Cancelar'),
-                onPressed: () => Navigator.of(context).pop(false),
-              ),
-              ElevatedButton(
-                child: const Text('Confirmar'),
-                onPressed: () => Navigator.of(context).pop(true),
-              ),
-            ],
+    final confirmar = await Get.dialog<bool>(
+      AlertDialog(
+        title: const Text('Confirmar cambio de estado'),
+        content: Text(
+          '¿Estás seguro de ${nuevoEstado == 1 ? 'activar' : 'desactivar'} al local?',
+        ),
+        actions: [
+          TextButton(
+            child: const Text('Cancelar'),
+            onPressed: () => Get.back(result: false),
           ),
+          ElevatedButton(
+            child: const Text('Confirmar'),
+            onPressed: () => Get.back(result: true),
+          ),
+        ],
+      ),
     );
 
     if (confirmar != true) return;
 
-    final success = await ApiService().actualizarEstadoRepartidor(nuevoEstado);
+    final userJson = await SecureStorage.getUser();
+    if (userJson == null) return;
+    final socio = Socio.fromJson(jsonDecode(userJson));
 
-    if (success) {
-      Socio? socio = await ApiService.getLoggedUser();
-      if (socio != null) {
+    try {
+      final response = await authService.updateEstado(socio.id, nuevoEstado);
+      if (response.statusCode == 200) {
         socio.activo = nuevoEstado;
-        await ApiService.updateLoggedUser(socio);
+        await SecureStorage.saveUser(jsonEncode(socio.toJson()));
+        onEstadoActualizado(nuevoEstado);
+        Get.snackbar("Éxito", "Estado actualizado correctamente.");
+      } else {
+        Get.snackbar("Error", "Error al actualizar el estado.");
       }
-
-      onEstadoActualizado(nuevoEstado);
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Estado actualizado correctamente.')),
-      );
-    } else {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error al actualizar el estado.')),
-      );
+    } catch (e) {
+      Get.snackbar("Error", "Error de conexión.");
     }
   }
 
@@ -133,10 +123,10 @@ class PedidosHelper {
     required BuildContext context,
     required Pedido pedido,
     required int nuevoEstado,
-    required ApiService apiService,
     required Function() onUpdate,
     required Function(bool) bloquearBoton,
   }) async {
+    final OrderService orderService = Get.find<OrderService>();
     bloquearBoton(true);
 
     try {
@@ -144,63 +134,34 @@ class PedidosHelper {
       final int estadoActual = int.parse(pedido.estado);
       if (estadoActual == 1 && nuevoEstado == 2) {
         tiempoPrep = await mostrarDialogoTiempo(context);
-        if (tiempoPrep == null) return;
+        if (tiempoPrep == null) {
+          bloquearBoton(false);
+          return;
+        }
       }
 
-      if (nuevoEstado == 0 || estadoActual == 0 || estadoActual == 1) {
-        final success = await apiService.actualizarEstado(
-          pedido.id,
-          nuevoEstado,
-          tiempo: tiempoPrep ?? 0,
-        );
+      final response = await orderService.actualizarEstadoPedido(
+        pedido.id,
+        nuevoEstado,
+        tiempo: tiempoPrep ?? 0,
+      );
+      
+      if (response.statusCode == 200) {
+        Get.snackbar("Éxito", "Estado del pedido actualizado");
+        onUpdate();
         
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(success 
-                ? 'Estado del pedido actualizado correctamente' 
-                : 'Error al actualizar el estado del pedido'),
-              backgroundColor: success ? Colors.green : Colors.red,
-            ),
-          );
+        if (nuevoEstado == 2) {
+          pedido.tiempo = tiempoPrep ?? 0;
+          pedido.estado = "2";
+          navegarASeguimiento(pedido);
         }
+      } else {
+        Get.snackbar("Error", "No se pudo actualizar el estado");
       }
-
-      await onUpdate();
-
-      if (nuevoEstado == 2 && context.mounted) {
-        if (tiempoPrep != null) pedido.tiempo = tiempoPrep;
-        pedido.estado = nuevoEstado.toString();
-
-        if (!context.mounted) return;
-        final result = await Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => SeguimientoPedidoView(pedido: pedido),
-          ),
-        );
-        if (result == true && context.mounted) {
-          onUpdate();
-        }
-      }
-    } catch (_) {
-      // manejar errores
+    } catch (e) {
+      debugPrint("Error actualizando pedido: $e");
     } finally {
       bloquearBoton(false);
-    }
-  }
-
-  static Future<void> actualizarEstadoPago({
-    required BuildContext context,
-    required Pedido pedido,
-    required ApiService apiService,
-    required Function() onUpdate,
-  }) async {
-    try {
-      await apiService.verificarConfirmacionPago(pedido.id);
-      await onUpdate();
-    } catch (_) {
-      // manejar errores
     }
   }
 }
