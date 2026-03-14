@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
-import 'package:truelovesocio/model/menu_model.dart';
-import 'package:truelovesocio/model/category_model.dart';
+import 'package:truelovesocio/data/models/menu_model.dart';
+import 'package:truelovesocio/data/models/category_model.dart';
 import 'package:truelovesocio/data/services/menu_service.dart';
 import 'package:truelovesocio/features/auth/controllers/auth_controller.dart';
 

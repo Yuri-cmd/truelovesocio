@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:truelovesocio/core/api/api_client.dart';
-import 'package:truelovesocio/model/category_model.dart';
+import 'package:truelovesocio/data/models/category_model.dart';
 import 'package:http_parser/http_parser.dart';
 
 class MenuService {

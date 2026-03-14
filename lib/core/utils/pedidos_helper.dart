@@ -3,8 +3,8 @@ import 'package:get/get.dart';
 import 'package:truelovesocio/core/storage/secure_storage.dart';
 import 'package:truelovesocio/data/services/auth_service.dart';
 import 'package:truelovesocio/data/services/order_service.dart';
-import 'package:truelovesocio/model/pedido_model.dart';
-import 'package:truelovesocio/model/socio_model.dart';
+import 'package:truelovesocio/data/models/pedido_model.dart';
+import 'package:truelovesocio/data/models/socio_model.dart';
 import 'package:truelovesocio/features/orders/presentation/screens/seguimiento_pedido_view.dart';
 import 'dart:convert';
 
@@ -131,7 +131,7 @@ class PedidosHelper {
 
     try {
       int? tiempoPrep;
-      final int estadoActual = int.parse(pedido.estado);
+      final int estadoActual = int.tryParse(pedido.estado) ?? 0;
       if (estadoActual == 1 && nuevoEstado == 2) {
         tiempoPrep = await mostrarDialogoTiempo(context);
         if (tiempoPrep == null) {
@@ -160,6 +160,27 @@ class PedidosHelper {
       }
     } catch (e) {
       debugPrint("Error actualizando pedido: $e");
+    } finally {
+      bloquearBoton(false);
+    }
+  }
+  static Future<void> verificarPago({
+    required int pedidoId,
+    required Function() onUpdate,
+    required Function(bool) bloquearBoton,
+  }) async {
+    final OrderService orderService = Get.find<OrderService>();
+    bloquearBoton(true);
+    try {
+      final response = await orderService.verificarConfirmacionPago(pedidoId);
+      if (response.statusCode == 200) {
+        Get.snackbar("Éxito", "Pago verificado correctamente");
+        onUpdate();
+      } else {
+        Get.snackbar("Error", "No se pudo verificar el pago");
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Error al verificar el pago: $e");
     } finally {
       bloquearBoton(false);
     }

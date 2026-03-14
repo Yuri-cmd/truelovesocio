@@ -9,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:truelovesocio/core/storage/secure_storage.dart';
 import 'package:truelovesocio/data/services/auth_service.dart';
 import 'package:truelovesocio/data/services/misc_service.dart';
-import 'package:truelovesocio/model/socio_model.dart';
+import 'package:truelovesocio/data/models/socio_model.dart';
 
 String _getValidTitle(RemoteMessage message, String defaultTitle) {
   if (message.notification?.title != null && message.notification!.title!.isNotEmpty) {
@@ -223,6 +223,8 @@ class FirebaseApi {
       vibrationPattern: vibrationPattern,
       enableLights: true,
       ledColor: Colors.green,
+      ledOnMs: 1000,
+      ledOffMs: 500,
     );
 
     await _flutterLocalNotificationsPlugin.show(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 // import 'package:truelove/theme/app_theme.dart';
 class NavOption {
@@ -43,13 +44,11 @@ class CustomNavOption extends StatelessWidget {
               leading: Icon(option.icon),
               title: Text(option.title),
               onTap: () {
-                Navigator.pop(context);
+                Get.back();
                 if (option.onTap != null) {
                   option.onTap!();
                 } else if (option.targetView != null) {
-                  Navigator.of(
-                    context,
-                  ).push(MaterialPageRoute(builder: (_) => option.targetView!));
+                  Get.to(() => option.targetView!);
                 }
               },
             );

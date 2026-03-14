@@ -1,3 +1,5 @@
+import 'package:truelovesocio/core/utils/url_helper.dart';
+
 class Menu {
   final int id;
   final String titulo;
@@ -20,7 +22,7 @@ class Menu {
       id: json['id'],
       titulo: json['titulo'],
       descripcion: json['descripcion'],
-      foto: json['foto'],
+      foto: UrlHelper.fixUrl(json['foto']),
       precio: json['precio'],
       status: json['status'],
     );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:truelovesocio/components/custom_button.dart';
-import 'package:truelovesocio/components/custom_text_field.dart';
+import 'package:truelovesocio/core/components/custom_button.dart';
+import 'package:truelovesocio/core/components/custom_text_field.dart';
 import 'package:truelovesocio/core/routes/app_routes.dart';
 import 'package:truelovesocio/data/services/auth_service.dart';
 

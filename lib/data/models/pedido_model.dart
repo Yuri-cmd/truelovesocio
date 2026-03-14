@@ -1,4 +1,5 @@
-import 'package:truelovesocio/model/detall_pedido_model.dart';
+import 'package:truelovesocio/core/utils/url_helper.dart';
+import 'package:truelovesocio/data/models/detall_pedido_model.dart';
 
 class Pedido {
   final int id;
@@ -101,7 +102,7 @@ class Pedido {
           json['requiere_confirmacion_local'] == '1',
       tipoComprobante: json['tipo_comprobante'] ?? '',
       documento: json['documento']?.toString() ?? '',
-      fotoPago: json['foto_pago'] ?? '',
+      fotoPago: UrlHelper.fixUrl(json['foto_pago']),
       tipoPedido: json['tipo_pedido'] ?? 0,
       fecha: json['created_at'] ?? '',
       subtotal: json['subtotal']?.toString() ?? '0.00',

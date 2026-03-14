@@ -139,7 +139,7 @@ class _CreateMenuViewState extends State<CreateMenuView> {
 
   Widget _buildCategoryDropdown() {
     return Obx(() => DropdownButtonFormField<int>(
-      value: _selectedCategoryId,
+      initialValue: _selectedCategoryId,
       hint: const Text('Seleccionar Categoría'),
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.category, color: Colors.red),

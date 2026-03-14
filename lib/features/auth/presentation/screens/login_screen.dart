@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
-import 'package:truelovesocio/components/custom_text_field.dart';
+import 'package:truelovesocio/core/components/custom_text_field.dart';
 import 'package:truelovesocio/core/routes/app_routes.dart';
-import 'package:truelovesocio/core/theme/app_theme.dart';
 import 'package:truelovesocio/features/auth/controllers/auth_controller.dart';
 
 class LoginScreen extends StatefulWidget {

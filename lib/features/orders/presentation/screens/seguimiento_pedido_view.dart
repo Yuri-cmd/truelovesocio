@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:truelovesocio/components/pedido_buttons.dart';
-import 'package:truelovesocio/components/pedido_cliente_card.dart';
-import 'package:truelovesocio/components/pedido_estado_timeline.dart';
-import 'package:truelovesocio/components/pedido_motorizado_card.dart';
-import 'package:truelovesocio/components/pedido_productos_list.dart';
-import 'package:truelovesocio/model/pedido_model.dart';
+import 'package:truelovesocio/core/components/pedido_buttons.dart';
+import 'package:truelovesocio/core/components/pedido_cliente_card.dart';
+import 'package:truelovesocio/core/components/pedido_estado_timeline.dart';
+import 'package:truelovesocio/core/components/pedido_motorizado_card.dart';
+import 'package:truelovesocio/core/components/pedido_productos_list.dart';
+import 'package:truelovesocio/data/models/pedido_model.dart';
 import 'package:truelovesocio/data/services/order_service.dart';
-import 'package:truelovesocio/utils/connection_helper.dart';
-import 'package:truelovesocio/utils/helpers.dart';
+import 'package:truelovesocio/core/utils/connection_helper.dart';
+import 'package:truelovesocio/core/utils/helpers.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 

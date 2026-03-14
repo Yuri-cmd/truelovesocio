@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:truelovesocio/core/storage/secure_storage.dart';
 import 'package:truelovesocio/data/services/auth_service.dart';
-import 'package:truelovesocio/model/socio_model.dart';
+import 'package:truelovesocio/data/models/socio_model.dart';
 import 'package:truelovesocio/core/routes/app_routes.dart';
 
 class AuthController extends GetxController {

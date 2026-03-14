@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:truelovesocio/components/pedido_card.dart';
+import 'package:truelovesocio/core/components/pedido_card.dart';
 import 'package:truelovesocio/features/auth/controllers/auth_controller.dart';
 import 'package:truelovesocio/features/orders/controllers/orders_controller.dart';
 import 'package:truelovesocio/main.dart';
-import 'package:truelovesocio/model/pedido_model.dart';
-import 'package:truelovesocio/utils/pedidos_helper.dart';
+import 'package:truelovesocio/data/models/pedido_model.dart';
+import 'package:truelovesocio/core/utils/pedidos_helper.dart';
 
 class PedidosView extends StatefulWidget {
   const PedidosView({super.key});

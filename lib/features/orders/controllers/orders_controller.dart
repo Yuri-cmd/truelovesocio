@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:truelovesocio/model/pedido_model.dart';
+import 'package:truelovesocio/data/models/pedido_model.dart';
 import 'package:truelovesocio/data/services/order_service.dart';
 import 'package:truelovesocio/features/auth/controllers/auth_controller.dart';
 

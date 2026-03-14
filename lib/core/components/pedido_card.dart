@@ -2,9 +2,10 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:truelovesocio/model/pedido_model.dart';
-import 'package:truelovesocio/utils/helpers.dart';
-import 'package:truelovesocio/utils/pedidos_helper.dart';
+import 'package:get/get.dart';
+import 'package:truelovesocio/data/models/pedido_model.dart';
+import 'package:truelovesocio/core/utils/helpers.dart';
+import 'package:truelovesocio/core/utils/pedidos_helper.dart';
 import 'package:path_provider/path_provider.dart';
 
 class PedidoCard extends StatefulWidget {
@@ -55,9 +56,7 @@ class _PedidoCardState extends State<PedidoCard> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.close, color: Colors.white),
-                        onPressed: () {
-                          Navigator.of(dialogContext).pop();
-                        },
+                        onPressed: () => Get.back(),
                       ),
                     ],
                   ),
@@ -192,10 +191,10 @@ class _PedidoCardState extends State<PedidoCard> {
                 ),
                 Chip(
                   label: Text(
-                    obtenerEstado(int.parse(widget.pedido.estado)),
+                    obtenerEstado(int.tryParse(widget.pedido.estado) ?? 0),
                     style: const TextStyle(color: Colors.white),
                   ),
-                  backgroundColor: obtenerColorEstado(int.parse(widget.pedido.estado)),
+                  backgroundColor: obtenerColorEstado(int.tryParse(widget.pedido.estado) ?? 0),
                 ),
               ],
             ),
@@ -239,7 +238,8 @@ class _PedidoCardState extends State<PedidoCard> {
                   ],
                 ),
                 if (widget.pedido.fotoPago.isNotEmpty &&
-                    widget.pedido.fotoPago != 'null')
+                    widget.pedido.fotoPago != 'null' &&
+                    widget.pedido.fotoPago != '(Null)')
                   TextButton.icon(
                     onPressed: () => _showPhotoDialog(widget.pedido.fotoPago),
                     icon: const Icon(Icons.remove_red_eye, size: 20),
@@ -311,7 +311,7 @@ class _PedidoCardState extends State<PedidoCard> {
                                   content: const Text('No se ha cargado una foto del pago.'),
                                   actions: [
                                     TextButton(
-                                      onPressed: () => Navigator.pop(context),
+                                      onPressed: () => Get.back(),
                                       child: const Text('OK'),
                                     ),
                                   ],
@@ -383,14 +383,17 @@ class _PedidoCardState extends State<PedidoCard> {
                                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                               children: [
                                                 TextButton(
-                                                  onPressed: () => Navigator.pop(context),
+                                                  onPressed: () => Get.back(),
                                                   child: const Text('Cancelar'),
                                                 ),
                                                 ElevatedButton(
                                                   onPressed: () async {
-                                                    Navigator.pop(context);
-                                                    // This was using PedidosHelper.actualizarEstadoPago which I removed/simplified
-                                                    // I should probably add it back or use OrderService directly
+                                                    Get.back();
+                                                    PedidosHelper.verificarPago(
+                                                      pedidoId: widget.pedido.id,
+                                                      onUpdate: () => widget.onUpdate(),
+                                                      bloquearBoton: widget.bloquearBoton,
+                                                    );
                                                   },
                                                   child: const Text('Verificar'),
                                                 ),
@@ -411,7 +414,7 @@ class _PedidoCardState extends State<PedidoCard> {
                     )
                     : ElevatedButton.icon(
                       onPressed:
-                          int.parse(widget.pedido.estado) == 0 ||
+                          (int.tryParse(widget.pedido.estado) ?? 0) == 0 ||
                                   widget.bloqueoBotones[widget.pedido.id] == true
                               ? null
                               : () {
@@ -426,15 +429,15 @@ class _PedidoCardState extends State<PedidoCard> {
                       style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
                       icon: const Icon(Icons.check_circle, color: Colors.white),
                       label: Text(
-                        int.parse(widget.pedido.estado) == 0 ||
-                                int.parse(widget.pedido.estado) == 1
+                        (int.tryParse(widget.pedido.estado) ?? 0) == 0 ||
+                                (int.tryParse(widget.pedido.estado) ?? 0) == 1
                             ? 'Aceptar'
                             : 'Ver Pedido',
                         style: const TextStyle(color: Colors.white),
                       ),
                     ),
                 Tooltip(
-                  message: int.parse(widget.pedido.estado) == 0 ? 'El pedido ya está cancelado' : 'Cancelar pedido',
+                  message: (int.tryParse(widget.pedido.estado) ?? 0) == 0 ? 'El pedido ya está cancelado' : 'Cancelar pedido',
                   child: ElevatedButton.icon(
                     onPressed:
                         _debeDeshabilitarBotonCancelar()
@@ -443,7 +446,7 @@ class _PedidoCardState extends State<PedidoCard> {
                                 final confirmar = await PedidosHelper.mostrarAlertaConfirmacion(context, 0);
                                 if (!confirmar) return;
                                 
-                                if (!mounted) return;
+                                 if (!context.mounted) return;
                                 PedidosHelper.actualizarEstadoPedido(
                                   context: context,
                                   pedido: widget.pedido,
@@ -466,7 +469,7 @@ class _PedidoCardState extends State<PedidoCard> {
   }
 
   bool _debeDeshabilitarBotonCancelar() {
-    final estado = int.parse(widget.pedido.estado);
+    final estado = int.tryParse(widget.pedido.estado) ?? 0;
     final bloqueado = widget.bloqueoBotones[widget.pedido.id] == true;
     if (estado == 0 || estado >= 8) return true;
     if (bloqueado) return true;

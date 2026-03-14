@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:truelovesocio/components/dish_item_widget.dart';
+import 'package:truelovesocio/core/components/dish_item_widget.dart';
 import 'package:truelovesocio/features/auth/controllers/auth_controller.dart';
 import 'package:truelovesocio/features/menu/controllers/socio_menu_controller.dart';
 import 'package:truelovesocio/main.dart';
@@ -75,7 +75,7 @@ class MenuView extends GetView<SocioMenuController> {
                               name: dish.titulo,
                               price: dish.precio,
                               isActive: dish.status == 'active',
-                              imageUrl: "https://magusemail.com/truelove-back/public/${dish.foto}",
+                              imageUrl: dish.foto,
                               onToggle: (val) => controller.toggleDishStatus(dish, val),
                             );
                           },

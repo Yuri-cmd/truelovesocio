@@ -1,10 +1,9 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:truelovesocio/features/cuotas/controllers/cuotas_controller.dart';
-import 'package:truelovesocio/model/cuota_model.dart';
+import 'package:truelovesocio/data/models/cuota_model.dart';
 
 class CuotasView extends GetView<CuotasController> {
   const CuotasView({super.key});
@@ -182,7 +181,7 @@ class CuotasView extends GetView<CuotasController> {
           const Divider(color: Colors.white10),
           _buildPremiumRow('Comisión', cuota.tipoCuota == 'porcentaje' ? '${cuota.porcentajeComision}%' : 'S/ ${cuota.montoCuota}'),
           const Divider(color: Colors.white10),
-          _buildPremiumRow('Facturación', (cuota.diaPago == null || cuota.diaPago == 0) ? 'Fin de periodo' : 'Cada día ${cuota.diaPago}'),
+          _buildPremiumRow('Facturación', (cuota.diaPago == 0) ? 'Fin de periodo' : 'Cada día ${cuota.diaPago}'),
         ],
       ),
     );
@@ -388,7 +387,7 @@ class CuotasView extends GetView<CuotasController> {
               const Text('Registrar Pago', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 20),
               DropdownButtonFormField<String>(
-                value: metodo,
+                initialValue: metodo,
                 items: ['yape', 'transferencia', 'plin'].map((m) => DropdownMenuItem(value: m, child: Text(m.toUpperCase()))).toList(),
                 onChanged: (val) => setState(() => metodo = val!),
                 decoration: const InputDecoration(labelText: 'Método de Pago'),
@@ -400,35 +399,51 @@ class CuotasView extends GetView<CuotasController> {
               const SizedBox(height: 20),
               ElevatedButton.icon(
                 onPressed: () async {
-                  final picker = ImagePicker();
-                  final picked = await picker.pickImage(source: ImageSource.gallery);
-                  if (picked != null) setState(() => image = picked);
+                  try {
+                    final picker = ImagePicker();
+                    final picked = await picker.pickImage(source: ImageSource.gallery);
+                    if (picked != null) {
+                      setState(() => image = picked);
+                    }
+                  } catch (e) {
+                    Get.snackbar("Error", "No se pudo acceder a la galería: $e");
+                  }
                 },
-                icon: const Icon(Icons.camera_alt),
+                icon: Icon(image == null ? Icons.camera_alt : Icons.check_circle, color: image == null ? null : Colors.green),
                 label: Text(image == null ? 'Subir Comprobante' : 'Imagen Seleccionada'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: image == null ? null : Colors.green.shade50,
+                  foregroundColor: image == null ? null : Colors.green,
+                ),
               ),
               const SizedBox(height: 30),
-              SizedBox(
+              Obx(() => SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () async {
+                  onPressed: controller.isSubmitting.value ? null : () async {
                     if (image == null || operacionCtrl.text.isEmpty) {
-                      Get.snackbar("Error", "Completa todos los datos");
+                      Get.snackbar("Error", "Completa todos los datos (Imagen y Nro Operación)", snackPosition: SnackPosition.BOTTOM);
                       return;
                     }
-                    final success = await controller.registrarPago(
+                    await controller.registrarPago(
                       periodoId: periodo.id,
                       monto: montoCtrl.text,
                       operacion: operacionCtrl.text,
                       metodo: metodo,
                       image: image!,
                     );
-                    if (success) Get.back();
+                    // El controlador cierra el modal y muestra la alerta de confirmación
                   },
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red, padding: const EdgeInsets.all(16)),
-                  child: const Text('ENVIAR REVISIÓN', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red, 
+                    padding: const EdgeInsets.all(16),
+                    disabledBackgroundColor: Colors.grey,
+                  ),
+                  child: controller.isSubmitting.value 
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text('ENVIAR REVISIÓN', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
-              ),
+              )),
             ],
           ),
         ),

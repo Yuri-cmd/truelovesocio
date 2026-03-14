@@ -1,12 +1,10 @@
-import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:truelovesocio/features/orders/controllers/orders_controller.dart';
-import 'package:truelovesocio/utils/helpers.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:truelovesocio/core/utils/helpers.dart';
 
 class HistoricoPedidosScreen extends GetView<OrdersController> {
   const HistoricoPedidosScreen({super.key});
@@ -58,7 +56,7 @@ class HistoricoPedidosScreen extends GetView<OrdersController> {
         children: [
           Expanded(
             child: Obx(() => DropdownButtonFormField<String>(
-              value: controller.selectedFecha.value,
+              initialValue: controller.selectedFecha.value,
               decoration: InputDecoration(
                 labelText: 'Fecha',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -78,7 +76,7 @@ class HistoricoPedidosScreen extends GetView<OrdersController> {
           const SizedBox(width: 12),
           Expanded(
             child: Obx(() => DropdownButtonFormField<String>(
-              value: controller.selectedTipo.value,
+              initialValue: controller.selectedTipo.value,
               decoration: InputDecoration(
                 labelText: 'Tipo',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
@@ -200,7 +198,10 @@ class _PedidoItemState extends State<_PedidoItem> {
                 ),
               ],
             ),
-            if (pedido.fotoPago != null)
+            if (pedido.fotoPago != null && 
+                pedido.fotoPago.isNotEmpty && 
+                pedido.fotoPago != 'null' && 
+                pedido.fotoPago != '(Null)')
               Align(
                 alignment: Alignment.centerRight,
                 child: IconButton(

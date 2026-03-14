@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:truelovesocio/features/auth/controllers/auth_controller.dart';
-import 'package:truelovesocio/model/category_model.dart';
+import 'package:truelovesocio/data/models/category_model.dart';
 import 'package:truelovesocio/data/services/menu_service.dart';
 
 class AddEditCategoryScreen extends StatefulWidget {
@@ -201,7 +201,11 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
           );
           if (picked != null) {
             setState(() {
-              if (isStart) _startTimes[day] = picked; else _endTimes[day] = picked;
+              if (isStart) {
+                _startTimes[day] = picked;
+              } else {
+                _endTimes[day] = picked;
+              }
             });
           }
         },

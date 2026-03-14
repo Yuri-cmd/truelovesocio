@@ -36,8 +36,9 @@ class CuotaService {
     String? observaciones,
   }) async {
     final formData = FormData.fromMap({
+      'socio_id': socioId.toString(),
       'periodo_id': periodoId.toString(),
-      'fecha_pago': DateTime.now().toString(), // Or should this be passed?
+      'fecha_pago': DateTime.now().toIso8601String().split('T')[0], // yyyy-MM-dd
       'monto_pagado': monto,
       'metodo_pago': metodo,
       'numero_operacion': operacion,

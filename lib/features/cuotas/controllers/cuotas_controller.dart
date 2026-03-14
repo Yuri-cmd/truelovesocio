@@ -1,7 +1,9 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:truelovesocio/model/cuota_model.dart';
-import 'package:truelovesocio/model/socio_model.dart';
+import 'package:truelovesocio/data/models/cuota_model.dart';
+import 'package:truelovesocio/data/models/socio_model.dart';
 import 'package:truelovesocio/data/services/cuota_service.dart';
 import 'package:truelovesocio/features/auth/controllers/auth_controller.dart';
 
@@ -15,6 +17,7 @@ class CuotasController extends GetxController {
   final periodoActualData = Rxn<Map<String, dynamic>>();
   final periodos = <PeriodoCuota>[].obs;
   final pagos = <PagoCuota>[].obs;
+  final isSubmitting = false.obs;
 
   @override
   void onInit() {
@@ -74,6 +77,7 @@ class CuotasController extends GetxController {
     if (socio.value == null) return false;
 
     try {
+      isSubmitting.value = true;
       final response = await _cuotaService.registrarPagoCuota(
         periodoId: periodoId,
         socioId: socio.value!.id,
@@ -83,15 +87,62 @@ class CuotasController extends GetxController {
         imagen: image,
       );
       
-      if (response.statusCode == 200) {
-        await loadAllData();
-        Get.snackbar("Éxito", "Pago registrado correctamente. En revisión.");
-        return true;
+      if (response.statusCode != null && response.statusCode! < 300) {
+        final bool success = response.data['success'] == true || response.data['success']?.toString() == 'true';
+        if (success) {
+          Get.back(); // Cerrar el modal del formulario primero
+          final message = response.data['message'] ?? "Pago registrado correctamente. En revisión.";
+          Get.dialog(
+            AlertDialog(
+              title: const Row(
+                children: [
+                  Icon(Icons.check_circle, color: Colors.green, size: 28),
+                  SizedBox(width: 12),
+                  Text('Enviado correctamente'),
+                ],
+              ),
+              content: Text(message),
+              actions: [
+                TextButton(
+                  onPressed: () => Get.back(),
+                  child: const Text('Aceptar'),
+                ),
+              ],
+            ),
+            barrierDismissible: false,
+          );
+          loadAllData(); // Recargar datos en segundo plano
+          return true;
+        } else {
+          Get.snackbar(
+            "Error",
+            response.data['message'] ?? "No se pudo registrar el pago",
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+          );
+          return false;
+        }
       }
+      Get.snackbar("Error", "Error del servidor: ${response.statusCode}", snackPosition: SnackPosition.BOTTOM);
       return false;
     } catch (e) {
-      Get.snackbar("Error", "No se pudo registrar el pago: $e");
+      String message = "No se pudo registrar el pago. Revisa los datos e intenta de nuevo.";
+      if (e is DioException && e.response?.data != null) {
+        final data = e.response!.data;
+        if (data is Map) {
+          if (data['message'] != null) message = data['message'].toString();
+          else if (data['errors'] != null && data['errors'] is Map) {
+            final errors = data['errors'] as Map;
+            final first = errors.values.isNotEmpty ? errors.values.first : null;
+            if (first is List && first.isNotEmpty) message = first.first.toString();
+          }
+        }
+      }
+      Get.snackbar("Error", message, backgroundColor: Colors.red, colorText: Colors.white, snackPosition: SnackPosition.BOTTOM);
       return false;
+    } finally {
+      isSubmitting.value = false;
     }
   }
 
