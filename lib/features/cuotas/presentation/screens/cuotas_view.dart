@@ -13,7 +13,7 @@ class CuotasView extends GetView<CuotasController> {
     Get.put(CuotasController());
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Theme.of(context).brightness == Brightness.dark ? null : Colors.grey[100],
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
@@ -32,17 +32,17 @@ class CuotasView extends GetView<CuotasController> {
                     children: [
                       _buildPeriodoActualBanner(context),
                       const SizedBox(height: 24),
-                      _buildSectionHeader('Configuración de mi Plan', Icons.settings_suggest),
+                      _buildSectionHeader(context, 'Configuración de mi Plan', Icons.settings_suggest),
                       const SizedBox(height: 12),
-                      _buildCuotaPremiumCard(),
+                      _buildCuotaPremiumCard(context),
                       const SizedBox(height: 24),
-                      _buildPaymentInfoSection(),
+                      _buildPaymentInfoSection(context),
                       const SizedBox(height: 24),
-                      _buildSectionHeader('Historial Mensual', Icons.history),
+                      _buildSectionHeader(context, 'Historial Mensual', Icons.history),
                       const SizedBox(height: 12),
                       _buildPeriodosGrid(context),
                       const SizedBox(height: 24),
-                      _buildSectionHeader('Últimos Comprobantes', Icons.receipt_long),
+                      _buildSectionHeader(context, 'Últimos Comprobantes', Icons.receipt_long),
                       const SizedBox(height: 12),
                       _buildPagosModernList(context),
                       const SizedBox(height: 40),
@@ -77,14 +77,19 @@ class CuotasView extends GetView<CuotasController> {
     );
   }
 
-  Widget _buildSectionHeader(String title, IconData icon) {
+  Widget _buildSectionHeader(BuildContext context, String title, IconData icon) {
     return Row(
       children: [
         Icon(icon, size: 20, color: Colors.red),
         const SizedBox(width: 8),
         Text(
           title.toUpperCase(),
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.grey[600], letterSpacing: 1.1),
+          style: TextStyle(
+            fontSize: 13, 
+            fontWeight: FontWeight.w800, 
+            color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600], 
+            letterSpacing: 1.1
+          ),
         ),
       ],
     );
@@ -103,9 +108,16 @@ class CuotasView extends GetView<CuotasController> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: color.withAlpha(25), blurRadius: 20, offset: const Offset(0, 10))],
+        border: Theme.of(context).brightness == Brightness.dark ? Border.all(color: Colors.white12, width: 0.5) : null,
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).brightness == Brightness.dark ? Colors.black45 : color.withAlpha(25), 
+            blurRadius: 20, 
+            offset: const Offset(0, 10)
+          )
+        ],
       ),
       child: Column(
         children: [
@@ -131,7 +143,11 @@ class CuotasView extends GetView<CuotasController> {
                       Text('S/ ${periodo.montoEsperado}', style: const TextStyle(fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: -1)),
                       Text(
                         periodo.estaVencido ? 'PAGO VENCIDO' : 'Vence en $diasParaVencer días',
-                        style: TextStyle(color: periodo.estaVencido ? Colors.red : Colors.grey[600], fontSize: 12, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          color: periodo.estaVencido ? Colors.red : (Theme.of(context).brightness == Brightness.dark ? Colors.grey[400] : Colors.grey[600]), 
+                          fontSize: 12, 
+                          fontWeight: FontWeight.w600
+                        ),
                       ),
                     ],
                   ),
@@ -156,7 +172,7 @@ class CuotasView extends GetView<CuotasController> {
     );
   }
 
-  Widget _buildCuotaPremiumCard() {
+  Widget _buildCuotaPremiumCard(BuildContext context) {
     final cuota = controller.cuotaActiva.value;
     if (cuota == null) return const SizedBox.shrink();
 
@@ -200,35 +216,41 @@ class CuotasView extends GetView<CuotasController> {
     );
   }
 
-  Widget _buildPaymentInfoSection() {
+  Widget _buildPaymentInfoSection(BuildContext context) {
     final cuota = controller.cuotaActiva.value;
     if (cuota == null) return const SizedBox.shrink();
 
     return Column(
       children: [
-        _buildInfoCard('Datos de Cuenta', Icons.account_balance, [
+        _buildInfoCard(context, 'Datos de Cuenta', Icons.account_balance, [
           {'label': 'Banco', 'value': cuota.banco ?? 'N/A'},
           {'label': 'Cuenta', 'value': cuota.numeroCuenta ?? 'N/A'},
           {'label': 'Tipo', 'value': cuota.tipoCuenta ?? 'N/A'},
         ]),
         const SizedBox(height: 16),
         if (cuota.numeroYape != null)
-          _buildInfoCard('Yape/Plin', Icons.qr_code_scanner, [
+          _buildInfoCard(context, 'Yape/Plin', Icons.qr_code_scanner, [
             {'label': 'Número', 'value': cuota.numeroYape ?? 'N/A'},
             {'label': 'Titular', 'value': cuota.titularYape ?? 'N/A'},
-          ], color: Colors.purple[50]!, accentColor: Colors.purple),
+          ], color: Theme.of(context).brightness == Brightness.dark ? Colors.purple.withAlpha(30) : Colors.purple[50]!, accentColor: Colors.purple),
       ],
     );
   }
 
-  Widget _buildInfoCard(String title, IconData icon, List<Map<String, String>> rows, {Color color = Colors.white, Color accentColor = Colors.grey}) {
+  Widget _buildInfoCard(BuildContext context, String title, IconData icon, List<Map<String, String>> rows, {Color? color, Color accentColor = Colors.grey}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
-      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withAlpha(10), blurRadius: 10, offset: const Offset(0, 5))]),
+      decoration: BoxDecoration(
+        color: color ?? Theme.of(context).cardColor, 
+        borderRadius: BorderRadius.circular(20), 
+        border: isDark ? Border.all(color: Colors.white12, width: 0.5) : null,
+        boxShadow: [BoxShadow(color: isDark ? Colors.black45 : Colors.black.withAlpha(10), blurRadius: 10, offset: const Offset(0, 5))]
+      ),
       child: Column(
         children: [
           ListTile(
-            leading: Icon(icon, color: accentColor == Colors.grey ? Colors.black87 : accentColor),
-            title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: accentColor == Colors.grey ? Colors.black87 : accentColor)),
+            leading: Icon(icon, color: accentColor == Colors.grey ? (isDark ? Colors.white70 : Colors.black87) : accentColor),
+            title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: accentColor == Colors.grey ? (isDark ? Colors.white70 : Colors.black87) : accentColor)),
           ),
           const Divider(height: 1),
           Padding(
@@ -262,7 +284,11 @@ class CuotasView extends GetView<CuotasController> {
           onTap: () => _showPedidosDetail(context, p),
           child: Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor, 
+              borderRadius: BorderRadius.circular(16),
+              border: Theme.of(context).brightness == Brightness.dark ? Border.all(color: Colors.white12, width: 0.5) : null,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
@@ -286,7 +312,12 @@ class CuotasView extends GetView<CuotasController> {
       children: controller.pagos.take(5).map((pago) {
         return Card(
           margin: const EdgeInsets.only(bottom: 10),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          color: Theme.of(context).cardColor,
+          elevation: Theme.of(context).brightness == Brightness.dark ? 2 : 1,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: Theme.of(context).brightness == Brightness.dark ? const BorderSide(color: Colors.white12, width: 0.5) : BorderSide.none,
+          ),
           child: Column(
             children: [
               ListTile(
@@ -327,7 +358,7 @@ class CuotasView extends GetView<CuotasController> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
-        decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+        decoration: BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: const BorderRadius.vertical(top: Radius.circular(25))),
         child: DraggableScrollableSheet(
           initialChildSize: 0.7,
           expand: false,
@@ -379,7 +410,7 @@ class CuotasView extends GetView<CuotasController> {
     Get.bottomSheet(
       StatefulBuilder(builder: (context, setState) => Container(
         padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+        decoration: BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: const BorderRadius.vertical(top: Radius.circular(25))),
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,

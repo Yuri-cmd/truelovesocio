@@ -3,9 +3,9 @@ import 'package:get/get.dart';
 import 'package:truelovesocio/core/components/pedido_card.dart';
 import 'package:truelovesocio/features/auth/controllers/auth_controller.dart';
 import 'package:truelovesocio/features/orders/controllers/orders_controller.dart';
-import 'package:truelovesocio/main.dart';
 import 'package:truelovesocio/data/models/pedido_model.dart';
 import 'package:truelovesocio/core/utils/pedidos_helper.dart';
+import 'package:truelovesocio/main.dart';
 
 class PedidosView extends StatefulWidget {
   const PedidosView({super.key});
@@ -90,48 +90,88 @@ class _PedidosViewState extends State<PedidosView> {
     return DefaultTabController(
       length: 3,
       child: Scaffold(
+        backgroundColor: isDark ? null : const Color(0xFFF8F9FD),
         appBar: AppBar(
-          title: const Text('Órdenes activas', style: TextStyle(fontWeight: FontWeight.bold)),
-          backgroundColor: Colors.red,
+          title: const Text('Órdenes Activas', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+          backgroundColor: Colors.red[700],
           foregroundColor: Colors.white,
-          bottom: TabBar(
-            isScrollable: true,
-            indicatorColor: Colors.white,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            tabs: [
-              Tab(child: _buildTabLabel("Por Aceptar", controller.porAceptar)),
-              Tab(child: _buildTabLabel("En Preparación", controller.enPreparacion)),
-              Tab(child: _buildTabLabel("Por Entregar", controller.porEntregar)),
-            ],
+          elevation: 0,
+          centerTitle: true,
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(50),
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: Colors.black.withAlpha(20),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: TabBar(
+                isScrollable: true,
+                tabAlignment: TabAlignment.center,
+                indicator: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                ),
+                indicatorSize: TabBarIndicatorSize.tab,
+                labelColor: Colors.red[700],
+                unselectedLabelColor: Colors.white70,
+                labelStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 12),
+                unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
+                tabs: [
+                  _buildTabLabel("POR ACEPTAR", controller.porAceptar),
+                  _buildTabLabel("PROCESO", controller.enPreparacion),
+                  _buildTabLabel("ENTREGA", controller.porEntregar),
+                ],
+              ),
+            ),
           ),
           actions: [
-            Row(
-              children: [
-                Icon(isDark ? Icons.dark_mode : Icons.light_mode, color: colorScheme.onPrimary),
-                Switch(
-                  value: isDark,
-                  onChanged: (val) => themeNotifier.setTheme(val ? ThemeMode.dark : ThemeMode.light),
-                ),
-                const SizedBox(width: 8),
-                Obx(() => Text(
-                  activo.value == 1 ? "Activo" : "Inactivo",
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: colorScheme.onPrimary),
-                )),
-                Obx(() => Switch(
-                  value: activo.value == 1,
-                  activeTrackColor: Colors.green,
-                  inactiveThumbColor: Colors.grey,
-                  onChanged: (value) {
-                    PedidosHelper.cambiarEstadoRepartidor(
-                      context,
-                      activo.value,
-                      (nuevo) => activo.value = nuevo,
-                    );
-                  },
-                )),
-              ],
-            ),
+            Obx(() => Container(
+              margin: const EdgeInsets.only(right: 8),
+              child: Row(
+                children: [
+                  IconButton(
+                    onPressed: () => themeNotifier.setTheme(isDark ? ThemeMode.light : ThemeMode.dark),
+                    icon: Icon(isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded, color: Colors.white),
+                    tooltip: 'Cambiar Tema',
+                  ),
+                  const VerticalDivider(color: Colors.white24, indent: 12, endIndent: 12, width: 8),
+                  const SizedBox(width: 4),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        activo.value == 1 ? "RECIBIENDO" : "APAGADO",
+                        style: const TextStyle(fontSize: 8, fontWeight: FontWeight.w900, color: Colors.white70, letterSpacing: 0.5),
+                      ),
+                      Text(
+                        activo.value == 1 ? "ACTIVO" : "INACTIVO",
+                        style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Colors.white),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 4),
+                  Transform.scale(
+                    scale: 0.7,
+                    child: Switch(
+                      value: activo.value == 1,
+                      activeColor: Colors.greenAccent[400],
+                      activeTrackColor: Colors.green[900],
+                      inactiveThumbColor: Colors.grey[400],
+                      inactiveTrackColor: Colors.black26,
+                      onChanged: (value) {
+                        PedidosHelper.cambiarEstadoRepartidor(
+                          context,
+                          activo.value,
+                          (nuevo) => activo.value = nuevo,
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            )),
           ],
         ),
         body: TabBarView(
@@ -141,23 +181,30 @@ class _PedidosViewState extends State<PedidosView> {
             _buildTabContent(controller.porEntregar, colorScheme),
           ],
         ),
-        backgroundColor: colorScheme.surface,
       ),
     );
   }
 
   Widget _buildTabLabel(String text, RxList<Pedido> list) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(text),
-        const SizedBox(height: 4),
-        Obx(() => Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-          decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(12)),
-          child: Text('${list.length}', style: const TextStyle(fontSize: 12, color: Colors.white)),
-        )),
-      ],
+    return Tab(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(text),
+          const SizedBox(width: 6),
+          Obx(() => Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: list.isNotEmpty ? Colors.black.withAlpha(40) : Colors.transparent,
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              '${list.length}',
+              style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w900),
+            ),
+          )),
+        ],
+      ),
     );
   }
 }

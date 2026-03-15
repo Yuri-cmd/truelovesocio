@@ -25,6 +25,7 @@ class OrdersController extends GetxController {
   void onInit() {
     super.onInit();
     loadActiveOrders();
+    loadFilteredOrders();
     _startTimer();
   }
 

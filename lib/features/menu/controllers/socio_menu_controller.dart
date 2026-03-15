@@ -12,6 +12,25 @@ class SocioMenuController extends GetxController {
   final categories = <Category>[].obs;
   final isLoading = false.obs;
   final selectedCategoryId = Rxn<int>();
+  final searchQuery = ''.obs;
+
+  List<Menu> get filteredDishes {
+    // Primero filtramos platos de categorías inactivas
+    final activeCategoryIds = categories.where((c) => c.estado == 1).map((c) => c.id).toSet();
+    
+    var list = dishes.where((dish) {
+      if (dish.categoriaId == null) return true;
+      return activeCategoryIds.contains(dish.categoriaId);
+    });
+
+    if (searchQuery.value.isNotEmpty) {
+      list = list.where((dish) => 
+        dish.titulo.toLowerCase().contains(searchQuery.value.toLowerCase())
+      );
+    }
+    
+    return list.toList();
+  }
 
   @override
   void onInit() {

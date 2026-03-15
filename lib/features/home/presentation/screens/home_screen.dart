@@ -18,6 +18,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late PersistentTabController _controller;
   final AuthController authController = Get.find<AuthController>();
+  int _lastIndex = 0;
 
   @override
   void initState() {
@@ -27,6 +28,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = Theme.of(context).cardColor;
+
     return PersistentTabView(
       context,
       controller: _controller,
@@ -40,46 +44,71 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
       items: [
         PersistentBottomNavBarItem(
-          icon: const Icon(Icons.shopping_bag_outlined),
+          icon: const Icon(Icons.receipt_long_rounded),
+          inactiveIcon: const Icon(Icons.receipt_long_outlined),
           title: 'Pedidos',
-          activeColorPrimary: Colors.red,
-          inactiveColorPrimary: Colors.grey,
+          activeColorPrimary: Colors.red[700]!,
+          inactiveColorPrimary: Colors.grey[500]!,
         ),
         PersistentBottomNavBarItem(
-          icon: const Icon(Icons.book),
-          title: 'Historico',
-          activeColorPrimary: Colors.red,
-          inactiveColorPrimary: Colors.grey,
+          icon: const Icon(Icons.history_rounded),
+          inactiveIcon: const Icon(Icons.history_outlined),
+          title: 'Historial',
+          activeColorPrimary: Colors.red[700]!,
+          inactiveColorPrimary: Colors.grey[500]!,
         ),
         PersistentBottomNavBarItem(
-          icon: const Icon(Icons.menu_book_rounded),
-          title: 'Menu',
-          activeColorPrimary: Colors.red,
-          inactiveColorPrimary: Colors.grey,
+          icon: const Icon(Icons.restaurant_menu_rounded),
+          inactiveIcon: const Icon(Icons.restaurant_menu_outlined),
+          title: 'Menú',
+          activeColorPrimary: Colors.red[700]!,
+          inactiveColorPrimary: Colors.grey[500]!,
         ),
         PersistentBottomNavBarItem(
-          icon: const Icon(Icons.receipt_long),
-          title: 'Cuotas',
-          activeColorPrimary: Colors.red,
-          inactiveColorPrimary: Colors.grey,
+          icon: const Icon(Icons.account_balance_wallet_rounded),
+          inactiveIcon: const Icon(Icons.account_balance_wallet_outlined),
+          title: 'Pagos',
+          activeColorPrimary: Colors.red[700]!,
+          inactiveColorPrimary: Colors.grey[500]!,
         ),
         PersistentBottomNavBarItem(
-          icon: const Icon(Icons.star),
-          title: 'Evaluaciones',
-          activeColorPrimary: Colors.red,
-          inactiveColorPrimary: Colors.grey,
+          icon: const Icon(Icons.stars_rounded),
+          inactiveIcon: const Icon(Icons.stars_outlined),
+          title: 'Reseñas',
+          activeColorPrimary: Colors.red[700]!,
+          inactiveColorPrimary: Colors.grey[500]!,
         ),
         PersistentBottomNavBarItem(
-          icon: const Icon(Icons.exit_to_app),
-          title: 'Cerrar',
-          activeColorPrimary: Colors.red,
-          inactiveColorPrimary: Colors.grey,
+          icon: const Icon(Icons.logout_rounded),
+          title: 'Salir',
+          activeColorPrimary: Colors.orange[800]!,
+          inactiveColorPrimary: Colors.grey[500]!,
         ),
       ],
+      backgroundColor: cardColor,
+      handleAndroidBackButtonPress: true,
+      resizeToAvoidBottomInset: true,
+      stateManagement: true,
+      decoration: NavBarDecoration(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        colorBehindNavBar: isDark ? Colors.black : const Color(0xFFF8F9FD),
+        boxShadow: [
+          BoxShadow(
+            color: isDark ? Colors.black54 : Colors.black.withAlpha(15),
+            blurRadius: 15,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
       navBarStyle: NavBarStyle.style6,
       onItemSelected: (int index) {
         if (index == 5) {
           _showLogoutDialog();
+          Future.delayed(const Duration(milliseconds: 100), () {
+            _controller.index = _lastIndex;
+          });
+        } else {
+          _lastIndex = index;
         }
       },
     );
@@ -88,19 +117,31 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showLogoutDialog() {
     Get.dialog(
       AlertDialog(
-        title: const Text('Cerrar Sesión'),
-        content: const Text('¿Estás seguro de que deseas cerrar sesión?'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Row(
+          children: [
+            Icon(Icons.logout_rounded, color: Colors.red),
+            SizedBox(width: 10),
+            Text('Cerrar Sesión'),
+          ],
+        ),
+        content: const Text('¿Estás seguro de que deseas cerrar sesión en Truelove Socio?'),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
-            child: const Text('Cancelar'),
+            child: Text('CANCELAR', style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.bold)),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               Get.back();
               authController.logout();
             },
-            child: const Text('Cerrar Sesión', style: TextStyle(color: Colors.red)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red[700],
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('CERRAR SESIÓN', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),

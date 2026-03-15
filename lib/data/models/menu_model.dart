@@ -6,6 +6,7 @@ class Menu {
   final String descripcion;
   final String foto;
   final String precio;
+  final int? categoriaId;
   String status;
 
   Menu({
@@ -14,6 +15,7 @@ class Menu {
     required this.descripcion,
     required this.foto,
     required this.precio,
+    this.categoriaId,
     required this.status,
   });
 
@@ -24,6 +26,7 @@ class Menu {
       descripcion: json['descripcion'],
       foto: UrlHelper.fixUrl(json['foto']),
       precio: json['precio'],
+      categoriaId: json['categoria_id'] != null ? int.tryParse(json['categoria_id'].toString()) : null,
       status: json['status'],
     );
   }

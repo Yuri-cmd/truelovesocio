@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:truelovesocio/core/components/dish_item_widget.dart';
 import 'package:truelovesocio/features/auth/controllers/auth_controller.dart';
 import 'package:truelovesocio/features/menu/controllers/socio_menu_controller.dart';
-import 'package:truelovesocio/main.dart';
 import 'package:truelovesocio/features/menu/presentation/screens/category_view.dart';
 import 'package:truelovesocio/features/menu/presentation/screens/create_menu_view.dart';
 
@@ -17,108 +16,204 @@ class MenuView extends GetView<SocioMenuController> {
     }
     
     final colorScheme = Theme.of(context).colorScheme;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: Theme.of(context).brightness == Brightness.dark ? null : const Color(0xFFF8F9FD),
       appBar: AppBar(
-        backgroundColor: Colors.red,
+        title: const Text('Mi Carta Digital', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+        backgroundColor: Colors.red[700],
         foregroundColor: Colors.white,
-        title: const Text("Menú"),
+        elevation: 0,
+        centerTitle: true,
         actions: [
-          Row(
-            children: [
-              Icon(isDark ? Icons.dark_mode : Icons.light_mode, color: colorScheme.onPrimary),
-              Switch(
-                value: isDark,
-                onChanged: (val) => themeNotifier.setTheme(val ? ThemeMode.dark : ThemeMode.light),
-              ),
-              const SizedBox(width: 8),
-            ],
+          IconButton(
+            onPressed: () => controller.loadAll(),
+            icon: const Icon(Icons.refresh_rounded),
           ),
+          const SizedBox(width: 8),
         ],
       ),
       drawer: _buildDrawer(context, colorScheme, textTheme),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                decoration: BoxDecoration(
-                  color: colorScheme.surface,
-                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16.0),
-                      child: Text('Explorar Menú', style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
-                    ),
-                    _buildFilters(colorScheme),
-                    const SizedBox(height: 10),
-                    Expanded(
-                      child: Obx(() {
-                        if (controller.isLoading.value && controller.dishes.isEmpty) {
-                          return const Center(child: CircularProgressIndicator());
-                        }
-                        if (controller.dishes.isEmpty) {
-                          return const Center(child: Text('No hay platos disponibles en esta categoría'));
-                        }
-                        return ListView.builder(
-                          itemCount: controller.dishes.length,
-                          itemBuilder: (context, index) {
-                            final dish = controller.dishes[index];
-                            return DishItemWidget(
-                              name: dish.titulo,
-                              price: dish.precio,
-                              isActive: dish.status == 'active',
-                              imageUrl: dish.foto,
-                              onToggle: (val) => controller.toggleDishStatus(dish, val),
-                            );
-                          },
-                        );
-                      }),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+      body: Column(
+        children: [
+          _buildHeader(context),
+          Expanded(
+            child: Obx(() {
+              final list = controller.filteredDishes;
+              if (controller.isLoading.value && list.isEmpty) {
+                return const Center(child: CircularProgressIndicator(color: Colors.red));
+              }
+              if (list.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        controller.searchQuery.value.isNotEmpty 
+                            ? Icons.search_off_rounded 
+                            : Icons.restaurant_menu_rounded, 
+                        size: 80, 
+                        color: Colors.grey[300]
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        controller.searchQuery.value.isNotEmpty 
+                            ? 'No se encontraron resultados'
+                            : 'No hay platos disponibles',
+                        style: TextStyle(color: Colors.grey[500], fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  ),
+                );
+              }
+              return ListView.separated(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+                itemCount: list.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final dish = list[index];
+                  return DishItemWidget(
+                    name: dish.titulo,
+                    price: dish.precio,
+                    isActive: dish.status == 'active',
+                    imageUrl: dish.foto,
+                    onToggle: (val) => controller.toggleDishStatus(dish, val),
+                  );
+                },
+              );
+            }),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Get.to(() => const CreateMenuView())?.then((_) => controller.loadMenu()),
-        backgroundColor: Colors.red,
-        child: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: Colors.red[700],
+        foregroundColor: Colors.white,
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: const Icon(Icons.add_rounded, size: 30),
       ),
     );
   }
 
-  Widget _buildFilters(ColorScheme colorScheme) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Obx(() => DropdownButton<int?>(
-          value: controller.selectedCategoryId.value,
-          hint: const Text('Categoría'),
-          items: [
-            const DropdownMenuItem<int?>(value: null, child: Text('Todas')),
-            ...controller.categories.where((cat) => cat.estado == 1).map((cat) => DropdownMenuItem<int?>(
-              value: cat.id,
-              child: Text(cat.name),
-            )),
-          ],
-          onChanged: (val) => controller.filterByCategory(val),
-        )),
-        IconButton(
-          onPressed: () => controller.loadAll(),
-          icon: const Icon(Icons.refresh),
-          tooltip: 'Refrescar',
-        ),
-      ],
+  Widget _buildHeader(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.only(bottom: 24),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(30)),
+        boxShadow: [
+          BoxShadow(
+            color: isDark ? Colors.black45 : Colors.black.withAlpha(12),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Search Bar
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Container(
+              decoration: BoxDecoration(
+                color: isDark ? Colors.white.withAlpha(10) : Colors.grey[100],
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: isDark ? Colors.white12 : Colors.grey[300]!),
+              ),
+              child: TextField(
+                onChanged: (v) => controller.searchQuery.value = v,
+                decoration: InputDecoration(
+                  hintText: 'Buscar en el menú...',
+                  hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
+                  prefixIcon: Icon(Icons.search_rounded, color: Colors.red[300], size: 20),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+          ),
+
+          // Categories Title and Stats
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'CATEGORÍAS',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.red[400],
+                    letterSpacing: 1.2,
+                  ),
+                ),
+                Obx(() => Text(
+                  '${controller.dishes.length} PLATOS TOTALES',
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.grey[500],
+                    letterSpacing: 0.5,
+                  ),
+                )),
+              ],
+            ),
+          ),
+
+          // Category Chips
+          SizedBox(
+            height: 40,
+            child: Obx(() {
+              final activeCategories = controller.categories.where((cat) => cat.estado == 1).toList();
+              return ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                scrollDirection: Axis.horizontal,
+                itemCount: activeCategories.length + 1,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (context, index) {
+                  final isAll = index == 0;
+                  final category = isAll ? null : activeCategories[index - 1];
+                  final isSelected = controller.selectedCategoryId.value == (isAll ? null : category!.id);
+
+                  return InkWell(
+                    onTap: () => controller.filterByCategory(isAll ? null : category!.id),
+                    borderRadius: BorderRadius.circular(12),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: isSelected 
+                            ? Colors.red[700] 
+                            : (isDark ? Colors.white.withAlpha(15) : Colors.grey[100]),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isSelected ? Colors.transparent : (isDark ? Colors.white12 : Colors.transparent),
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        isAll ? 'Todas' : category!.name,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : (isDark ? Colors.white70 : Colors.grey[700]),
+                          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            }),
+          ),
+        ],
+      ),
     );
   }
 
