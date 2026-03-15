@@ -9,7 +9,8 @@ class OrdersController extends GetxController {
   final OrderService _orderService = Get.find<OrderService>();
   final AuthController _authController = Get.find<AuthController>();
   
-  final pedidos = <Pedido>[].obs;
+  final pedidos = <Pedido>[].obs; // Historical/Filtered orders
+  final activeOrders = <Pedido>[].obs; // Real-time active orders
   final isLoading = true.obs;
   final selectedFecha = 'todas'.obs;
   final selectedTipo = 'todos'.obs;
@@ -47,11 +48,11 @@ class OrdersController extends GetxController {
         final List<dynamic> data = response.data;
         final List<Pedido> loadedPedidos = data.map((p) => Pedido.fromJson(p)).toList();
         
-        pedidos.assignAll(loadedPedidos);
+        activeOrders.assignAll(loadedPedidos);
         
         porAceptar.assignAll(loadedPedidos.where((p) => p.estado == '1').toList());
         enPreparacion.assignAll(loadedPedidos.where((p) => p.estado == '2').toList());
-        porEntregar.assignAll(loadedPedidos.where((p) => p.estado != '1' && p.estado != '2').toList());
+        porEntregar.assignAll(loadedPedidos.where((p) => (int.tryParse(p.estado) ?? 0) >= 3 && (int.tryParse(p.estado) ?? 0) < 8).toList());
       }
     } catch (e) {
       debugPrint('Error en loadActiveOrders: $e');

@@ -51,6 +51,7 @@ class ThemeNotifier extends ValueNotifier<ThemeMode> {
       
       await prefs.setString(_themeKey, themeString);
     } catch (e) {
+      throw Exception(e.toString());
     }
   }
 

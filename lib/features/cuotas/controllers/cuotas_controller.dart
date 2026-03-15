@@ -131,8 +131,9 @@ class CuotasController extends GetxController {
       if (e is DioException && e.response?.data != null) {
         final data = e.response!.data;
         if (data is Map) {
-          if (data['message'] != null) message = data['message'].toString();
-          else if (data['errors'] != null && data['errors'] is Map) {
+          if (data['message'] != null) {
+            message = data['message'].toString();
+          } else if (data['errors'] != null && data['errors'] is Map) {
             final errors = data['errors'] as Map;
             final first = errors.values.isNotEmpty ? errors.values.first : null;
             if (first is List && first.isNotEmpty) message = first.first.toString();

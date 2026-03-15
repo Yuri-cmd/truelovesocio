@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'package:get/get.dart';
 import 'package:truelovesocio/features/auth/bindings/auth_binding.dart';
 import 'package:truelovesocio/features/auth/presentation/screens/change_password_screen.dart';
