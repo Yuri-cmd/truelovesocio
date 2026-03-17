@@ -23,7 +23,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = PersistentTabController(initialIndex: 0);
+    // Si no puede acceder (deuda), iniciar en la pestaña de cuotas (índice 3)
+    int initialIndex = authController.puedeAcceder.value ? 0 : 3;
+    _controller = PersistentTabController(initialIndex: initialIndex);
+    _lastIndex = initialIndex;
   }
 
   @override
@@ -106,6 +109,18 @@ class _HomeScreenState extends State<HomeScreen> {
           _showLogoutDialog();
           Future.delayed(const Duration(milliseconds: 100), () {
             _controller.index = _lastIndex;
+          });
+        } else if (!authController.puedeAcceder.value && index != 3) {
+          // Si tiene deuda y trata de ir a otra pestaña que no sea Cuotas (3) o Salir (5)
+          Get.snackbar(
+            "Acceso Restringido",
+            "Debes regularizar tus pagos para acceder a esta sección.",
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: Colors.redAccent,
+            colorText: Colors.white,
+          );
+          Future.delayed(const Duration(milliseconds: 100), () {
+            _controller.index = 3;
           });
         } else {
           _lastIndex = index;

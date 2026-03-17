@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:truelovesocio/features/cuotas/controllers/cuotas_controller.dart';
+import 'package:truelovesocio/features/auth/controllers/auth_controller.dart';
 import 'package:truelovesocio/data/models/cuota_model.dart';
 
 class CuotasView extends GetView<CuotasController> {
@@ -30,6 +31,9 @@ class CuotasView extends GetView<CuotasController> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (!Get.find<AuthController>().puedeAcceder.value)
+                        _buildAccesoRestringidoBanner(context),
+                      const SizedBox(height: 16),
                       _buildPeriodoActualBanner(context),
                       const SizedBox(height: 24),
                       _buildSectionHeader(context, 'Configuración de mi Plan', Icons.settings_suggest),
@@ -480,6 +484,45 @@ class CuotasView extends GetView<CuotasController> {
         ),
       )),
       isScrollControlled: true,
+    );
+  }
+
+  Widget _buildAccesoRestringidoBanner(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.red[700],
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.red.withAlpha(50),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: const Row(
+        children: [
+          Icon(Icons.warning_amber_rounded, color: Colors.white, size: 28),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'ACCESO RESTRINGIDO',
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                Text(
+                  'Tu acceso a otras secciones está suspendido por falta de pago. Regulariza tu situación aquí.',
+                  style: TextStyle(color: Colors.white, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 

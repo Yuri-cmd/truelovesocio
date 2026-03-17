@@ -174,7 +174,7 @@ class _CategoryItem extends StatelessWidget {
                         return Switch(
                           value: currentCat.estado == 1,
                           onChanged: (val) => controller.toggleCategoryStatus(category, val),
-                          activeColor: Colors.red[700],
+                          activeThumbColor: Colors.red[700],
                         );
                       }),
                     ),

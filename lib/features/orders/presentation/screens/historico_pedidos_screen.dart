@@ -259,7 +259,7 @@ class _PedidoItemState extends State<_PedidoItem> {
                               Row(
                                 children: [
                                   Text(
-                                    '#' + pedido.id.toString(),
+                                    '#${pedido.id}',
                                     style: TextStyle(
                                       color: Colors.red[700],
                                       fontWeight: FontWeight.w900,

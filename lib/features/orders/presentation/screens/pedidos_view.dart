@@ -156,7 +156,7 @@ class _PedidosViewState extends State<PedidosView> {
                     scale: 0.7,
                     child: Switch(
                       value: activo.value == 1,
-                      activeColor: Colors.greenAccent[400],
+                      activeThumbColor: Colors.greenAccent[400],
                       activeTrackColor: Colors.green[900],
                       inactiveThumbColor: Colors.grey[400],
                       inactiveTrackColor: Colors.black26,

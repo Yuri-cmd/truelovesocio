@@ -44,7 +44,6 @@ class _LoginScreenState extends State<LoginScreen> {
     if (result['success']) {
       final loginResponse = result['data'];
       final puedeAcceder = loginResponse['estado_cuota']['puede_acceder'] ?? false;
-      final motivo = loginResponse['estado_cuota']['motivo'] ?? '';
       final mensaje = loginResponse['estado_cuota']['mensaje'] ?? '';
       final diasVencimiento = loginResponse['estado_cuota']['dias_vencimiento'] ?? 0;
       final alerta = loginResponse['estado_cuota']['alerta'] ?? '';
@@ -58,16 +57,36 @@ class _LoginScreenState extends State<LoginScreen> {
           });
         }
       } else {
-        _mostrarAlertaCuotaVencida(motivo.isNotEmpty ? motivo : 'Tu cuota ha vencido y no puedes acceder al sistema.');
+        // Permitir acceso pero irá directo a cuotas
+        Get.offAllNamed(Routes.HOME);
+        
+        Future.delayed(const Duration(milliseconds: 500), () {
+          Get.snackbar(
+            "Acceso Restringido",
+            mensaje.isNotEmpty ? mensaje : "Tienes pagos vencidos. Por favor, regulariza tu situación.",
+            snackPosition: SnackPosition.TOP,
+            backgroundColor: Colors.orange,
+            colorText: Colors.white,
+            duration: const Duration(seconds: 5),
+          );
+        });
       }
     } else {
-      Get.snackbar(
-        "Error",
-        result['message'],
-        snackPosition: SnackPosition.BOTTOM,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      final errorData = result['data'];
+      if (errorData != null && errorData['motivo'] == 'cuota_vencida') {
+        // Incluso si el API lo devuelve como error 403/401 por cuota vencida,
+        // si tenemos los datos del socio, podríamos intentar entrar.
+        // Pero usualmente el API de login en 200 ya trae el estado_cuota.
+        _mostrarAlertaCuotaVencida(errorData['message'] ?? 'Tienes pagos vencidos. Por favor, regulariza tu situación.');
+      } else {
+        Get.snackbar(
+          "Error",
+          result['message'],
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
     }
   }
 
