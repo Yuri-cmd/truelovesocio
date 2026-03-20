@@ -115,7 +115,7 @@ class _PedidoCardState extends State<PedidoCard> {
   String _obtenerTiempoTranscurrido(String fecha) {
     if (fecha.isEmpty) return '';
     try {
-      final DateTime orderDate = DateTime.parse(fecha);
+      final DateTime orderDate = parsearFecha(fecha);
       final Duration diff = DateTime.now().difference(orderDate);
       if (diff.isNegative) return '0m';
 

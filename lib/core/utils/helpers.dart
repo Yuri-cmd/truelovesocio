@@ -133,3 +133,34 @@ String getMetodoPagoColor(String? tipoPago) {
 
   return colorHex;
 }
+
+/// Formatea una fecha del servidor (asumiendo UTC si no tiene offset) a Local.
+String formatearFecha(String? fecha) {
+  if (fecha == null || fecha.isEmpty || fecha == 'null') return 'Sin fecha';
+  try {
+    String fechaProcesada = fecha;
+    // Si no tiene 'Z' ni '+' ni '-', asumimos que el servidor envía UTC puro sin indicador.
+    if (!fecha.contains('Z') && !fecha.contains('+') && !fecha.contains('-')) {
+      fechaProcesada = "${fecha.trim().replaceFirst(' ', 'T')}Z";
+    }
+    
+    DateTime dt = DateTime.parse(fechaProcesada).toLocal();
+    return '${dt.day}/${dt.month}/${dt.year} ${dt.hour}:${dt.minute.toString().padLeft(2, '0')}';
+  } catch (e) {
+    return fecha;
+  }
+}
+
+/// Parsea una fecha del servidor a un objeto DateTime local.
+DateTime parsearFecha(String? fecha) {
+  if (fecha == null || fecha.isEmpty || fecha == 'null') return DateTime.now();
+  try {
+    String fechaProcesada = fecha;
+    if (!fecha.contains('Z') && !fecha.contains('+') && !fecha.contains('-')) {
+      fechaProcesada = "${fecha.trim().replaceFirst(' ', 'T')}Z";
+    }
+    return DateTime.parse(fechaProcesada).toLocal();
+  } catch (e) {
+    return DateTime.now();
+  }
+}

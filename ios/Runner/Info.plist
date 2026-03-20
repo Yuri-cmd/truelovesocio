@@ -48,6 +48,8 @@
 	<!-- Permisos para image_picker -->
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Requerimos acceso a tu galería para poder seleccionar fotos de perfil o productos.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Requerimos permiso para guardar las fotos de pagos en tu galería.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Requerimos acceso a tu cámara para poder tomar fotos de perfil o productos.</string>
 	<key>NSMicrophoneUsageDescription</key>

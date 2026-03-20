@@ -180,15 +180,8 @@ class _PedidoItem extends StatefulWidget {
 class _PedidoItemState extends State<_PedidoItem> {
   bool isExpanded = false;
 
-  String _formatDate(String? fecha) {
-    if (fecha == null || fecha.isEmpty) return 'Sin fecha';
-    try {
-      final dt = DateTime.parse(fecha);
-      return '${dt.day}/${dt.month}/${dt.year} ${dt.hour}:${dt.minute.toString().padLeft(2, '0')}';
-    } catch (_) {
-      return fecha;
-    }
-  }
+  // El método _formatDate ha sido reemplazado por la función global formatearFecha en helpers.dart
+
 
   Future<void> _downloadImage(String url) async {
     try {
@@ -289,7 +282,7 @@ class _PedidoItemState extends State<_PedidoItem> {
                     const SizedBox(height: 16),
                     _buildIconLabel(Icons.location_on_rounded, pedido.direccionEntrega),
                     const SizedBox(height: 8),
-                    _buildIconLabel(Icons.access_time_filled_rounded, _formatDate(pedido.fecha)),
+                    _buildIconLabel(Icons.access_time_filled_rounded, formatearFecha(pedido.fecha)),
                     const SizedBox(height: 16),
                     const Divider(height: 1),
                     const SizedBox(height: 12),
