@@ -218,6 +218,13 @@ class _PedidoCardState extends State<PedidoCard> {
             ),
             infoRow(context, Icons.phone, widget.pedido.celular, color: Colors.green),
             infoRow(context, Icons.person, widget.pedido.cliente, color: Colors.orange),
+            if (widget.pedido.motorizado.isNotEmpty)
+              infoRow(
+                context,
+                Icons.delivery_dining_rounded,
+                'Driver: ${widget.pedido.motorizado} ${widget.pedido.celularMotorizado.isNotEmpty ? "(${widget.pedido.celularMotorizado})" : ""}',
+                color: Colors.deepOrange,
+              ),
             infoRow(context, Icons.timer, '${widget.pedido.tiempo} min', color: Colors.orange),
             infoRow(context, Icons.article_sharp, widget.pedido.nota, color: Colors.blue),
 

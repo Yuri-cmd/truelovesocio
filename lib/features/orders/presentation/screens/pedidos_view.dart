@@ -161,7 +161,7 @@ class _PedidosViewState extends State<PedidosView> {
                       inactiveThumbColor: Colors.grey[400],
                       inactiveTrackColor: Colors.black26,
                       onChanged: (value) {
-                        PedidosHelper.cambiarEstadoRepartidor(
+                        PedidosHelper.cambiarEstadoSocio(
                           context,
                           activo.value,
                           (nuevo) => activo.value = nuevo,

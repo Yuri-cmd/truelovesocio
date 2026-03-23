@@ -71,7 +71,7 @@ class PedidosHelper {
         false;
   }
 
-  static Future<void> cambiarEstadoRepartidor(
+  static Future<void> cambiarEstadoSocio(
     BuildContext context,
     int estadoActual,
     Function(int) onEstadoActualizado,
@@ -104,18 +104,48 @@ class PedidosHelper {
     if (userJson == null) return;
     final socio = Socio.fromJson(jsonDecode(userJson));
 
+    // Mostrar diálogo de carga
+    Get.dialog(
+      Center(
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                CircularProgressIndicator(color: Colors.red),
+                SizedBox(height: 16),
+                Text('Actualizando estado...', style: TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+          ),
+        ),
+      ),
+      barrierDismissible: false,
+    );
+
     try {
       final response = await authService.updateEstado(socio.id, nuevoEstado);
+      Get.back(); // Cerrar diálogo de carga
+
       if (response.statusCode == 200) {
         socio.activo = nuevoEstado;
         await SecureStorage.saveUser(jsonEncode(socio.toJson()));
         onEstadoActualizado(nuevoEstado);
-        Get.snackbar("Éxito", "Estado actualizado correctamente.");
+        Get.snackbar("Éxito", "Estado actualizado correctamente.", backgroundColor: Colors.green, colorText: Colors.white);
       } else {
-        Get.snackbar("Error", "Error al actualizar el estado.");
+        Get.snackbar("Error", "Error al actualizar el estado (${response.statusCode}).", backgroundColor: Colors.red, colorText: Colors.white);
       }
     } catch (e) {
-      Get.snackbar("Error", "Error de conexión.");
+      Get.back(); // Cerrar diálogo de carga
+      Get.snackbar(
+        "Error de conexión",
+        "No se pudo conectar con el servidor. Revisa tu internet e intenta de nuevo.",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 4),
+      );
+      debugPrint("Error updating socio state: $e");
     }
   }
 

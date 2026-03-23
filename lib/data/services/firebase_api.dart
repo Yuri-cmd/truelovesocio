@@ -61,13 +61,29 @@ Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
       importance: Importance.max,
       sound: RawResourceAndroidNotificationSound('nuevo_pedido'),
       enableVibration: true,
+      playSound: true,
+    ),
+  );
+  
+  await androidPlugin?.createNotificationChannel(
+    const AndroidNotificationChannel(
+      'general_channel',
+      'Notificaciones Generales',
+      importance: Importance.max,
+      enableVibration: true,
+      playSound: true,
     ),
   );
 
   final title = _getValidTitle(message, 'Nuevo Pedido');
   final body = _getValidBody(message, 'Tienes un nuevo pedido');
-  final soundFile = message.data['sound'] ?? 'nuevo_pedido';
+  String? soundFile = message.data['sound'];
   final channelId = message.data['channel_id'] ?? 'pedidos_v3';
+  
+  // Si sound es 'default' o vacío, null hará que use el sonido por defecto del sistema
+  AndroidNotificationSound? androidSound = (soundFile == null || soundFile == 'default' || soundFile.isEmpty) 
+      ? null 
+      : RawResourceAndroidNotificationSound(soundFile);
 
   await plugin.show(
     DateTime.now().millisecondsSinceEpoch.remainder(100000),
@@ -76,10 +92,10 @@ Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
     NotificationDetails(
       android: AndroidNotificationDetails(
         channelId,
-        'Nuevos Pedidos',
+        'Notificaciones',
         importance: Importance.max,
         priority: Priority.max,
-        sound: RawResourceAndroidNotificationSound(soundFile),
+        sound: androidSound,
         playSound: true,
         enableVibration: true,
       ),
@@ -89,7 +105,9 @@ Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
         presentSound: true,
         presentBanner: true,
         presentList: true,
-        sound: soundFile.endsWith('.wav') ? soundFile : '$soundFile.wav',
+        sound: (soundFile == null || soundFile == 'default' || soundFile.isEmpty) 
+            ? 'default' 
+            : (soundFile.endsWith('.wav') ? soundFile : '$soundFile.wav'),
       ),
     ),
   );
@@ -195,10 +213,22 @@ class FirebaseApi {
       enableVibration: true,
       enableLights: true,
       ledColor: Color(0xFF00FF00),
+      playSound: true,
+    );
+
+    final AndroidNotificationChannel generalChannel = const AndroidNotificationChannel(
+      'general_channel',
+      'Notificaciones Generales',
+      description: 'Notificaciones sobre el seguimiento de los pedidos',
+      importance: Importance.max,
+      enableVibration: true,
+      enableLights: true,
+      playSound: true,
     );
 
     final androidPlugin = _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
     await androidPlugin?.createNotificationChannel(pedidosChannelWithSound);
+    await androidPlugin?.createNotificationChannel(generalChannel);
   }
 
   Future<void> _showNotification(RemoteMessage message) async {
@@ -239,8 +269,10 @@ class FirebaseApi {
     const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'general_channel',
       'Notificaciones Generales',
-      importance: Importance.high,
-      priority: Priority.high,
+      importance: Importance.max,
+      priority: Priority.max,
+      playSound: true,
+      enableVibration: true,
     );
 
     await _flutterLocalNotificationsPlugin.show(

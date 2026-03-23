@@ -283,6 +283,14 @@ class _PedidoItemState extends State<_PedidoItem> {
                     _buildIconLabel(Icons.location_on_rounded, pedido.direccionEntrega),
                     const SizedBox(height: 8),
                     _buildIconLabel(Icons.access_time_filled_rounded, formatearFecha(pedido.fecha)),
+                    if (pedido.celular.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      _buildIconLabel(Icons.phone_android_rounded, 'Cliente: ${pedido.celular}'),
+                    ],
+                    if (pedido.motorizado.isNotEmpty) ...[
+                      const SizedBox(height: 8),
+                      _buildIconLabel(Icons.delivery_dining_rounded, 'Driver: ${pedido.motorizado} ${pedido.celularMotorizado.isNotEmpty ? "(${pedido.celularMotorizado})" : ""}'),
+                    ],
                     const SizedBox(height: 16),
                     const Divider(height: 1),
                     const SizedBox(height: 12),
