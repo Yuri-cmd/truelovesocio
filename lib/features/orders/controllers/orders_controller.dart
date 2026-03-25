@@ -53,7 +53,10 @@ class OrdersController extends GetxController {
         
         porAceptar.assignAll(loadedPedidos.where((p) => p.estado == '1').toList());
         enPreparacion.assignAll(loadedPedidos.where((p) => p.estado == '2').toList());
-        porEntregar.assignAll(loadedPedidos.where((p) => (int.tryParse(p.estado) ?? 0) >= 3 && (int.tryParse(p.estado) ?? 0) < 8).toList());
+        porEntregar.assignAll(loadedPedidos.where((p) {
+          final est = int.tryParse(p.estado) ?? 0;
+          return (est >= 3 && est < 8) || est == 9;
+        }).toList());
       }
     } catch (e) {
       debugPrint('Error en loadActiveOrders: $e');
