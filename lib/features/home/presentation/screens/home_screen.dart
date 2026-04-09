@@ -27,6 +27,21 @@ class _HomeScreenState extends State<HomeScreen> {
     int initialIndex = authController.puedeAcceder.value ? 0 : 3;
     _controller = PersistentTabController(initialIndex: initialIndex);
     _lastIndex = initialIndex;
+
+    // Escuchar cambios en puedeAcceder para forzar el cambio de pestaña
+    ever(authController.puedeAcceder, (bool puede) {
+      if (!puede && _controller.index != 3) {
+        Get.snackbar(
+          "Acceso Restringido",
+          "Se ha detectado una deuda pendiente. Regulariza tus pagos para continuar.",
+          snackPosition: SnackPosition.TOP,
+          backgroundColor: Colors.redAccent,
+          colorText: Colors.white,
+          duration: const Duration(seconds: 5),
+        );
+        _controller.index = 3;
+      }
+    });
   }
 
   @override

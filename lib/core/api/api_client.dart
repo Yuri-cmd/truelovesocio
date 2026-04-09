@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:truelovesocio/core/constants/constants.dart';
 import 'package:truelovesocio/core/storage/secure_storage.dart';
 import 'package:get/get.dart' as getx;
+import 'package:truelovesocio/features/auth/controllers/auth_controller.dart';
 
 class ApiClient {
   static final Dio _dio = _createDio();
@@ -33,6 +34,21 @@ class ApiClient {
             await SecureStorage.clearSession();
             if (getx.Get.context != null) {
               getx.Get.offAllNamed('/login');
+            }
+          }
+          
+          if (e.response?.statusCode == 403) {
+            final data = e.response?.data;
+            if (data is Map && data['puede_acceder'] == false) {
+              try {
+                final authController = getx.Get.find<AuthController>();
+                authController.puedeAcceder.value = false;
+                if (data['message'] != null) {
+                  authController.mensajeCuota.value = data['message'];
+                }
+              } catch (_) {
+                // Silently fail if controller not found
+              }
             }
           }
           return handler.next(e);

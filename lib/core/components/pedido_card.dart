@@ -421,9 +421,10 @@ class _PedidoCardState extends State<PedidoCard> {
                     )
                     : ElevatedButton.icon(
                       onPressed:
+                          (int.tryParse(widget.pedido.estado) ?? 0) > 1 ||
                           (int.tryParse(widget.pedido.estado) ?? 0) == 0 ||
-                                  widget.bloqueoBotones[widget.pedido.id] == true
-                              ? null
+                          widget.bloqueoBotones[widget.pedido.id] == true
+                              ? null // Se deshabilita la acción de botón porque ya fue aceptado o está bloqueado
                               : () {
                                 PedidosHelper.actualizarEstadoPedido(
                                   context: context,
@@ -439,7 +440,7 @@ class _PedidoCardState extends State<PedidoCard> {
                         (int.tryParse(widget.pedido.estado) ?? 0) == 0 ||
                                 (int.tryParse(widget.pedido.estado) ?? 0) == 1
                             ? 'Aceptar'
-                            : 'Ver Pedido',
+                            : 'En Proceso', // Cambiado de 'Ver Pedido' a 'En Proceso' para evitar confusión
                         style: const TextStyle(color: Colors.white),
                       ),
                     ),
