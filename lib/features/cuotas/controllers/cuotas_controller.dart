@@ -111,7 +111,8 @@ class CuotasController extends GetxController {
             ),
             barrierDismissible: false,
           );
-          loadAllData(); // Recargar datos en segundo plano
+          loadAllData(); // Recargar datos de cuotas
+          _authController.actualizarEstadoAcceso(); // Refrescar estado de acceso
           return true;
         } else {
           Get.snackbar(

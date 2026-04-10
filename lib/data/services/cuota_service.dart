@@ -26,6 +26,10 @@ class CuotaService {
     return await _dio.get('socio/pedidos-periodo/$periodoId', queryParameters: {'socio_id': socioId});
   }
 
+  Future<Response> verificarAcceso() async {
+    return await _dio.get('socio/verificar-acceso');
+  }
+
   Future<Response> registrarPagoCuota({
     required int socioId,
     required int periodoId,

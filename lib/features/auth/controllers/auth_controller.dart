@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:truelovesocio/core/storage/secure_storage.dart';
 import 'package:truelovesocio/data/services/auth_service.dart';
+import 'package:truelovesocio/data/services/cuota_service.dart';
 import 'package:truelovesocio/data/models/socio_model.dart';
 import 'package:truelovesocio/core/routes/app_routes.dart';
 
@@ -116,5 +117,28 @@ class AuthController extends GetxController {
     await prefs.remove('socio');
     socio.value = null;
     Get.offAllNamed(Routes.LOGIN);
+  }
+
+  /// Refresca el estado de acceso del socio consultando el API.
+  /// Llamar después de registrar un pago para que el banner de
+  /// "Acceso Restringido" desaparezca sin necesidad de cerrar sesión.
+  Future<void> actualizarEstadoAcceso() async {
+    try {
+      final cuotaService = Get.find<CuotaService>();
+      final response = await cuotaService.verificarAcceso();
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        final data = response.data['data'] as Map<String, dynamic>;
+        puedeAcceder.value = data['puede_acceder'] ?? true;
+        mensajeCuota.value = data['mensaje'] ?? '';
+        statusCuota.value = data['motivo'] ?? '';
+
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('puedeAcceder', puedeAcceder.value);
+        await prefs.setString('mensajeCuota', mensajeCuota.value);
+        await prefs.setString('statusCuota', statusCuota.value);
+      }
+    } catch (_) {
+      // Silencioso: si falla la verificación no interrumpir al usuario
+    }
   }
 }
