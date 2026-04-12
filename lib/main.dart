@@ -8,12 +8,14 @@ import 'package:truelovesocio/core/routes/app_pages.dart';
 import 'package:truelovesocio/core/theme/app_theme.dart';
 import 'package:truelovesocio/core/theme/theme_notifier.dart';
 import 'package:truelovesocio/data/services/firebase_api.dart';
+import 'package:truelovesocio/data/services/error_log_service.dart';
 import 'firebase_options.dart';
 
 final ThemeNotifier themeNotifier = ThemeNotifier();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  ErrorLogService.initialize();
   
   FirebaseMessaging.onBackgroundMessage(firebaseBackgroundHandler);
   
