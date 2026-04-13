@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:dio/dio.dart';
 import 'package:truelovesocio/core/storage/secure_storage.dart';
 import 'package:truelovesocio/data/services/auth_service.dart';
 import 'package:truelovesocio/data/services/order_service.dart';
@@ -189,6 +190,19 @@ class PedidosHelper {
         Get.snackbar("Error", "No se pudo actualizar el estado");
       }
     } catch (e) {
+      String errorMessage = "Error desconocido";
+      if (e is DioException) {
+        if (e.response?.data is Map && e.response?.data['error'] != null) {
+          errorMessage = e.response?.data['error'];
+        } else if (e.response?.data is Map && e.response?.data['message'] != null) {
+          errorMessage = e.response?.data['message'];
+        } else {
+          errorMessage = e.message ?? e.toString();
+        }
+      } else {
+        errorMessage = e.toString();
+      }
+      Get.snackbar("Error", "Error actualizando pedido: $errorMessage");
       debugPrint("Error actualizando pedido: $e");
     } finally {
       bloquearBoton(false);

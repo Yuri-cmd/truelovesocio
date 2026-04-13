@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:dio/dio.dart';
 import 'package:truelovesocio/core/components/pedido_buttons.dart';
 import 'package:truelovesocio/core/components/pedido_cliente_card.dart';
 import 'package:truelovesocio/core/components/pedido_estado_timeline.dart';
@@ -109,7 +110,19 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
         _loadInfoPedido(id);
       }
     } catch (e) {
-      Get.snackbar("Error", "Error actualizando pedido: $e");
+      String errorMessage = "Error desconocido";
+      if (e is DioException) {
+        if (e.response?.data is Map && e.response?.data['error'] != null) {
+          errorMessage = e.response?.data['error'];
+        } else if (e.response?.data is Map && e.response?.data['message'] != null) {
+          errorMessage = e.response?.data['message'];
+        } else {
+          errorMessage = e.message ?? e.toString();
+        }
+      } else {
+        errorMessage = e.toString();
+      }
+      Get.snackbar("Error", "No se pudo actualizar el pedido: $errorMessage");
     }
   }
 
