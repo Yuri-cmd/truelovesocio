@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 class ConnectionHelper extends StatefulWidget {
@@ -11,8 +12,8 @@ class ConnectionHelper extends StatefulWidget {
 class _ConnectionHelperState extends State<ConnectionHelper> {
   bool _isConnected = true;
   late final Connectivity _connectivity;
-  late final Stream<List<ConnectivityResult>>
-  _connectivityStream; // <-- corregido
+  late final Stream<List<ConnectivityResult>> _connectivityStream;
+  StreamSubscription<List<ConnectivityResult>>? _subscription;
 
   @override
   void initState() {
@@ -20,15 +21,23 @@ class _ConnectionHelperState extends State<ConnectionHelper> {
     _connectivity = Connectivity();
     _connectivityStream = _connectivity.onConnectivityChanged;
 
-    _connectivityStream.listen((List<ConnectivityResult> results) {
+    _subscription = _connectivityStream.listen((List<ConnectivityResult> results) {
       final result =
           results.isNotEmpty
               ? results.first
-              : ConnectivityResult.none; // <- obtener el primer resultado
-      setState(() {
-        _isConnected = result != ConnectivityResult.none;
-      });
+              : ConnectivityResult.none;
+      if (mounted) {
+        setState(() {
+          _isConnected = result != ConnectivityResult.none;
+        });
+      }
     });
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 
   @override

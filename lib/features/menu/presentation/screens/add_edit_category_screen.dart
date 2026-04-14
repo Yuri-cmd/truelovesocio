@@ -98,7 +98,9 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
     } catch (e) {
       Get.snackbar("Error", "Ocurrió un error: $e");
     } finally {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

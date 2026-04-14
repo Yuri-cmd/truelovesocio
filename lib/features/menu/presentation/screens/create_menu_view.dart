@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
 import 'package:truelovesocio/features/auth/controllers/auth_controller.dart';
 import 'package:truelovesocio/features/menu/controllers/socio_menu_controller.dart';
 import 'package:truelovesocio/data/services/menu_service.dart';
@@ -26,21 +27,43 @@ class _CreateMenuViewState extends State<CreateMenuView> {
   XFile? _image;
   int? _selectedCategoryId;
   bool _isSaving = false;
+  bool _isPickingImage = false;
 
   Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final XFile? pickedImage = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedImage != null) {
-      setState(() => _image = pickedImage);
+    if (_isPickingImage) return;
+    
+    _isPickingImage = true;
+    try {
+      final picker = ImagePicker();
+      final XFile? pickedImage = await picker.pickImage(source: ImageSource.gallery);
+      if (pickedImage != null) {
+        setState(() => _image = pickedImage);
+      }
+    } catch (e) {
+      debugPrint("Error picking image: $e");
+    } finally {
+      _isPickingImage = false;
     }
   }
 
   Future<void> _save() async {
+    if (_isSaving) return;
+
     final socioId = _authController.socio.value?.id;
-    if (socioId == null) return;
+    if (socioId == null) {
+      Get.snackbar("Error", "No se pudo identificar al socio");
+      return;
+    }
 
     if (_tituloController.text.isEmpty || _precioController.text.isEmpty || _selectedCategoryId == null || _image == null) {
-      Get.snackbar("Error", "Por favor completa los campos y selecciona una imagen");
+      Get.snackbar("Error", "Por favor completa todos los campos y selecciona una imagen");
+      return;
+    }
+
+    final precioStr = _precioController.text.replaceAll(',', '.');
+    final precio = double.tryParse(precioStr);
+    if (precio == null) {
+      Get.snackbar("Error", "El precio ingresado no es válido");
       return;
     }
 
@@ -51,18 +74,28 @@ class _CreateMenuViewState extends State<CreateMenuView> {
         titulo: _tituloController.text,
         descripcion: _descripcionController.text,
         foto: _image!,
-        precio: double.parse(_precioController.text),
+        precio: precio,
         status: _status,
         categoriaId: _selectedCategoryId!,
       );
-      if (response.statusCode == 200) {
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
         Get.back(result: true);
         Get.snackbar("Éxito", "Platillo creado correctamente");
       } else {
-        Get.snackbar("Error", "No se pudo crear el platillo");
+        final message = response.data?['message'] ?? "No se pudo crear el platillo";
+        Get.snackbar("Error", message);
       }
     } catch (e) {
-      Get.snackbar("Error", "No se pudo crear el platillo: $e");
+      String errorMessage = "No se pudo crear el platillo";
+      if (e is DioException && e.response?.data != null) {
+        if (e.response?.data['message'] != null) {
+          errorMessage = e.response?.data['message'];
+        }
+      } else {
+        errorMessage = "Error: $e";
+      }
+      Get.snackbar("Error", errorMessage);
     } finally {
       setState(() => _isSaving = false);
     }
@@ -83,7 +116,7 @@ class _CreateMenuViewState extends State<CreateMenuView> {
             const SizedBox(height: 15),
             _buildTextField(_descripcionController, 'Descripción', Icons.description, maxLines: 3),
             const SizedBox(height: 15),
-            _buildTextField(_precioController, 'Precio', Icons.attach_money, keyboardType: TextInputType.number),
+            _buildTextField(_precioController, 'Precio', Icons.attach_money, keyboardType: const TextInputType.numberWithOptions(decimal: true)),
             const SizedBox(height: 15),
             _buildCategoryDropdown(),
             const SizedBox(height: 30),
@@ -138,15 +171,23 @@ class _CreateMenuViewState extends State<CreateMenuView> {
   }
 
   Widget _buildCategoryDropdown() {
-    return Obx(() => DropdownButtonFormField<int>(
-      initialValue: _selectedCategoryId,
-      hint: const Text('Seleccionar Categoría'),
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.category, color: Colors.red),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-      items: controller.categories.map((cat) => DropdownMenuItem(value: cat.id, child: Text(cat.name))).toList(),
-      onChanged: (val) => setState(() => _selectedCategoryId = val),
-    ));
+    return Obx(() {
+      if (controller.categories.isEmpty) {
+        return const Text(
+          "No tienes categorías creadas. Debes crear una primero.",
+          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+        );
+      }
+      return DropdownButtonFormField<int>(
+        initialValue: _selectedCategoryId,
+        hint: const Text('Seleccionar Categoría'),
+        decoration: InputDecoration(
+          prefixIcon: const Icon(Icons.category, color: Colors.red),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+        items: controller.categories.map((cat) => DropdownMenuItem(value: cat.id, child: Text(cat.name))).toList(),
+        onChanged: (val) => setState(() => _selectedCategoryId = val),
+      );
+    });
   }
 }
