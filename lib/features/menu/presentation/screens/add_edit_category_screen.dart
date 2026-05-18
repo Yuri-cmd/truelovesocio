@@ -88,15 +88,24 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
     try {
       final schedules = _buildSchedulesFromState();
       if (widget.category == null) {
-        await _menuService.createCategory(socioId, _nameController.text, schedules);
-        Get.snackbar("Éxito", "Categoría creada");
+        final response = await _menuService.createCategory(socioId, _nameController.text, schedules);
+        if (response.statusCode == 201 || response.statusCode == 200) {
+          Get.snackbar("Éxito", "Categoría creada");
+          Get.back(result: true);
+        } else {
+          Get.snackbar("Error", "No se pudo crear la categoría (código ${response.statusCode})");
+        }
       } else {
-        await _menuService.updateCategory(widget.category!.id, socioId, _nameController.text, schedules);
-        Get.snackbar("Éxito", "Categoría actualizada");
+        final response = await _menuService.updateCategory(widget.category!.id, socioId, _nameController.text, schedules);
+        if (response.statusCode == 200) {
+          Get.snackbar("Éxito", "Categoría actualizada");
+          Get.back(result: true);
+        } else {
+          Get.snackbar("Error", "No se pudo actualizar la categoría (código ${response.statusCode})");
+        }
       }
-      Get.back(result: true);
     } catch (e) {
-      Get.snackbar("Error", "Ocurrió un error: $e");
+      Get.snackbar("Error", "Ocurrió un error de conexión, verifique su red e intente de nuevo");
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
