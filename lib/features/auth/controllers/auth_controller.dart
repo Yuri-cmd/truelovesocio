@@ -123,9 +123,10 @@ class AuthController extends GetxController {
   /// Llamar después de registrar un pago para que el banner de
   /// "Acceso Restringido" desaparezca sin necesidad de cerrar sesión.
   Future<void> actualizarEstadoAcceso() async {
+    if (socio.value == null) return;
     try {
       final cuotaService = Get.find<CuotaService>();
-      final response = await cuotaService.verificarAcceso();
+      final response = await cuotaService.verificarAcceso(socio.value!.id);
       if (response.statusCode == 200 && response.data['success'] == true) {
         final data = response.data['data'] as Map<String, dynamic>;
         puedeAcceder.value = data['puede_acceder'] ?? true;
