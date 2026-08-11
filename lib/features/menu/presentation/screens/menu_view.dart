@@ -5,6 +5,7 @@ import 'package:truelovesocio/features/auth/controllers/auth_controller.dart';
 import 'package:truelovesocio/features/menu/controllers/socio_menu_controller.dart';
 import 'package:truelovesocio/features/menu/presentation/screens/category_view.dart';
 import 'package:truelovesocio/features/menu/presentation/screens/create_menu_view.dart';
+import 'package:truelovesocio/features/promociones/presentation/screens/promociones_view.dart';
 
 class MenuView extends GetView<SocioMenuController> {
   const MenuView({super.key});
@@ -238,6 +239,14 @@ class MenuView extends GetView<SocioMenuController> {
             onTap: () {
               Get.back();
               Get.to(() => const CategoryView())?.then((_) => controller.loadCategories());
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.campaign, color: Colors.red),
+            title: const Text('Gestionar Promociones', style: TextStyle(fontWeight: FontWeight.bold)),
+            onTap: () {
+              Get.back();
+              Get.to(() => const PromocionesView());
             },
           ),
           const Divider(),

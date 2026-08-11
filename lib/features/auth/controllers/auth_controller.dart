@@ -47,6 +47,26 @@ class AuthController extends GetxController {
     }
   }
 
+  // Puente temporal: las sesiones guardadas antes de que el app empezara a
+  // persistir el token de login se quedaron sin uno. En vez de forzar un
+  // re-login (muchos socios no recuerdan su contraseña), pedimos uno nuevo
+  // usando los datos que ya tenemos guardados localmente. Si falla, no pasa
+  // nada: el interceptor de 401 ya redirige a login como respaldo.
+  Future<void> ensureToken() async {
+    if (socio.value == null) return;
+    if (await SecureStorage.getToken() != null) return;
+
+    try {
+      final response = await _authService.renovarToken(socio.value!.id, socio.value!.documentNumber);
+      final token = response.data?['token'];
+      if (response.statusCode == 200 && token != null) {
+        await SecureStorage.saveToken(token.toString());
+      }
+    } catch (_) {
+      // Silencioso: si esto falla, el flujo normal de 401 se encarga después.
+    }
+  }
+
   Future<Map<String, dynamic>> loginWithQuota(String usuario, String password) async {
     try {
       isLoading.value = true;
@@ -66,7 +86,11 @@ class AuthController extends GetxController {
           }
 
           await SecureStorage.saveUser(jsonEncode(socioData));
-          
+
+          if (data['token'] != null) {
+            await SecureStorage.saveToken(data['token'].toString());
+          }
+
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('socio', jsonEncode(socioData));
           await prefs.setBool('puedeAcceder', puedeAcceder.value);

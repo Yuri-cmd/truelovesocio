@@ -12,6 +12,7 @@ import 'package:truelovesocio/features/menu/bindings/menu_binding.dart';
 import 'package:truelovesocio/features/menu/presentation/screens/add_edit_category_screen.dart';
 import 'package:truelovesocio/features/orders/bindings/order_binding.dart';
 import 'package:truelovesocio/features/orders/presentation/screens/historico_pedidos_screen.dart';
+import 'package:truelovesocio/features/promociones/bindings/promociones_binding.dart';
 import 'package:truelovesocio/features/reviews/bindings/reviews_binding.dart';
 import 'package:truelovesocio/features/reviews/presentation/screens/reviews_view.dart';
 import 'package:truelovesocio/features/splash/bindings/splash_binding.dart';
@@ -41,6 +42,7 @@ class AppPages {
         SocioMenuBinding(),
         ReviewsBinding(),
         CuotasBinding(),
+        PromocionesBinding(),
       ],
     ),
     GetPage(

@@ -31,6 +31,7 @@ class SplashController extends GetxController {
   Future<void> _checkLogin() async {
     await _authController.loadSavedUser();
     if (_authController.isLoggedIn) {
+      await _authController.ensureToken();
       Get.offAllNamed(Routes.HOME);
     } else {
       Get.offAllNamed(Routes.LOGIN);

@@ -39,4 +39,13 @@ class AuthService {
       'activo': activo,
     });
   }
+
+  // Puente temporal para sesiones guardadas antes de que el app empezara a
+  // persistir el token de login. No requiere contraseña.
+  Future<Response> renovarToken(int id, String documentNumber) async {
+    return await _dio.post('socio/renovar-token', data: {
+      'id': id,
+      'documentNumber': documentNumber,
+    });
+  }
 }
