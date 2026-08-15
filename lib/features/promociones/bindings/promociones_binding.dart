@@ -4,6 +4,6 @@ import 'package:truelovesocio/features/promociones/controllers/promociones_contr
 class PromocionesBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<PromocionesController>(() => PromocionesController());
+    Get.lazyPut<PromocionesController>(() => PromocionesController(), fenix: true);
   }
 }

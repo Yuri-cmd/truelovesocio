@@ -15,7 +15,9 @@ class CreateEditPromocionView extends StatefulWidget {
 }
 
 class _CreateEditPromocionViewState extends State<CreateEditPromocionView> {
-  final PromocionesController controller = Get.find<PromocionesController>();
+  final PromocionesController controller = Get.isRegistered<PromocionesController>()
+      ? Get.find<PromocionesController>()
+      : Get.put(PromocionesController());
 
   late final TextEditingController _tituloController;
   late final TextEditingController _subtituloController;
