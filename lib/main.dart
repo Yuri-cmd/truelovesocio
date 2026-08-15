@@ -16,9 +16,9 @@ final ThemeNotifier themeNotifier = ThemeNotifier();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   ErrorLogService.initialize();
-  
+
   FirebaseMessaging.onBackgroundMessage(firebaseBackgroundHandler);
-  
+
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,

@@ -6,6 +6,10 @@ import 'package:truelovesocio/features/menu/controllers/socio_menu_controller.da
 import 'package:truelovesocio/features/menu/presentation/screens/category_view.dart';
 import 'package:truelovesocio/features/menu/presentation/screens/create_menu_view.dart';
 import 'package:truelovesocio/features/promociones/presentation/screens/promociones_view.dart';
+import 'package:truelovesocio/features/adicionales/presentation/screens/biblioteca_adicionales_view.dart';
+import 'package:truelovesocio/features/adicionales/presentation/screens/grupos_adicionales_view.dart';
+import 'package:truelovesocio/features/agotados/presentation/screens/marcar_productos_agotados_view.dart';
+import 'package:truelovesocio/features/agotados/presentation/screens/marcar_opciones_agotadas_view.dart';
 
 class MenuView extends GetView<SocioMenuController> {
   const MenuView({super.key});
@@ -247,6 +251,40 @@ class MenuView extends GetView<SocioMenuController> {
             onTap: () {
               Get.back();
               Get.to(() => const PromocionesView());
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.list_alt_rounded, color: Colors.red),
+            title: const Text('Biblioteca de Adicionales', style: TextStyle(fontWeight: FontWeight.bold)),
+            onTap: () {
+              Get.back();
+              Get.to(() => const BibliotecaAdicionalesView());
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.layers_rounded, color: Colors.red),
+            title: const Text('Grupos de Adicionales', style: TextStyle(fontWeight: FontWeight.bold)),
+            onTap: () {
+              Get.back();
+              Get.to(() => const GruposAdicionalesView());
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.remove_shopping_cart_rounded, color: Colors.deepOrange),
+            title: const Text('Marcar Productos Agotados', style: TextStyle(fontWeight: FontWeight.bold)),
+            onTap: () {
+              Get.back();
+              Get.to(() => const MarcarProductosAgotadosView());
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.block_rounded, color: Colors.deepOrange),
+            title: const Text('Marcar Opciones Agotadas', style: TextStyle(fontWeight: FontWeight.bold)),
+            onTap: () {
+              Get.back();
+              Get.to(() => const MarcarOpcionesAgotadasView());
             },
           ),
           const Divider(),

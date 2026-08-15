@@ -10,6 +10,8 @@ import 'package:truelovesocio/data/models/pedido_model.dart';
 import 'package:truelovesocio/data/services/order_service.dart';
 import 'package:truelovesocio/core/utils/connection_helper.dart';
 import 'package:truelovesocio/core/utils/helpers.dart';
+import 'package:truelovesocio/features/agotados/presentation/screens/marcar_productos_agotados_view.dart';
+import 'package:truelovesocio/features/agotados/presentation/screens/marcar_opciones_agotadas_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 
@@ -146,6 +148,29 @@ class _SeguimientoPedidoViewState extends State<SeguimientoPedidoView> {
         backgroundColor: Colors.red,
         title: const Text('Seguimiento de Pedido', style: TextStyle(color: Colors.white)),
         leading: IconButton(icon: const Icon(Icons.arrow_back, color: Colors.white), onPressed: () => Get.back()),
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.remove_shopping_cart_outlined, color: Colors.white),
+            tooltip: 'Marcar agotados',
+            onSelected: (value) {
+              if (value == 'productos') {
+                Get.to(() => const MarcarProductosAgotadosView());
+              } else if (value == 'opciones') {
+                Get.to(() => const MarcarOpcionesAgotadasView());
+              }
+            },
+            itemBuilder: (_) => const [
+              PopupMenuItem(
+                value: 'productos',
+                child: ListTile(leading: Icon(Icons.fastfood_outlined), title: Text('Marcar productos agotados')),
+              ),
+              PopupMenuItem(
+                value: 'opciones',
+                child: ListTile(leading: Icon(Icons.block_outlined), title: Text('Marcar opciones agotadas')),
+              ),
+            ],
+          ),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async => await _loadInfoPedido(widget.pedido.id),

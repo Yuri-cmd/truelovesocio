@@ -7,6 +7,7 @@ import 'package:truelovesocio/data/services/review_service.dart';
 import 'package:truelovesocio/data/services/cuota_service.dart';
 import 'package:truelovesocio/data/services/misc_service.dart';
 import 'package:truelovesocio/data/services/promocion_service.dart';
+import 'package:truelovesocio/data/services/adicional_service.dart';
 
 class InitialBinding extends Bindings {
   @override
@@ -19,6 +20,7 @@ class InitialBinding extends Bindings {
     Get.put(CuotaService(), permanent: true);
     Get.put(MiscService(), permanent: true);
     Get.put(PromocionService(), permanent: true);
+    Get.put(AdicionalService(), permanent: true);
 
     // Controllers
     Get.put<AuthController>(AuthController(), permanent: true);
