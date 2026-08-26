@@ -25,4 +25,18 @@ class OrderService {
   Future<Response> verificarConfirmacionPago(int idPedido) async {
     return await _dio.put('socio/update/verificar/confirmacion/$idPedido');
   }
+
+  Future<Response> solicitarCancelacionPedido(int id, String motivo) async {
+    return await _dio.post('socio/pedidos/$id/solicitar-cancelacion', data: {
+      'motivo': motivo,
+    });
+  }
+
+  /// Descarga el mismo PDF de comprobante (ticket térmico 80mm) que usa la web.
+  Future<Response<List<int>>> fetchTicketPdf(int id) async {
+    return await _dio.get<List<int>>(
+      'pedido/$id/ticket',
+      options: Options(responseType: ResponseType.bytes),
+    );
+  }
 }

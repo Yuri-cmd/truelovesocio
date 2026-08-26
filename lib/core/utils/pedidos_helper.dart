@@ -208,6 +208,98 @@ class PedidosHelper {
       bloquearBoton(false);
     }
   }
+  static Future<String?> mostrarDialogoMotivoCancelacion(
+    BuildContext context,
+  ) async {
+    final TextEditingController controller = TextEditingController();
+    return await Get.dialog<String>(
+      AlertDialog(
+        title: const Text('Solicitar cancelación'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Este pedido ya fue recogido por el motorizado. Indica el motivo; '
+              'un administrador debe aprobar la solicitud para que se cancele.',
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: controller,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'Motivo',
+                hintText: 'Ej: el cliente ya no se encuentra en la dirección',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(result: null),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final texto = controller.text.trim();
+              if (texto.length < 5) {
+                Get.snackbar("Motivo requerido", "Escribe al menos 5 caracteres.");
+                return;
+              }
+              Get.back(result: texto);
+            },
+            child: const Text('Enviar solicitud'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static Future<void> solicitarCancelacionPedido({
+    required BuildContext context,
+    required Pedido pedido,
+    required Function() onUpdate,
+    required Function(bool) bloquearBoton,
+  }) async {
+    final motivo = await mostrarDialogoMotivoCancelacion(context);
+    if (motivo == null) return;
+
+    final OrderService orderService = Get.find<OrderService>();
+    bloquearBoton(true);
+    try {
+      final response = await orderService.solicitarCancelacionPedido(pedido.id, motivo);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        pedido.cancelacionSolicitudPendiente = true;
+        Get.snackbar(
+          "Solicitud enviada",
+          "Pendiente de aprobación del administrador.",
+          backgroundColor: Colors.amber,
+        );
+        onUpdate();
+      } else {
+        Get.snackbar("Error", "No se pudo enviar la solicitud de cancelación");
+      }
+    } catch (e) {
+      String errorMessage = "Error desconocido";
+      if (e is DioException) {
+        if (e.response?.data is Map && e.response?.data['message'] != null) {
+          errorMessage = e.response?.data['message'];
+        } else if (e.response?.data is Map && e.response?.data['error'] != null) {
+          errorMessage = e.response?.data['error'];
+        } else {
+          errorMessage = e.message ?? e.toString();
+        }
+      } else {
+        errorMessage = e.toString();
+      }
+      Get.snackbar("Error", "Error al solicitar cancelación: $errorMessage");
+      debugPrint("Error solicitando cancelación: $e");
+    } finally {
+      bloquearBoton(false);
+    }
+  }
+
   static Future<void> verificarPago({
     required int pedidoId,
     required Function() onUpdate,

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:truelovesocio/data/models/promocion_model.dart';
@@ -8,6 +9,23 @@ class PromocionesController extends GetxController {
 
   final promociones = <Promocion>[].obs;
   final isLoading = false.obs;
+
+  /// Extrae el mensaje real de validación del backend (ej. "La imagen no debe
+  /// pesar más de X" o "debe ser un archivo de tipo..."), si está disponible.
+  String _mensajeError(Object e, String fallback) {
+    if (e is DioException) {
+      final data = e.response?.data;
+      if (data is Map) {
+        final errors = data['errors'];
+        if (errors is Map && errors.isNotEmpty) {
+          final primero = errors.values.first;
+          if (primero is List && primero.isNotEmpty) return primero.first.toString();
+        }
+        if (data['message'] is String) return data['message'];
+      }
+    }
+    return fallback;
+  }
 
   @override
   void onInit() {
@@ -44,7 +62,7 @@ class PromocionesController extends GetxController {
       await loadPromociones();
       return true;
     } catch (e) {
-      Get.snackbar("Error", "No se pudo crear la promoción");
+      Get.snackbar("Error", _mensajeError(e, "No se pudo crear la promoción"));
       return false;
     }
   }
@@ -67,7 +85,7 @@ class PromocionesController extends GetxController {
       await loadPromociones();
       return true;
     } catch (e) {
-      Get.snackbar("Error", "No se pudo actualizar la promoción");
+      Get.snackbar("Error", _mensajeError(e, "No se pudo actualizar la promoción"));
       return false;
     }
   }

@@ -26,40 +26,91 @@ class PedidoProductosList extends StatelessWidget {
 
     for (var pedido in pedidos) {
       final detalleArray = pedido['detalleArray'] as List<dynamic>?;
+      if (detalleArray == null) continue;
 
-      if (detalleArray != null) {
-        for (var detalle in detalleArray) {
-          final cantidad = int.tryParse(detalle['cantidad'].toString()) ?? 0;
-          final precio = double.tryParse(detalle['precio'].toString()) ?? 0.0;
-          final nombre = detalle['nombre'] ?? '';
+      final grupos = _agruparPorProducto(detalleArray);
 
-          productosWidgets.add(
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '($cantidad) $nombre',
-                    style: const TextStyle(fontSize: 16, color: Colors.black), 
-                  ),
-                  Text(
-                    (precio * cantidad).toStringAsFixed(2),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black
+      for (var grupo in grupos) {
+        final producto = grupo['producto'] as Map<String, dynamic>;
+        final adicionales = grupo['adicionales'] as List<Map<String, dynamic>>;
+        final cantidad = int.tryParse(producto['cantidad'].toString()) ?? 0;
+        final precio = double.tryParse(producto['precio'].toString()) ?? 0.0;
+        final nombre = producto['nombre'] ?? '';
+
+        productosWidgets.add(
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '($cantidad) $nombre',
+                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                    ),
+                    Text(
+                      (precio * cantidad).toStringAsFixed(2),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black
+                      ),
+                    ),
+                  ],
+                ),
+                if (adicionales.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4, left: 4),
+                    child: Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: [
+                        for (var adicional in adicionales)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: Colors.amber.shade100,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              '${adicional['nombre'] ?? ''}',
+                              style: const TextStyle(fontSize: 12.5, color: Colors.black87),
+                            ),
+                          ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+              ],
             ),
-          );
-        }
+          ),
+        );
       }
     }
 
     return Column(children: productosWidgets);
+  }
+
+  /// Agrupa cada adicional debajo del producto principal que lo precede,
+  /// según el campo `tipo` ('item' | 'adicional') que envía el backend.
+  List<Map<String, dynamic>> _agruparPorProducto(List<dynamic> detalleArray) {
+    final grupos = <Map<String, dynamic>>[];
+    Map<String, dynamic>? ultimoGrupo;
+
+    for (var item in detalleArray) {
+      final detalle = Map<String, dynamic>.from(item as Map);
+      final tipo = detalle['tipo']?.toString();
+
+      if (tipo == 'adicional' && ultimoGrupo != null) {
+        (ultimoGrupo['adicionales'] as List<Map<String, dynamic>>).add(detalle);
+      } else {
+        ultimoGrupo = {'producto': detalle, 'adicionales': <Map<String, dynamic>>[]};
+        grupos.add(ultimoGrupo);
+      }
+    }
+
+    return grupos;
   }
 
   Widget _buildTotalRow() {

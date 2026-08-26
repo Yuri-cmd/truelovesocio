@@ -16,6 +16,7 @@ class PedidoMotorizadoCard extends StatelessWidget {
           pedidos.map((pedido) {
             final motorizado = pedido['motorizado'] ?? 'Cliente desconocido';
             final celular = pedido['celular_motorizado'] ?? '';
+            final String foto = (pedido['foto_motorizado'] ?? '').toString();
             return Card(
               color: Colors.white,
               shape: RoundedRectangleBorder(
@@ -23,10 +24,13 @@ class PedidoMotorizadoCard extends StatelessWidget {
               ),
               elevation: 5,
               child: ListTile(
-                leading: const CircleAvatar(
+                leading: CircleAvatar(
                   radius: 20,
                   backgroundColor: Colors.orange,
-                  child: Icon(Icons.delivery_dining, color: Colors.white),
+                  backgroundImage: foto.isNotEmpty ? NetworkImage(foto) : null,
+                  child: foto.isEmpty
+                      ? const Icon(Icons.delivery_dining, color: Colors.white)
+                      : null,
                 ),
                 title: Text(motorizado, style: TextStyle(color: Colors.black),),
                 trailing: ElevatedButton(

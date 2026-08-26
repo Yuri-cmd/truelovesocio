@@ -19,6 +19,7 @@ class Pedido {
   String estado;
   final String motorizado;
   final String celularMotorizado;
+  final String fotoMotorizado;
   final String nota;
   final String tipoPago;
   final String? pagaCon;
@@ -35,6 +36,7 @@ class Pedido {
   final String descuento;
   final String? fechaInicio;
   final String? fechaHoraInicio;
+  bool cancelacionSolicitudPendiente;
 
   Pedido({
     required this.id,
@@ -56,6 +58,7 @@ class Pedido {
     required this.tiempo,
     required this.motorizado,
     required this.celularMotorizado,
+    this.fotoMotorizado = '',
     required this.nota,
     required this.tipoPago,
     this.pagaCon,
@@ -70,6 +73,7 @@ class Pedido {
     this.descuento = '0.00',
     this.fechaInicio,
     this.fechaHoraInicio,
+    this.cancelacionSolicitudPendiente = false,
   });
 
   factory Pedido.fromJson(Map<String, dynamic> json) {
@@ -93,6 +97,7 @@ class Pedido {
       motorizado: json['motorizado'] ?? '',
       celularMotorizado:
           json['celularMotorizado']?.toString() ?? json['celular_motorizado']?.toString() ?? '',
+      fotoMotorizado: UrlHelper.fixUrl(json['foto_motorizado']?.toString()),
       nota: json['nota'] ?? '',
       tipoPago: json['tipo_pago'] ?? '',
       pagaCon: json['paga_con']?.toString(),
@@ -110,6 +115,7 @@ class Pedido {
       descuento: json['descuento']?.toString() ?? '0.00',
       fechaInicio: json['fecha_inicio'],
       fechaHoraInicio: json['fecha_hora_inicio'],
+      cancelacionSolicitudPendiente: json['cancelacion_solicitud_pendiente'] == true,
       detalleArray:
           (json['detalleArray'] as List<dynamic>?)
                ?.map((item) => DetallePedido.fromJson(item))
@@ -127,6 +133,9 @@ class Pedido {
       'cliente': cliente,
       'celular': celular,
       'celular_whatsapp': celularWhatsapp,
+      'motorizado': motorizado,
+      'celular_motorizado': celularMotorizado,
+      'foto_motorizado': fotoMotorizado,
       'lat_local': latLocal,
       'lon_local': lonLocal,
       'latitud': latitud,

@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:truelovesocio/data/models/pedido_model.dart';
+import 'package:truelovesocio/core/components/pedido_productos_agrupados.dart';
 import 'package:truelovesocio/core/utils/helpers.dart';
 import 'package:truelovesocio/core/utils/pedidos_helper.dart';
+import 'package:truelovesocio/features/orders/presentation/screens/ticket_preview_screen.dart';
 import 'package:path_provider/path_provider.dart';
 
 class PedidoCard extends StatefulWidget {
@@ -189,6 +191,15 @@ class _PedidoCardState extends State<PedidoCard> {
                     ],
                   ),
                 ),
+                IconButton(
+                  onPressed: () => Get.to(() => TicketPreviewScreen(pedidoId: widget.pedido.id)),
+                  icon: const Icon(Icons.receipt_long_outlined),
+                  tooltip: 'Ver / imprimir comprobante',
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+                const SizedBox(width: 8),
                 Chip(
                   label: Text(
                     obtenerEstado(int.tryParse(widget.pedido.estado) ?? 0),
@@ -198,6 +209,20 @@ class _PedidoCardState extends State<PedidoCard> {
                 ),
               ],
             ),
+            if (widget.pedido.cancelacionSolicitudPendiente) ...[
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.amber.shade100,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: const Text(
+                  'Cancelación solicitada: pendiente de aprobación del admin',
+                  style: TextStyle(color: Colors.black87, fontSize: 12, fontWeight: FontWeight.w600),
+                ),
+              ),
+            ],
             const SizedBox(height: 8),
             Text(
               widget.pedido.cliente,
@@ -294,11 +319,9 @@ class _PedidoCardState extends State<PedidoCard> {
               ),
             ),
             const SizedBox(height: 4),
-            Text(
-              widget.pedido.productos,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colorScheme.onSurface,
-              ),
+            PedidoProductosAgrupados(
+              detalleArray: widget.pedido.detalleArray,
+              fallbackTexto: widget.pedido.productos,
             ),
             const SizedBox(height: 12),
 
@@ -445,15 +468,29 @@ class _PedidoCardState extends State<PedidoCard> {
                       ),
                     ),
                 Tooltip(
-                  message: (int.tryParse(widget.pedido.estado) ?? 0) == 0 ? 'El pedido ya está cancelado' : 'Cancelar pedido',
+                  message: _mensajeTooltipCancelar(),
                   child: ElevatedButton.icon(
                     onPressed:
                         _debeDeshabilitarBotonCancelar()
                             ? null
                             : () async {
+                                final estadoActual = int.tryParse(widget.pedido.estado) ?? 0;
+                                final yaFueRecogido = estadoActual >= 5 && estadoActual <= 7;
+
+                                if (yaFueRecogido) {
+                                  if (!context.mounted) return;
+                                  PedidosHelper.solicitarCancelacionPedido(
+                                    context: context,
+                                    pedido: widget.pedido,
+                                    onUpdate: () => widget.onUpdate(),
+                                    bloquearBoton: widget.bloquearBoton,
+                                  );
+                                  return;
+                                }
+
                                 final confirmar = await PedidosHelper.mostrarAlertaConfirmacion(context, 0);
                                 if (!confirmar) return;
-                                
+
                                  if (!context.mounted) return;
                                 PedidosHelper.actualizarEstadoPedido(
                                   context: context,
@@ -465,7 +502,12 @@ class _PedidoCardState extends State<PedidoCard> {
                               },
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
                     icon: const Icon(Icons.cancel, color: Colors.white),
-                    label: const Text('Cancelar', style: TextStyle(color: Colors.white)),
+                    label: Text(
+                      (int.tryParse(widget.pedido.estado) ?? 0) >= 5 && (int.tryParse(widget.pedido.estado) ?? 0) <= 7
+                          ? 'Solicitar cancelación'
+                          : 'Cancelar',
+                      style: const TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
               ],
@@ -480,8 +522,21 @@ class _PedidoCardState extends State<PedidoCard> {
     final estado = int.tryParse(widget.pedido.estado) ?? 0;
     final bloqueado = widget.bloqueoBotones[widget.pedido.id] == true;
     if (estado == 0 || estado >= 8) return true;
+    if (widget.pedido.cancelacionSolicitudPendiente) return true;
     if (bloqueado) return true;
     return false;
+  }
+
+  String _mensajeTooltipCancelar() {
+    final estado = int.tryParse(widget.pedido.estado) ?? 0;
+    if (estado == 0) return 'El pedido ya está cancelado';
+    if (widget.pedido.cancelacionSolicitudPendiente) {
+      return 'Solicitud de cancelación pendiente de aprobación';
+    }
+    if (estado >= 5 && estado <= 7) {
+      return 'El pedido ya fue recogido: solicita la cancelación con una justificación';
+    }
+    return 'Cancelar pedido';
   }
 
   Widget infoRow(BuildContext context, IconData icon, String text, {Color color = Colors.black}) {

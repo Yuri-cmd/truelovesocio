@@ -50,7 +50,12 @@ class _CreateEditPromocionViewState extends State<CreateEditPromocionView> {
     _isPickingImage = true;
     try {
       final picker = ImagePicker();
-      final XFile? pickedImage = await picker.pickImage(source: ImageSource.gallery);
+      // imageQuality fuerza a re-codificar la imagen como JPEG (evita subir HEIC
+      // crudo de iOS con el content-type falseado) y reduce el peso del archivo.
+      final XFile? pickedImage = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+      );
       if (pickedImage != null) {
         setState(() => _image = pickedImage);
       }
