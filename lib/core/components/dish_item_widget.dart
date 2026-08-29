@@ -73,6 +73,8 @@ class _DishItemWidgetState extends State<DishItemWidget> {
                       child: Image.network(
                         widget.imageUrl,
                         fit: BoxFit.cover,
+                        cacheWidth: 220,
+                        cacheHeight: 220,
                         errorBuilder: (context, error, stackTrace) => Image.asset(
                           'images/default.jpg',
                           fit: BoxFit.cover,

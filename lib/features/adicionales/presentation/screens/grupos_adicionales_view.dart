@@ -105,6 +105,14 @@ class _GrupoFormDialogState extends State<_GrupoFormDialog> {
     _maximoController = TextEditingController(text: (widget.grupo?.maximo ?? 1).toString());
   }
 
+  @override
+  void dispose() {
+    _nombreController.dispose();
+    _minimoController.dispose();
+    _maximoController.dispose();
+    super.dispose();
+  }
+
   Future<void> _submit() async {
     final nombre = _nombreController.text.trim();
     final minimo = int.tryParse(_minimoController.text) ?? 0;
@@ -187,6 +195,12 @@ class _GrupoCardState extends State<_GrupoCard> {
   final TextEditingController _precioController = TextEditingController();
 
   final controller = Get.find<AdicionalesController>();
+
+  @override
+  void dispose() {
+    _precioController.dispose();
+    super.dispose();
+  }
 
   Color _statusColor(String status) {
     switch (status) {

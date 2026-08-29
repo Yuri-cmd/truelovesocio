@@ -141,6 +141,8 @@ class _PromocionItem extends StatelessWidget {
                         ? Image.network(
                             promocion.imagen,
                             fit: BoxFit.cover,
+                            cacheWidth: 120,
+                            cacheHeight: 120,
                             errorBuilder: (context, error, stackTrace) => Container(
                               color: Colors.grey[200],
                               child: const Icon(Icons.broken_image, color: Colors.grey),

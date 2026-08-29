@@ -484,7 +484,10 @@ class CuotasView extends GetView<CuotasController> {
         ),
       )),
       isScrollControlled: true,
-    );
+    ).whenComplete(() {
+      montoCtrl.dispose();
+      operacionCtrl.dispose();
+    });
   }
 
   Widget _buildAccesoRestringidoBanner(BuildContext context) {

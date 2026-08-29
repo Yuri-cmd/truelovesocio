@@ -69,6 +69,14 @@ class PedidoProductosAgrupados extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Text(
+                  'Adicionales:',
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.bold,
+                    color: textColor?.withValues(alpha: 0.7),
+                  ),
+                ),
                 for (final adicional in adicionales) ...[
                   const SizedBox(height: 4),
                   _buildAdicional(adicional),

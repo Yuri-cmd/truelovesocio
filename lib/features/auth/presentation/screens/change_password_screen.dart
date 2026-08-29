@@ -19,6 +19,12 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   bool _isLoading = false;
   String _errorMessage = '';
 
+  @override
+  void dispose() {
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   void _changePassword() async {
     setState(() {
       _isLoading = true;

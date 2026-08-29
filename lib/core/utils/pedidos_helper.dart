@@ -16,7 +16,7 @@ class PedidosHelper {
 
   static Future<int?> mostrarDialogoTiempo(BuildContext context) async {
     final TextEditingController controller = TextEditingController();
-    return await Get.dialog<int>(
+    final result = await Get.dialog<int>(
       AlertDialog(
         title: const Text('Tiempo de preparación'),
         content: TextField(
@@ -43,6 +43,8 @@ class PedidosHelper {
         ],
       ),
     );
+    controller.dispose();
+    return result;
   }
 
   static Future<bool> mostrarAlertaConfirmacion(
@@ -212,7 +214,7 @@ class PedidosHelper {
     BuildContext context,
   ) async {
     final TextEditingController controller = TextEditingController();
-    return await Get.dialog<String>(
+    final result = await Get.dialog<String>(
       AlertDialog(
         title: const Text('Solicitar cancelación'),
         content: Column(
@@ -254,6 +256,8 @@ class PedidosHelper {
         ],
       ),
     );
+    controller.dispose();
+    return result;
   }
 
   static Future<void> solicitarCancelacionPedido({

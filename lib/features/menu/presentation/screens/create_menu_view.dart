@@ -29,6 +29,14 @@ class _CreateMenuViewState extends State<CreateMenuView> {
   bool _isSaving = false;
   bool _isPickingImage = false;
 
+  @override
+  void dispose() {
+    _tituloController.dispose();
+    _descripcionController.dispose();
+    _precioController.dispose();
+    super.dispose();
+  }
+
   Future<void> _pickImage() async {
     if (_isPickingImage) return;
     

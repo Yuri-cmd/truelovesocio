@@ -23,6 +23,13 @@ class _EmailVerifyScreenState extends State<EmailVerifyScreen> {
   String? _codigoCorrecto;
   bool _codeSent = false;
 
+  @override
+  void dispose() {
+    _inputController.dispose();
+    _codeController.dispose();
+    super.dispose();
+  }
+
   void _handleAction() async {
     setState(() {
       _isLoading = true;

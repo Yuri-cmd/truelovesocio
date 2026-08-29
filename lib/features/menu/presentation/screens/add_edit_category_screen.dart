@@ -21,6 +21,12 @@ class _AddEditCategoryScreenState extends State<AddEditCategoryScreen> {
 
   bool _isLoading = false;
 
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
   final List<String> _daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
   final Map<String, TimeOfDay?> _startTimes = {};

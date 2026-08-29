@@ -66,6 +66,14 @@ class PedidoProductosList extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const Text(
+                          'Adicionales:',
+                          style: TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black54,
+                          ),
+                        ),
                         for (var adicional in adicionales) ...[
                           const SizedBox(height: 4),
                           _buildAdicional(adicional),

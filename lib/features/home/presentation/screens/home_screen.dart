@@ -18,6 +18,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late PersistentTabController _controller;
   final AuthController authController = Get.find<AuthController>();
+  late final Worker _puedeAccederWorker;
   int _lastIndex = 0;
 
   @override
@@ -29,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _lastIndex = initialIndex;
 
     // Escuchar cambios en puedeAcceder para forzar el cambio de pestaña
-    ever(authController.puedeAcceder, (bool puede) {
+    _puedeAccederWorker = ever(authController.puedeAcceder, (bool puede) {
       if (!puede && _controller.index != 3) {
         Get.snackbar(
           "Acceso Restringido",
@@ -42,6 +43,13 @@ class _HomeScreenState extends State<HomeScreen> {
         _controller.index = 3;
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _puedeAccederWorker.dispose();
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
