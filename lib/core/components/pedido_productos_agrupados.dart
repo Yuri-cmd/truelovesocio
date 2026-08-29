@@ -66,26 +66,50 @@ class PedidoProductosAgrupados extends StatelessWidget {
         if (adicionales.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 4, left: 4),
-            child: Wrap(
-              spacing: 6,
-              runSpacing: 6,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (final adicional in adicionales)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: Colors.amber.shade100,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Text(
-                      adicional.nombre,
-                      style: const TextStyle(fontSize: 12.5, color: Colors.black87),
-                    ),
-                  ),
+                for (final adicional in adicionales) ...[
+                  const SizedBox(height: 4),
+                  _buildAdicional(adicional),
+                ],
               ],
             ),
           ),
       ],
+    );
+  }
+
+  Widget _buildAdicional(DetallePedido adicional) {
+    final precio = double.tryParse(adicional.precio) ?? 0.0;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: Colors.amber.shade100,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              adicional.nombre,
+              style: const TextStyle(fontSize: 12.5, color: Colors.black87),
+            ),
+          ),
+          if (precio > 0)
+            Text(
+              '+ S/ ${precio.toStringAsFixed(2)}',
+              style: const TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
