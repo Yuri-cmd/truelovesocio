@@ -1,7 +1,7 @@
 name: truelovesocio
 description: "Aplicación para gestión de pedidos y comercios Truelove"
 publish_to: 'none'
-version: 1.1.57+60
+version: 1.1.59+62 
 
 environment:
   sdk: ^3.7.0-207.0.dev
@@ -30,6 +30,7 @@ dependencies:
   get: ^4.7.3
   flutter_secure_storage: ^10.0.0
   printing: ^5.15.0
+  audioplayers: ^6.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -37,6 +38,9 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets: 
+  assets:
     - images/
-    # - assets/sounds/  <-- removed: use Android res/raw for custom notification sounds
+    # Se usa para el timbre en bucle de "pedido por aceptar" (order_alert_sound_service.dart).
+    # El sonido de la notificación del sistema sigue usando el mismo archivo desde
+    # Android res/raw (necesario para el canal de notificaciones nativo).
+    - assets/sounds/

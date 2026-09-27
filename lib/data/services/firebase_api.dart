@@ -8,8 +8,10 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:truelovesocio/core/storage/secure_storage.dart';
 import 'package:truelovesocio/data/services/auth_service.dart';
+import 'package:get/get.dart';
 import 'package:truelovesocio/data/services/misc_service.dart';
 import 'package:truelovesocio/data/models/socio_model.dart';
+import 'package:truelovesocio/features/orders/controllers/orders_controller.dart';
 
 String _getValidTitle(RemoteMessage message, String defaultTitle) {
   if (message.notification?.title != null && message.notification!.title!.isNotEmpty) {
@@ -241,6 +243,13 @@ class FirebaseApi {
   }
 
   Future<void> _showPedidoNotification(RemoteMessage message) async {
+    // No esperar a que pase el sondeo de 15s para que empiece el timbre en
+    // bucle de "por aceptar": si la pantalla de órdenes ya está abierta, se
+    // refresca al toque y OrdersController se encarga de empezar a sonar.
+    if (Get.isRegistered<OrdersController>()) {
+      Get.find<OrdersController>().loadActiveOrders();
+    }
+
     final vibrationPattern = Int64List.fromList([0, 200, 100, 200, 100, 200, 100, 400, 200, 400, 200, 400]);
     final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'pedidos_v3',

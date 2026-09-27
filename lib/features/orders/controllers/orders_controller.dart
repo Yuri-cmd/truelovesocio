@@ -2,13 +2,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:truelovesocio/data/models/pedido_model.dart';
+import 'package:truelovesocio/data/services/order_alert_sound_service.dart';
 import 'package:truelovesocio/data/services/order_service.dart';
 import 'package:truelovesocio/features/auth/controllers/auth_controller.dart';
 
 class OrdersController extends GetxController {
   final OrderService _orderService = Get.find<OrderService>();
   final AuthController _authController = Get.find<AuthController>();
-  
+  final OrderAlertSoundService _alertSound = OrderAlertSoundService();
+
   final pedidos = <Pedido>[].obs; // Historical/Filtered orders
   final activeOrders = <Pedido>[].obs; // Real-time active orders
   final isLoading = true.obs;
@@ -32,6 +34,7 @@ class OrdersController extends GetxController {
   @override
   void onClose() {
     _timer?.cancel();
+    _alertSound.stop();
     super.onClose();
   }
 
@@ -57,6 +60,15 @@ class OrdersController extends GetxController {
           final est = int.tryParse(p.estado) ?? 0;
           return (est >= 3 && est < 8) || est == 9;
         }).toList());
+
+        // Suena en bucle mientras quede algún pedido sin aceptar, y se detiene
+        // solo (sin importar por qué desapareció de la lista: aceptado,
+        // rechazado o cancelado por el cliente).
+        if (porAceptar.isNotEmpty) {
+          _alertSound.start();
+        } else {
+          _alertSound.stop();
+        }
       }
     } catch (e) {
       debugPrint('Error en loadActiveOrders: $e');
