@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:truelovesocio/data/services/firebase_api.dart';
 
 /// Timbre en bucle para pedidos "por aceptar": suena sin parar mientras haya
 /// al menos un pedido pendiente de aceptar, y se detiene en cuanto el socio
@@ -19,6 +21,11 @@ class OrderAlertSoundService {
   Future<void> start() async {
     if (_sonando) return;
     _sonando = true;
+    try {
+      // La app ya está abierta y suena el timbre propio: se apaga el de la
+      // notificación para que no suenen los dos a la vez.
+      await FlutterLocalNotificationsPlugin().cancel(kNewOrderNotificationId);
+    } catch (_) {}
     try {
       await _player.setReleaseMode(ReleaseMode.loop);
 
@@ -44,6 +51,10 @@ class OrderAlertSoundService {
   Future<void> stop() async {
     if (!_sonando) return;
     _sonando = false;
+    try {
+      // Si había una notificación de pedido sonando en bucle, se apaga también.
+      await FlutterLocalNotificationsPlugin().cancel(kNewOrderNotificationId);
+    } catch (_) {}
     try {
       await _player.stop();
     } catch (e) {

@@ -13,6 +13,14 @@ import 'package:truelovesocio/data/services/misc_service.dart';
 import 'package:truelovesocio/data/models/socio_model.dart';
 import 'package:truelovesocio/features/orders/controllers/orders_controller.dart';
 
+/// Id fijo de la notificación de "nuevo pedido": así un pedido nuevo reemplaza
+/// a la anterior (el timbre sigue sonando) y se puede cancelar al atenderlo.
+const int kNewOrderNotificationId = 4001;
+
+/// FLAG_INSISTENT de Android: repite el sonido hasta que se abre o descarta la
+/// notificación (o hasta que vence `timeoutAfter`).
+const int _kFlagInsistent = 4;
+
 String _getValidTitle(RemoteMessage message, String defaultTitle) {
   if (message.notification?.title != null && message.notification!.title!.isNotEmpty) {
     return message.notification!.title!;
@@ -92,8 +100,21 @@ Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
       ? null 
       : RawResourceAndroidNotificationSound(soundFile);
 
+  // Android reproduce un solo sonido de notificación a la vez: si llega otra
+  // mientras suena el timbre de pedido, lo corta. Por eso el pedido nuevo suena
+  // en bucle (insistent) y las demás notificaciones, mientras ese timbre siga
+  // activo, llegan en silencio.
+  final isPedido = soundFile == 'nuevo_pedido';
+  var silenciar = false;
+  if (!isPedido) {
+    try {
+      final activas = await androidPlugin?.getActiveNotifications();
+      silenciar = activas?.any((n) => n.id == kNewOrderNotificationId) ?? false;
+    } catch (_) {}
+  }
+
   await plugin.show(
-    DateTime.now().millisecondsSinceEpoch.remainder(100000),
+    isPedido ? kNewOrderNotificationId : DateTime.now().millisecondsSinceEpoch.remainder(100000),
     title,
     body,
     NotificationDetails(
@@ -103,8 +124,11 @@ Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
         importance: Importance.max,
         priority: Priority.max,
         sound: androidSound,
-        playSound: true,
-        enableVibration: true,
+        playSound: !silenciar,
+        enableVibration: !silenciar,
+        silent: silenciar,
+        additionalFlags: isPedido ? Int32List.fromList([_kFlagInsistent]) : null,
+        timeoutAfter: isPedido ? 120000 : null,
       ),
       iOS: DarwinNotificationDetails(
         presentAlert: true,
