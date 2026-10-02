@@ -58,7 +58,7 @@ Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
   final androidPlugin = plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
   await androidPlugin?.createNotificationChannel(
     const AndroidNotificationChannel(
-      'pedidos_v3',
+      'pedidos_v4',
       'Nuevos Pedidos',
       importance: Importance.max,
       sound: RawResourceAndroidNotificationSound('nuevo_pedido'),
@@ -80,7 +80,12 @@ Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
   final title = _getValidTitle(message, 'Nuevo Pedido');
   final body = _getValidBody(message, 'Tienes un nuevo pedido');
   String? soundFile = message.data['sound'];
-  final channelId = message.data['channel_id'] ?? 'pedidos_v3';
+  // El backend sigue mandando 'pedidos_v3' (apps viejas); aquí se redirige al
+  // canal nuevo, que se creó limpio con el sonido de pedido.
+  var channelId = message.data['channel_id'];
+  if (channelId == null || channelId.isEmpty || channelId == 'pedidos_v3') {
+    channelId = 'pedidos_v4';
+  }
   
   // Si sound es 'default' o vacío, null hará que use el sonido por defecto del sistema
   AndroidNotificationSound? androidSound = (soundFile == null || soundFile == 'default' || soundFile.isEmpty) 
@@ -207,7 +212,7 @@ class FirebaseApi {
 
   Future<void> _createNotificationChannels() async {
     final AndroidNotificationChannel pedidosChannelWithSound = const AndroidNotificationChannel(
-      'pedidos_v3',
+      'pedidos_v4',
       'Nuevos Pedidos',
       description: 'Notificaciones de nuevos pedidos con sonido personalizado',
       importance: Importance.max,
@@ -229,6 +234,9 @@ class FirebaseApi {
     );
 
     final androidPlugin = _flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    // Un canal ya creado no se puede modificar: el v3 quedó sin sonido en
+    // algunos teléfonos, por eso se reemplaza por v4.
+    await androidPlugin?.deleteNotificationChannel('pedidos_v3');
     await androidPlugin?.createNotificationChannel(pedidosChannelWithSound);
     await androidPlugin?.createNotificationChannel(generalChannel);
   }
@@ -252,7 +260,7 @@ class FirebaseApi {
 
     final vibrationPattern = Int64List.fromList([0, 200, 100, 200, 100, 200, 100, 400, 200, 400, 200, 400]);
     final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'pedidos_v3',
+      'pedidos_v4',
       'Nuevos Pedidos',
       importance: Importance.max,
       priority: Priority.max,
