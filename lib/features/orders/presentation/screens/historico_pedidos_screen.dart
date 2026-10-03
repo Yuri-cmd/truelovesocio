@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:truelovesocio/features/orders/controllers/orders_controller.dart';
 import 'package:truelovesocio/core/utils/helpers.dart';
 import 'package:truelovesocio/data/models/pedido_model.dart';
+import 'package:truelovesocio/features/orders/presentation/screens/ticket_preview_screen.dart';
 
 class HistoricoPedidosScreen extends GetView<OrdersController> {
   const HistoricoPedidosScreen({super.key});
@@ -322,7 +323,18 @@ class _PedidoItemState extends State<_PedidoItem> {
                         ),
                         Row(
                           children: [
-                            if (pedido.fotoPago.isNotEmpty && 
+                            IconButton.filledTonal(
+                              onPressed: () => Get.to(() => TicketPreviewScreen(pedidoId: pedido.id)),
+                              icon: const Icon(Icons.print_rounded, size: 20),
+                              tooltip: 'Ver / imprimir ticket',
+                              style: IconButton.styleFrom(
+                                backgroundColor: Colors.red.withAlpha(25),
+                                foregroundColor: Colors.red[700],
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            if (pedido.fotoPago.isNotEmpty &&
                                 pedido.fotoPago != 'null' && 
                                 pedido.fotoPago != '(Null)')
                               IconButton.filledTonal(

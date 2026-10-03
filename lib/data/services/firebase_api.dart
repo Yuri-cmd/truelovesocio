@@ -17,6 +17,11 @@ import 'package:truelovesocio/features/orders/controllers/orders_controller.dart
 /// a la anterior (el timbre sigue sonando) y se puede cancelar al atenderlo.
 const int kNewOrderNotificationId = 4001;
 
+/// Canal de pedidos. Usa el stream de alarma para que una notificación de otra
+/// app (p. ej. WhatsApp) no corte el timbre. Un canal no se puede modificar una
+/// vez creado: para cambiar sonido/atributos hay que subir la versión.
+const String kPedidosChannelId = 'pedidos_v5';
+
 /// FLAG_INSISTENT de Android: repite el sonido hasta que se abre o descarta la
 /// notificación (o hasta que vence `timeoutAfter`).
 const int _kFlagInsistent = 4;
@@ -66,10 +71,11 @@ Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
   final androidPlugin = plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
   await androidPlugin?.createNotificationChannel(
     const AndroidNotificationChannel(
-      'pedidos_v4',
+      kPedidosChannelId,
       'Nuevos Pedidos',
       importance: Importance.max,
       sound: RawResourceAndroidNotificationSound('nuevo_pedido'),
+      audioAttributesUsage: AudioAttributesUsage.alarm,
       enableVibration: true,
       playSound: true,
     ),
@@ -91,8 +97,8 @@ Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
   // El backend sigue mandando 'pedidos_v3' (apps viejas); aquí se redirige al
   // canal nuevo, que se creó limpio con el sonido de pedido.
   var channelId = message.data['channel_id'];
-  if (channelId == null || channelId.isEmpty || channelId == 'pedidos_v3') {
-    channelId = 'pedidos_v4';
+  if (channelId == null || channelId.isEmpty || channelId == 'pedidos_v3' || channelId == 'pedidos_v4') {
+    channelId = kPedidosChannelId;
   }
   
   // Si sound es 'default' o vacío, null hará que use el sonido por defecto del sistema
@@ -124,6 +130,7 @@ Future<void> firebaseBackgroundHandler(RemoteMessage message) async {
         importance: Importance.max,
         priority: Priority.max,
         sound: androidSound,
+        audioAttributesUsage: isPedido ? AudioAttributesUsage.alarm : AudioAttributesUsage.notification,
         playSound: !silenciar,
         enableVibration: !silenciar,
         silent: silenciar,
@@ -236,11 +243,12 @@ class FirebaseApi {
 
   Future<void> _createNotificationChannels() async {
     final AndroidNotificationChannel pedidosChannelWithSound = const AndroidNotificationChannel(
-      'pedidos_v4',
+      kPedidosChannelId,
       'Nuevos Pedidos',
       description: 'Notificaciones de nuevos pedidos con sonido personalizado',
       importance: Importance.max,
       sound: RawResourceAndroidNotificationSound('nuevo_pedido'),
+      audioAttributesUsage: AudioAttributesUsage.alarm,
       enableVibration: true,
       enableLights: true,
       ledColor: Color(0xFF00FF00),
@@ -261,6 +269,7 @@ class FirebaseApi {
     // Un canal ya creado no se puede modificar: el v3 quedó sin sonido en
     // algunos teléfonos, por eso se reemplaza por v4.
     await androidPlugin?.deleteNotificationChannel('pedidos_v3');
+    await androidPlugin?.deleteNotificationChannel('pedidos_v4');
     await androidPlugin?.createNotificationChannel(pedidosChannelWithSound);
     await androidPlugin?.createNotificationChannel(generalChannel);
   }
@@ -284,11 +293,14 @@ class FirebaseApi {
 
     final vibrationPattern = Int64List.fromList([0, 200, 100, 200, 100, 200, 100, 400, 200, 400, 200, 400]);
     final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
-      'pedidos_v4',
+      kPedidosChannelId,
       'Nuevos Pedidos',
       importance: Importance.max,
       priority: Priority.max,
       sound: const RawResourceAndroidNotificationSound('nuevo_pedido'),
+      audioAttributesUsage: AudioAttributesUsage.alarm,
+      additionalFlags: Int32List.fromList([_kFlagInsistent]),
+      timeoutAfter: 120000,
       playSound: true,
       enableVibration: true,
       vibrationPattern: vibrationPattern,
@@ -299,7 +311,7 @@ class FirebaseApi {
     );
 
     await _flutterLocalNotificationsPlugin.show(
-      DateTime.now().millisecondsSinceEpoch.remainder(100000),
+      kNewOrderNotificationId,
       _getValidTitle(message, '🛒 Nuevo Pedido'),
       _getValidBody(message, 'Tienes un nuevo pedido'),
       NotificationDetails(android: androidDetails),

@@ -16,16 +16,24 @@ class GruposAdicionalesView extends GetView<AdicionalesController> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FD),
       appBar: AppBar(
-        title: const Text('Grupos de Adicionales', style: TextStyle(fontWeight: FontWeight.w800)),
+        title: const Text(
+          'Grupos de Adicionales',
+          style: TextStyle(fontWeight: FontWeight.w800),
+        ),
         backgroundColor: Colors.red[700],
         foregroundColor: Colors.white,
         actions: [
-          IconButton(onPressed: () => controller.loadGrupos(), icon: const Icon(Icons.refresh_rounded)),
+          IconButton(
+            onPressed: () => controller.loadGrupos(),
+            icon: const Icon(Icons.refresh_rounded),
+          ),
         ],
       ),
       body: Obx(() {
         if (controller.isLoading.value && controller.grupos.isEmpty) {
-          return const Center(child: CircularProgressIndicator(color: Colors.red));
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.red),
+          );
         }
         if (controller.grupos.isEmpty) {
           return Center(
@@ -34,9 +42,18 @@ class GruposAdicionalesView extends GetView<AdicionalesController> {
               children: [
                 Icon(Icons.layers_outlined, size: 70, color: Colors.grey[300]),
                 const SizedBox(height: 12),
-                Text('No hay grupos de adicionales', style: TextStyle(color: Colors.grey[500], fontWeight: FontWeight.w600)),
+                Text(
+                  'No hay grupos de adicionales',
+                  style: TextStyle(
+                    color: Colors.grey[500],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text('Crea tu primer grupo para organizar tus adicionales', style: TextStyle(color: Colors.grey[400], fontSize: 12)),
+                Text(
+                  'Crea tu primer grupo para organizar tus adicionales',
+                  style: TextStyle(color: Colors.grey[400], fontSize: 12),
+                ),
               ],
             ),
           );
@@ -74,9 +91,12 @@ class GruposAdicionalesView extends GetView<AdicionalesController> {
   void _showCreateGrupoDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (_) => _GrupoFormDialog(
-        onSave: (nombre, minimo, maximo) => controller.createGrupo(nombre, minimo, maximo),
-      ),
+      builder:
+          (_) => _GrupoFormDialog(
+            onSave:
+                (nombre, minimo, maximo) =>
+                    controller.createGrupo(nombre, minimo, maximo),
+          ),
     );
   }
 }
@@ -101,8 +121,12 @@ class _GrupoFormDialogState extends State<_GrupoFormDialog> {
   void initState() {
     super.initState();
     _nombreController = TextEditingController(text: widget.grupo?.nombre ?? '');
-    _minimoController = TextEditingController(text: (widget.grupo?.minimo ?? 0).toString());
-    _maximoController = TextEditingController(text: (widget.grupo?.maximo ?? 1).toString());
+    _minimoController = TextEditingController(
+      text: (widget.grupo?.minimo ?? 0).toString(),
+    );
+    _maximoController = TextEditingController(
+      text: (widget.grupo?.maximo ?? 1).toString(),
+    );
   }
 
   @override
@@ -119,7 +143,9 @@ class _GrupoFormDialogState extends State<_GrupoFormDialog> {
     final maximo = int.tryParse(_maximoController.text) ?? 1;
 
     if (nombre.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('El nombre es requerido')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('El nombre es requerido')));
       return;
     }
 
@@ -139,7 +165,10 @@ class _GrupoFormDialogState extends State<_GrupoFormDialog> {
         children: [
           TextField(
             controller: _nombreController,
-            decoration: const InputDecoration(labelText: 'Nombre del grupo *', hintText: 'Ej: Elige tu salsa'),
+            decoration: const InputDecoration(
+              labelText: 'Nombre del grupo *',
+              hintText: 'Ej: Elige tu salsa',
+            ),
           ),
           const SizedBox(height: 12),
           Row(
@@ -148,7 +177,10 @@ class _GrupoFormDialogState extends State<_GrupoFormDialog> {
                 child: TextField(
                   controller: _minimoController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Mínimo', helperText: '0 = opcional'),
+                  decoration: const InputDecoration(
+                    labelText: 'Mínimo',
+                    helperText: '0 = opcional',
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
@@ -164,13 +196,27 @@ class _GrupoFormDialogState extends State<_GrupoFormDialog> {
         ],
       ),
       actions: [
-        TextButton(onPressed: _saving ? null : () => Navigator.of(context).pop(), child: const Text('Cancelar')),
+        TextButton(
+          onPressed: _saving ? null : () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
         ElevatedButton(
           onPressed: _saving ? null : _submit,
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.red[700], foregroundColor: Colors.white),
-          child: _saving
-              ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-              : Text(widget.grupo == null ? 'Crear Grupo' : 'Guardar'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red[700],
+            foregroundColor: Colors.white,
+          ),
+          child:
+              _saving
+                  ? const SizedBox(
+                    height: 16,
+                    width: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                  : Text(widget.grupo == null ? 'Crear Grupo' : 'Guardar'),
         ),
       ],
     );
@@ -249,7 +295,13 @@ class _GrupoCardState extends State<_GrupoCard> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.black.withAlpha(10)),
-        boxShadow: [BoxShadow(color: Colors.black.withAlpha(10), blurRadius: 8, offset: const Offset(0, 3))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(10),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         children: [
@@ -260,7 +312,12 @@ class _GrupoCardState extends State<_GrupoCard> {
               padding: const EdgeInsets.all(14),
               child: Row(
                 children: [
-                  Icon(_expanded ? Icons.expand_more_rounded : Icons.chevron_right_rounded, color: Colors.grey[500]),
+                  Icon(
+                    _expanded
+                        ? Icons.expand_more_rounded
+                        : Icons.chevron_right_rounded,
+                    color: Colors.grey[500],
+                  ),
                   const SizedBox(width: 4),
                   Expanded(
                     child: Column(
@@ -268,35 +325,72 @@ class _GrupoCardState extends State<_GrupoCard> {
                       children: [
                         Row(
                           children: [
-                            Flexible(child: Text(grupo.nombre, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15), overflow: TextOverflow.ellipsis)),
+                            Flexible(
+                              child: Text(
+                                grupo.nombre,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 15,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
                             const SizedBox(width: 6),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(20)),
-                              child: Text('${grupo.items.length} items', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700)),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                '${grupo.items.length} items',
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 2),
                         Text(
                           '${grupo.minimo == 0 ? 'Opcional' : 'Mínimo: ${grupo.minimo}'} | Máximo: ${grupo.maximo}',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
                         ),
                       ],
                     ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.edit_outlined, size: 20),
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (_) => _GrupoFormDialog(
-                        grupo: grupo,
-                        onSave: (nombre, minimo, maximo) => controller.updateGrupo(grupo, nombre: nombre, minimo: minimo, maximo: maximo),
-                      ),
-                    ),
+                    onPressed:
+                        () => showDialog(
+                          context: context,
+                          builder:
+                              (_) => _GrupoFormDialog(
+                                grupo: grupo,
+                                onSave:
+                                    (nombre, minimo, maximo) =>
+                                        controller.updateGrupo(
+                                          grupo,
+                                          nombre: nombre,
+                                          minimo: minimo,
+                                          maximo: maximo,
+                                        ),
+                              ),
+                        ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.delete_outline_rounded, size: 20, color: Colors.red),
+                    icon: const Icon(
+                      Icons.delete_outline_rounded,
+                      size: 20,
+                      color: Colors.red,
+                    ),
                     onPressed: () => _confirmDeleteGrupo(context),
                   ),
                   const Icon(Icons.drag_handle_rounded, color: Colors.grey),
@@ -314,7 +408,10 @@ class _GrupoCardState extends State<_GrupoCard> {
                   if (grupo.items.isEmpty)
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Text('Este grupo no tiene adicionales', style: TextStyle(color: Colors.grey[500], fontSize: 13)),
+                      child: Text(
+                        'Este grupo no tiene adicionales',
+                        style: TextStyle(color: Colors.grey[500], fontSize: 13),
+                      ),
                     )
                   else
                     ...grupo.items.map((item) => _buildItemRow(item)),
@@ -333,11 +430,14 @@ class _GrupoCardState extends State<_GrupoCard> {
                           label: const Text('Agregar existente'),
                         ),
                         OutlinedButton.icon(
-                          onPressed: () => setState(() {
-                            _creatingNew = true;
-                            _addingExisting = false;
-                          }),
-                          style: OutlinedButton.styleFrom(foregroundColor: Colors.green[700]),
+                          onPressed:
+                              () => setState(() {
+                                _creatingNew = true;
+                                _addingExisting = false;
+                              }),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.green[700],
+                          ),
                           icon: const Icon(Icons.add, size: 16),
                           label: const Text('Crear nuevo'),
                         ),
@@ -355,7 +455,10 @@ class _GrupoCardState extends State<_GrupoCard> {
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-      decoration: BoxDecoration(color: Colors.grey[50], borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Row(
         children: [
           Expanded(
@@ -364,22 +467,52 @@ class _GrupoCardState extends State<_GrupoCard> {
               children: [
                 Row(
                   children: [
-                    Flexible(child: Text(item.titulo, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13), overflow: TextOverflow.ellipsis)),
+                    Flexible(
+                      child: Text(
+                        item.titulo,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 13,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                     const SizedBox(width: 6),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                      decoration: BoxDecoration(color: _statusColor(item.status), borderRadius: BorderRadius.circular(20)),
-                      child: Text(_statusLabel(item.status), style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w700)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 1,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _statusColor(item.status),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        _statusLabel(item.status),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                Text('S/ ${item.precioGrupo.toStringAsFixed(2)}', style: TextStyle(color: Colors.green[700], fontWeight: FontWeight.w700, fontSize: 12)),
+                Text(
+                  'S/ ${item.precioGrupo.toStringAsFixed(2)}',
+                  style: TextStyle(
+                    color: Colors.green[700],
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                  ),
+                ),
               ],
             ),
           ),
           IconButton(
             icon: const Icon(Icons.close_rounded, size: 18, color: Colors.red),
-            onPressed: () => controller.removeItemFromGrupo(widget.grupo.id, item.id),
+            onPressed:
+                () => controller.removeItemFromGrupo(widget.grupo.id, item.id),
           ),
         ],
       ),
@@ -389,26 +522,51 @@ class _GrupoCardState extends State<_GrupoCard> {
   Widget _buildAddExistingForm() {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.grey[50], borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Seleccionar adicional existente', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+          const Text(
+            'Seleccionar adicional existente',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+          ),
           const SizedBox(height: 8),
           if (_loadingAvailable)
-            const Center(child: Padding(padding: EdgeInsets.all(8), child: CircularProgressIndicator(strokeWidth: 2)))
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.all(8),
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            )
           else if (_availableItems.isEmpty)
-            const Text('No hay adicionales disponibles. Crea uno nuevo.', style: TextStyle(fontSize: 12, color: Colors.grey))
+            const Text(
+              'No hay adicionales disponibles. Crea uno nuevo.',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            )
           else ...[
             DropdownButtonFormField<int>(
               initialValue: _selectedItemId,
               isExpanded: true,
               hint: const Text('Selecciona un adicional'),
-              items: _availableItems
-                  .map((i) => DropdownMenuItem(value: i.id, child: Text('${i.titulo} - S/ ${i.precio}', overflow: TextOverflow.ellipsis)))
-                  .toList(),
+              items:
+                  _availableItems
+                      .map(
+                        (i) => DropdownMenuItem(
+                          value: i.id,
+                          child: Text(
+                            '${i.titulo} - S/ ${i.precio}',
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      )
+                      .toList(),
               onChanged: (val) {
-                final item = _availableItems.firstWhereOrNull((i) => i.id == val);
+                final item = _availableItems.firstWhereOrNull(
+                  (i) => i.id == val,
+                );
                 setState(() {
                   _selectedItemId = val;
                   _precioController.text = item?.precio ?? '';
@@ -418,25 +576,46 @@ class _GrupoCardState extends State<_GrupoCard> {
             const SizedBox(height: 8),
             TextField(
               controller: _precioController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(labelText: 'Precio en este grupo', isDense: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              decoration: const InputDecoration(
+                labelText: 'Precio en este grupo',
+                isDense: true,
+              ),
             ),
             const SizedBox(height: 10),
             Row(
               children: [
                 ElevatedButton(
-                  onPressed: _selectedItemId == null
-                      ? null
-                      : () async {
-                          final precio = double.tryParse(_precioController.text.replaceAll(',', '.')) ?? 0;
-                          final ok = await controller.addItemToGrupo(widget.grupo.id, _selectedItemId!, precio);
-                          if (ok && mounted) setState(() => _addingExisting = false);
-                        },
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[600], foregroundColor: Colors.white),
+                  onPressed:
+                      _selectedItemId == null
+                          ? null
+                          : () async {
+                            final precio =
+                                double.tryParse(
+                                  _precioController.text.replaceAll(',', '.'),
+                                ) ??
+                                0;
+                            final ok = await controller.addItemToGrupo(
+                              widget.grupo.id,
+                              _selectedItemId!,
+                              precio,
+                            );
+                            if (ok && mounted)
+                              setState(() => _addingExisting = false);
+                          },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue[600],
+                    foregroundColor: Colors.white,
+                  ),
                   child: const Text('Agregar'),
                 ),
                 const SizedBox(width: 8),
-                TextButton(onPressed: () => setState(() => _addingExisting = false), child: const Text('Cancelar')),
+                TextButton(
+                  onPressed: () => setState(() => _addingExisting = false),
+                  child: const Text('Cancelar'),
+                ),
               ],
             ),
           ],
@@ -448,36 +627,59 @@ class _GrupoCardState extends State<_GrupoCard> {
   Widget _buildCreateNewForm() {
     return Container(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(color: Colors.green[50], borderRadius: BorderRadius.circular(10)),
+      decoration: BoxDecoration(
+        color: Colors.green[50],
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Crear nuevo adicional', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+          const Text(
+            'Crear nuevo adicional',
+            style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+          ),
           const SizedBox(height: 8),
           ElevatedButton.icon(
             onPressed: () async {
               final result = await showDialog<bool>(
                 context: context,
-                builder: (_) => CreateEditAdicionalDialog(
-                  onSave: (titulo, descripcion, precio) async {
-                    final ok = await controller.createAdicional(titulo, descripcion, precio);
-                    if (ok) {
-                      final creado = controller.adicionales.firstWhereOrNull((a) => a.titulo == titulo);
-                      if (creado != null) {
-                        await controller.addItemToGrupo(widget.grupo.id, creado.id, precio);
-                      }
-                    }
-                    return ok;
-                  },
-                ),
+                builder:
+                    (_) => CreateEditAdicionalDialog(
+                      onSave: (titulo, descripcion, precio) async {
+                        final ok = await controller.createAdicional(
+                          titulo,
+                          descripcion,
+                          precio,
+                        );
+                        if (ok) {
+                          final creado = controller.adicionales
+                              .firstWhereOrNull((a) => a.titulo == titulo);
+                          if (creado != null) {
+                            await controller.addItemToGrupo(
+                              widget.grupo.id,
+                              creado.id,
+                              precio,
+                            );
+                          }
+                        }
+                        return ok;
+                      },
+                    ),
               );
-              if (result == true && mounted) setState(() => _creatingNew = false);
+              if (result == true && mounted)
+                setState(() => _creatingNew = false);
             },
             icon: const Icon(Icons.add, size: 16),
             label: const Text('Abrir formulario'),
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green[700], foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green[700],
+              foregroundColor: Colors.white,
+            ),
           ),
-          TextButton(onPressed: () => setState(() => _creatingNew = false), child: const Text('Cancelar')),
+          TextButton(
+            onPressed: () => setState(() => _creatingNew = false),
+            child: const Text('Cancelar'),
+          ),
         ],
       ),
     );
@@ -486,21 +688,27 @@ class _GrupoCardState extends State<_GrupoCard> {
   void _confirmDeleteGrupo(BuildContext context) {
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('¿Eliminar grupo?'),
-        content: Text('Se eliminará el grupo "${widget.grupo.nombre}" y todas sus relaciones con productos.'),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cancelar')),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              controller.deleteGrupo(widget.grupo.id);
-            },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Eliminar'),
+      builder:
+          (_) => AlertDialog(
+            title: const Text('¿Eliminar grupo?'),
+            content: Text(
+              'Se eliminará el grupo "${widget.grupo.nombre}" y todas sus relaciones con productos.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Cancelar'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  controller.deleteGrupo(widget.grupo.id);
+                },
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: const Text('Eliminar'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }
