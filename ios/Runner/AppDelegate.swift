@@ -2,14 +2,47 @@ import Flutter
 import UIKit
 import Photos
 import UserNotifications
+import FirebaseMessaging
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
+  /// Token APNs guardado: iOS lo entrega al arrancar, antes de que Dart
+  /// inicialice Firebase, y en ese momento Firebase lo descarta.
+  private var apnsTokenGuardado: Data?
+
+  /// Reaplica el token guardado a Firebase (ya inicializado desde Dart).
+  private func reaplicarApnsToken() -> String {
+    guard let token = apnsTokenGuardado else { return "sin token guardado" }
+    Messaging.messaging().apnsToken = token
+    return Messaging.messaging().apnsToken != nil ? "OK" : "nil"
+  }
+
+  override func application(
+    _ application: UIApplication,
+    didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+  ) {
+    apnsTokenGuardado = deviceToken
+    // iOS entrega el token, pero no llega a Firebase: se lo pasamos a mano.
+    Messaging.messaging().apnsToken = deviceToken
+    print("📲 [APNs] Token recibido exitosamente de Apple (\(deviceToken.count) bytes)")
+    super.application(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
+  }
+
+  override func application(
+    _ application: UIApplication,
+    didFailToRegisterForRemoteNotificationsWithError error: Error
+  ) {
+    let e = error as NSError
+    print("❌ [APNs] Error registrando en Apple: \(e.domain) \(e.code) - \(e.localizedDescription)")
+    super.application(application, didFailToRegisterForRemoteNotificationsWithError: error)
+  }
+
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     UNUserNotificationCenter.current().delegate = self
+    application.registerForRemoteNotifications()
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
@@ -37,6 +70,8 @@ import UserNotifications
           }
 
           self?.saveImageToGallery(path: path, result: result)
+        } else if call.method == "reaplicarApnsToken" {
+          result(self?.reaplicarApnsToken() ?? "sin AppDelegate")
         } else {
           result(FlutterMethodNotImplemented)
         }

@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'dart:developer';
 import 'dart:typed_data';
 import 'dart:io';
@@ -165,25 +166,49 @@ class FirebaseApi {
         criticalAlert: true,
       );
 
-      String? token = await _firebaseMessaging.getToken();
-      if (token != null) {
-        log("✅ Token FCM obtenido: $token");
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token_fcm', token);
-        
-        final userJson = await SecureStorage.getUser();
-        if (userJson != null) {
-          final socio = Socio.fromJson(jsonDecode(userJson));
-          await AuthService().updateFcmToken(socio.id, token);
-        }
-      }
-
       if (Platform.isIOS) {
         await _firebaseMessaging.setForegroundNotificationPresentationOptions(
           alert: true,
           badge: true,
           sound: true,
         );
+
+        // iOS entrega el token APNs al arrancar, antes de que Firebase esté listo
+        // y se pierde: se vuelve a aplicar desde el AppDelegate ya con Firebase iniciado.
+        try {
+          final r = await const MethodChannel('app.channel.documents').invokeMethod('reaplicarApnsToken');
+          log('🔁 Reaplicar token APNs a Firebase: $r');
+        } catch (e) {
+          log('🔁 No se pudo reaplicar el token APNs: $e');
+        }
+
+        // En iOS, es necesario verificar que el APNs token esté disponible antes de pedir getToken()
+        String? apnsToken = await _firebaseMessaging.getAPNSToken();
+        if (apnsToken == null) {
+          // Reintentar brevemente por si está demorando la conexión con Apple APNs
+          await Future.delayed(const Duration(seconds: 2));
+          apnsToken = await _firebaseMessaging.getAPNSToken();
+        }
+
+        if (apnsToken == null) {
+          log("⚠️ [iOS] APNs token no está disponible (Simulador o falta Push Capability en Xcode). Se omite getToken().");
+        }
+      }
+
+      // Solo pedir FCM token en Android o si en iOS ya tenemos el APNs Token
+      if (!Platform.isIOS || (await _firebaseMessaging.getAPNSToken()) != null) {
+        String? token = await _firebaseMessaging.getToken();
+        if (token != null) {
+          log("✅ Token FCM obtenido: $token");
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token_fcm', token);
+          
+          final userJson = await SecureStorage.getUser();
+          if (userJson != null) {
+            final socio = Socio.fromJson(jsonDecode(userJson));
+            await AuthService().updateFcmToken(socio.id, token);
+          }
+        }
       }
 
       const AndroidInitializationSettings androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');

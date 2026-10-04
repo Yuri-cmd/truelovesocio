@@ -27,9 +27,10 @@ Future<void> main() async {
     if (e.code != 'duplicate-app') rethrow;
   }
 
-  await FirebaseApi().initNotifications();
-
   runApp(const MyApp());
+
+  // No bloquear el arranque: en iOS el permiso/token APNs puede tardar o colgarse.
+  FirebaseApi().initNotifications();
 }
 
 class MyApp extends StatefulWidget {
