@@ -8,6 +8,7 @@ import 'package:truelovesocio/core/components/pedido_productos_agrupados.dart';
 import 'package:truelovesocio/core/utils/helpers.dart';
 import 'package:truelovesocio/core/utils/pedidos_helper.dart';
 import 'package:truelovesocio/features/orders/presentation/screens/ticket_preview_screen.dart';
+import 'package:truelovesocio/features/orders/presentation/widgets/imprimir_ticket.dart';
 import 'package:path_provider/path_provider.dart';
 
 class PedidoCard extends StatefulWidget {
@@ -194,10 +195,23 @@ class _PedidoCardState extends State<PedidoCard> {
                 IconButton(
                   onPressed: () => Get.to(() => TicketPreviewScreen(pedidoId: widget.pedido.id)),
                   icon: const Icon(Icons.receipt_long_outlined),
-                  tooltip: 'Ver / imprimir comprobante',
+                  tooltip: 'Ver comprobante (PDF)',
                   visualDensity: VisualDensity.compact,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
+                ),
+                const SizedBox(width: 12),
+                GestureDetector(
+                  // Mantener presionado: cambiar de impresora.
+                  onLongPress: () => elegirImpresora(context),
+                  child: IconButton(
+                    onPressed: () => imprimirTicket(context, widget.pedido),
+                    icon: const Icon(Icons.print_rounded),
+                    tooltip: 'Imprimir ticket (mantén presionado para cambiar de impresora)',
+                    visualDensity: VisualDensity.compact,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Chip(
