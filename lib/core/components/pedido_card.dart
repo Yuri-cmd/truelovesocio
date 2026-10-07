@@ -189,6 +189,16 @@ class _PedidoCardState extends State<PedidoCard> {
                             ),
                           ),
                         ),
+                      // Dentro del Wrap: un estado largo ("Motorizado llegó al domicilio") baja de
+                      // línea en vez de dejar sin ancho a los badges de #pedido y tiempo.
+                      Chip(
+                        label: Text(
+                          obtenerEstado(int.tryParse(widget.pedido.estado) ?? 0),
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                        backgroundColor: obtenerColorEstado(int.tryParse(widget.pedido.estado) ?? 0),
+                        visualDensity: VisualDensity.compact,
+                      ),
                     ],
                   ),
                 ),
@@ -212,14 +222,6 @@ class _PedidoCardState extends State<PedidoCard> {
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Chip(
-                  label: Text(
-                    obtenerEstado(int.tryParse(widget.pedido.estado) ?? 0),
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  backgroundColor: obtenerColorEstado(int.tryParse(widget.pedido.estado) ?? 0),
                 ),
               ],
             ),
