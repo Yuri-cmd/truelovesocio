@@ -37,6 +37,9 @@ class Pedido {
   final String? fechaInicio;
   final String? fechaHoraInicio;
   bool cancelacionSolicitudPendiente;
+  /// Con motorizado asignado (o ya recogido) el local solo puede solicitar la
+  /// cancelación. Null si el servidor es antiguo y no lo envía.
+  final bool? requiereSolicitudCancelacion;
 
   Pedido({
     required this.id,
@@ -74,6 +77,7 @@ class Pedido {
     this.fechaInicio,
     this.fechaHoraInicio,
     this.cancelacionSolicitudPendiente = false,
+    this.requiereSolicitudCancelacion,
   });
 
   factory Pedido.fromJson(Map<String, dynamic> json) {
@@ -116,6 +120,7 @@ class Pedido {
       fechaInicio: json['fecha_inicio'],
       fechaHoraInicio: json['fecha_hora_inicio'],
       cancelacionSolicitudPendiente: json['cancelacion_solicitud_pendiente'] == true,
+      requiereSolicitudCancelacion: json['requiere_solicitud_cancelacion'] as bool?,
       detalleArray:
           (json['detalleArray'] as List<dynamic>?)
                ?.map((item) => DetallePedido.fromJson(item))

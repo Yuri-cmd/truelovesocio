@@ -490,10 +490,7 @@ class _PedidoCardState extends State<PedidoCard> {
                         _debeDeshabilitarBotonCancelar()
                             ? null
                             : () async {
-                                final estadoActual = int.tryParse(widget.pedido.estado) ?? 0;
-                                final yaFueRecogido = estadoActual >= 5 && estadoActual <= 7;
-
-                                if (yaFueRecogido) {
+                                if (_requiereSolicitudCancelacion()) {
                                   if (!context.mounted) return;
                                   PedidosHelper.solicitarCancelacionPedido(
                                     context: context,
@@ -519,7 +516,7 @@ class _PedidoCardState extends State<PedidoCard> {
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
                     icon: const Icon(Icons.cancel, color: Colors.white),
                     label: Text(
-                      (int.tryParse(widget.pedido.estado) ?? 0) >= 5 && (int.tryParse(widget.pedido.estado) ?? 0) <= 7
+                      _requiereSolicitudCancelacion()
                           ? 'Solicitar cancelación'
                           : 'Cancelar',
                       style: const TextStyle(color: Colors.white),
@@ -549,10 +546,16 @@ class _PedidoCardState extends State<PedidoCard> {
     if (widget.pedido.cancelacionSolicitudPendiente) {
       return 'Solicitud de cancelación pendiente de aprobación';
     }
-    if (estado >= 5 && estado <= 7) {
-      return 'El pedido ya fue recogido: solicita la cancelación con una justificación';
+    if (_requiereSolicitudCancelacion()) {
+      return 'El pedido ya tiene motorizado asignado: solicita la cancelación con una justificación';
     }
     return 'Cancelar pedido';
+  }
+
+  /// Con motorizado asignado (o ya recogido) no se cancela directo: se solicita.
+  bool _requiereSolicitudCancelacion() {
+    final estado = int.tryParse(widget.pedido.estado) ?? 0;
+    return widget.pedido.requiereSolicitudCancelacion ?? (estado >= 5 && estado <= 7);
   }
 
   Widget infoRow(BuildContext context, IconData icon, String text, {Color color = Colors.black}) {
