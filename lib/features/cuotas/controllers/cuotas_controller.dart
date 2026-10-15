@@ -36,6 +36,8 @@ class CuotasController extends GetxController {
 
     isLoading.value = true;
     try {
+      await _authController.actualizarEstadoAcceso(); // Resincronizar estado de acceso en cada carga
+
       final results = await Future.wait([
         _cuotaService.getCuotaActiva(user.id),
         _cuotaService.getMiPeriodoActual(user.id),
@@ -111,8 +113,7 @@ class CuotasController extends GetxController {
             ),
             barrierDismissible: false,
           );
-          loadAllData(); // Recargar datos de cuotas
-          _authController.actualizarEstadoAcceso(); // Refrescar estado de acceso
+          await loadAllData(); // Recargar datos de cuotas y resincronizar estado de acceso
           return true;
         } else {
           Get.snackbar(
